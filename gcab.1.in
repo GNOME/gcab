@@ -1,0 +1,26 @@
+.TH GCAB "1" "December 2012" "@PACKAGE@ @VERSION@"
+.SH NAME
+gcab \- Program to create Microsoft cabinet (.cab) archives
+.SH SYNOPSIS
+.B gcab
+[\fIOPTION\fR]... \fICABFILE\fR \fIFILES...\fR
+.SH DESCRIPTION
+.PP
+Create the cabinet file CABFILE from the list of FILES.
+.SH OPTIONS
+.TP
+\fB\-n, --nopath\fR
+create files without pathnames
+.TP
+\fB\-v, --verbose\fR
+verbosely list files processed
+.TP
+\fB\-z, --zip\fR
+use zip compression
+.SH AUTHOR
+Written by Marc-André Lureau <marcandre.lureau@gmail.com>.
+
+.SH "SEE ALSO"
+.TP
+\fBcabextract\fR(1)
+program to extract files from Microsoft cabinet (.cab) archives

@@ -1,0 +1,8 @@
+LIBGCAB1_0.0 {
+    global:
+        gcab_file_get_type;
+        gcab_file_new;
+        gcab_file_add;
+        gcab_file_save;
+        gcab_compression_get_type;
+};
