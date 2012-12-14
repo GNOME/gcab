@@ -129,11 +129,6 @@ gcab_file_update_info (GCabFile *self, GFileInfo *info)
         ((m->tm_mon+1) << 5 ) + (m->tm_mday);
     self->cfile.time = (m->tm_hour << 11) + (m->tm_min << 5) + (m->tm_sec / 2);
 
-    /* if (cfiles->len != 0) { */
-    /*     cfile_t *prevf = &g_array_index (cfiles, cfile_t, cfiles->len - 1); */
-    /*     self->cfile.uoffset = prevf->uoffset + prevf->usize; */
-    /* } */
-
     return TRUE;
 }
 

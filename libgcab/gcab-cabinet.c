@@ -218,9 +218,15 @@ gcab_cabinet_write (GCabCabinet *self,
     if (cfolder_write (&folder, out, error) == -1)
         return FALSE;
 
-    /* for (i = 0; i < cfiles->len; ++i) */
-    /*     if (cfile_write (&g_array_index (cfiles, cfile_t, i), out, error) == -1) */
-    /*         return FALSE; */
+    cfile_t *prevf = NULL;
+    g_hash_table_iter_init (&iter, cabfolder->files);
+    while (g_hash_table_iter_next (&iter, NULL, (gpointer*)&file)) {
+        file->cfile.uoffset = prevf ? prevf->uoffset + prevf->usize : 0;
+        prevf = &file->cfile;
+
+        if (cfile_write (&file->cfile, out, error) == -1)
+            return FALSE;
+    }
 
     return TRUE;
 
