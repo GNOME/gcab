@@ -114,7 +114,8 @@ main (int argc, char *argv[])
         gcab_error ("No files to be archived.");
 
     GFile *outputfile = g_file_new_for_commandline_arg (args[0]);
-    GOutputStream *output = G_OUTPUT_STREAM (g_file_create (outputfile, 0, NULL, &error));
+    GOutputStream *output = G_OUTPUT_STREAM (g_file_replace (outputfile, NULL, FALSE,
+                                                             0, NULL, &error));
     if (error)
         gcab_error ("Can't create cab file %s: %s", args[0], error->message);
 
