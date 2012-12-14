@@ -70,7 +70,6 @@ struct cfile
     u2 time;
     u2 fattr;
     gchar *name;
-    GFile *file;
 };
 
 struct cdata

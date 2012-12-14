@@ -35,31 +35,13 @@ G_BEGIN_DECLS
 typedef struct _GCabFileClass GCabFileClass;
 typedef struct _GCabFile GCabFile;
 
-typedef enum
-{
-    GCAB_COMPRESSION_NONE = 0,
-    GCAB_COMPRESSION_MSZIP = 1,
-} GCabCompression;
-
-typedef void (*GCabFileSaveCallback) (GFile *current, gpointer data);
+typedef void (*GCabFileCallback) (GCabFile *current, gpointer data);
 
 GType gcab_file_get_type (void) G_GNUC_CONST;
 
-GCabFile *      gcab_file_new                 (void);
-gboolean        gcab_file_add                 (GCabFile *cabfile,
-                                               GFile *file,
-                                               const gchar *name,
-                                               gboolean recurse,
-                                               GCancellable *cancellable,
-                                               GError **error);
-gboolean        gcab_file_save                (GCabFile *cabfile,
-                                               GOutputStream *stream,
-                                               GCabCompression compression,
-                                               GCabFileSaveCallback file_callback,
-                                               GFileProgressCallback progress_callback,
-                                               gpointer callback_data,
-                                               GCancellable *cancellable,
-                                               GError **error);
+GCabFile *      gcab_file_new_with_file             (const gchar *name, GFile *file);
+GFile *         gcab_file_get_file                  (GCabFile *file);
+const gchar *   gcab_file_get_name                  (GCabFile *file);
 
 G_END_DECLS
 

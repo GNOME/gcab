@@ -1,6 +1,5 @@
 #include <zlib.h>
-#include "gcab-file.h"
-#include "cabinet.h"
+#include "gcab-priv.h"
 
 static voidpf
 zalloc (voidpf opaque, uInt items, uInt size)
@@ -47,7 +46,7 @@ cdata_set (cdata_t *cd, int type, guint8 *data, size_t size)
 #define W(data, count) \
     g_output_stream_write (out, data, count, NULL, error)
 
-gssize
+G_GNUC_INTERNAL gssize
 cheader_write (cheader_t *ch, GOutputStream *out, GError **error)
 {
     ch->versionMIN = 3;
@@ -71,7 +70,7 @@ cheader_write (cheader_t *ch, GOutputStream *out, GError **error)
     return 4 + 4 + 4 + 4 + 4 + 4 + 1 + 1 + 2 + 2 + 2 + 2 + 2;
 }
 
-gssize
+G_GNUC_INTERNAL gssize
 cfolder_write (cfolder_t *cf, GOutputStream *out, GError **error)
 {
     if ((W (&cf->offsetdata, 4) == -1) ||
@@ -83,7 +82,7 @@ cfolder_write (cfolder_t *cf, GOutputStream *out, GError **error)
 }
 
 
-gssize
+G_GNUC_INTERNAL gssize
 cfile_write (cfile_t *cf, GOutputStream *out, GError **error)
 {
     const gchar *name = cf->name;
@@ -102,7 +101,7 @@ cfile_write (cfile_t *cf, GOutputStream *out, GError **error)
 
 typedef unsigned long int CHECKSUM;
 
-CHECKSUM
+static CHECKSUM
 compute_checksum (guint8 *in, u2 ncbytes, CHECKSUM seed)
 {
     int no_ulongs;
@@ -134,7 +133,7 @@ compute_checksum (guint8 *in, u2 ncbytes, CHECKSUM seed)
     return csum;
 }
 
-gssize
+G_GNUC_INTERNAL gssize
 cdata_write(cdata_t *cd, GOutputStream *out, int type, guint8 *data, size_t size, GError **error)
 {
     cdata_set(cd, type, data, size);

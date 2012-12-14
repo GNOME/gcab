@@ -20,6 +20,8 @@
 #ifndef _LIBGCAB_H_
 #define _LIBGCAB_H_
 
+#include <libgcab/gcab-cabinet.h>
 #include <libgcab/gcab-file.h>
+#include <libgcab/gcab-folder.h>
 
 #endif /* _LIBGCAB_H_ */

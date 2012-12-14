@@ -1,8 +1,17 @@
 LIBGCAB1_0.0 {
     global:
-        gcab_file_get_type;
-        gcab_file_new;
-        gcab_file_add;
-        gcab_file_save;
+        gcab_cabinet_add_folder;
+        gcab_cabinet_get_folders;
+        gcab_cabinet_get_type;
+        gcab_cabinet_new;
+        gcab_cabinet_write;
         gcab_compression_get_type;
+        gcab_file_get_file;
+        gcab_file_get_name;
+        gcab_file_get_type;
+        gcab_file_new_with_file;
+        gcab_folder_add_file;
+        gcab_folder_get_nfiles;
+        gcab_folder_get_type;
+        gcab_folder_new;
 };
