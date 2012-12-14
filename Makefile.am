@@ -27,6 +27,7 @@ libgcab_1_0_la_SOURCES =			\
 	libgcab/gcab-folder.h			\
 	libgcab/gcab-file.c			\
 	libgcab/gcab-file.h			\
+	libgcab/gcab-priv.h			\
 	libgcab/cabinet.c			\
 	libgcab/cabinet.h			\
 	$(NULL)
@@ -83,10 +84,10 @@ GCab_1_0_gir_INCLUDES = GObject-2.0 GLib-2.0 Gio-2.0
 GCab_1_0_gir_LIBS = libgcab-1.0.la
 GCab_1_0_gir_FILES =				\
 	$(top_srcdir)/libgcab.h			\
-	$(top_srcdir)/libgcab/gcab-folder.h	\
-	$(top_srcdir)/libgcab/gcab-file.h	\
 	$(top_srcdir)/libgcab/gcab-cabinet.h	\
 	$(top_srcdir)/libgcab/gcab-enums.h	\
+	$(top_srcdir)/libgcab/gcab-file.h	\
+	$(top_srcdir)/libgcab/gcab-folder.h	\
 	$(NULL)
 GCab_1_0_gir_EXPORT_PACKAGES = libgcab-1.0
 GCab_1_0_gir_SCANNERFLAGS =			\
