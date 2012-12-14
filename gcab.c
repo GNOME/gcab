@@ -92,8 +92,7 @@ main (int argc, char *argv[])
     if (args[1] == NULL)
         gcab_error ("please specify input files.");
 
-    GCabFolder *folder = gcab_folder_new ();
-    g_object_set (folder, "compression", compress ? GCAB_COMPRESSION_MSZIP : 0, NULL);
+    GCabFolder *folder = gcab_folder_new (compress ? GCAB_COMPRESSION_MSZIP : 0);
 
     for (i = 1; args[i]; i++) {
         GFile *file = g_file_new_for_commandline_arg (args[i]);

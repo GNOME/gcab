@@ -44,7 +44,7 @@ typedef enum
 
 GType gcab_folder_get_type (void) G_GNUC_CONST;
 
-GCabFolder *    gcab_folder_new               (void);
+GCabFolder *    gcab_folder_new               (GCabCompression compression);
 gboolean        gcab_folder_add_file          (GCabFolder *cabfolder,
                                                GCabFile *cabfile,
                                                gboolean recurse,

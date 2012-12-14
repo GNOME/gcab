@@ -200,11 +200,14 @@ gcab_folder_get_nfiles (GCabFolder *self)
 
 /**
  * gcab_folder_new:
+ * @compression: compression used by the folder
  *
  * Returns: a new #GCabFolder
  **/
 GCabFolder *
-gcab_folder_new (void)
+gcab_folder_new (GCabCompression compression)
 {
-    return g_object_new (GCAB_TYPE_FOLDER, NULL);
+    return g_object_new (GCAB_TYPE_FOLDER,
+                         "compression", compression,
+                         NULL);
 }
