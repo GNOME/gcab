@@ -44,4 +44,12 @@ AT_CHECK([cabextract -ql out.cab | tail -n+3 |  cut -d'|' -f3], [0],
 cp test.txt expout
 AT_CHECK([cabextract -q out.cab], [0])
 AT_CHECK([cat test.txt], [0], [expout])
+#compressed
+AT_CHECK_GCAB([-z out.cab test.txt])
+AT_CHECK([cabextract -ql out.cab | tail -n+3 |  cut -d'|' -f3], [0],
+[ test.txt
+])
+cp test.txt expout
+AT_CHECK([cabextract -q out.cab], [0])
+AT_CHECK([cat test.txt], [0], [expout])
 AT_CLEANUP
