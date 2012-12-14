@@ -16,6 +16,14 @@ LT_INIT([win32-dll disable-fast-install])
 PKG_PROG_PKG_CONFIG
 GOBJECT_INTROSPECTION_CHECK([0.9.4])
 
+AM_MISSING_PROG([AUTOM4TE], [autom4te])
+AC_CONFIG_TESTDIR([.])
+AC_CONFIG_FILES([atlocal])
+AC_CONFIG_FILES([tests/package.m4.tmp:tests/package.m4.in],
+                [$srcdir/build-aux/move-if-change tests/package.m4.tmp $srcdir/tests/package.m4
+                 cp $srcdir/tests/package.m4 tests/package.m4.tmp])
+
+
 AM_PROG_VALAC([0.14])
 AC_PATH_PROG(VAPIGEN, vapigen, no)
 if test "x$VAPIGEN" == "xno"; then

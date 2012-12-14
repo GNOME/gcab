@@ -1,5 +1,7 @@
 NULL =
 BUILT_SOURCES =
+CLEANFILES =
+DISTCLEANFILES =
 ACLOCAL_AMFLAGS = -I m4
 AM_MAKEFLAGS = --no-print-directory
 
@@ -101,7 +103,7 @@ gir_DATA = GCab-1.0.gir
 typelibdir = $(libdir)/girepository-1.0
 typelib_DATA = $(INTROSPECTION_GIRS:.gir=.typelib)
 
-CLEANFILES = $(gir_DATA) $(typelib_DATA)
+CLEANFILES += $(gir_DATA) $(typelib_DATA)
 
 vapidir = $(datadir)/vala/vapi
 vapi_DATA = libgcab-1.0.vapi
@@ -117,6 +119,27 @@ libgcab-1.0.vapi: GCab-1.0.gir
 		$<
 
 CLEANFILES += libgcab-1.0.vapi
+
+# Autotest support
+
+TESTSUITE = $(srcdir)/tests/testsuite
+EXTRA_DIST += tests/testsuite.at $(srcdir)/tests/package.m4 $(TESTSUITE)
+DISTCLEANFILES += atconfig
+CLEANFILES += testsuite.log
+
+check-local: $(TESTSUITE) atconfig
+	builddir=`pwd` && \
+		$(SHELL) $(TESTSUITE) AUTOTEST_PATH=$$builddir $(TESTSUITEFLAGS)
+
+installcheck-local: $(TESTSUITE) atconfig
+	$(SHELL) $(TESTSUITE) AUTOTEST_PATH=$(bindir) $(TESTSUITEFLAGS)
+
+clean-local:
+	-$(SHELL) $(TESTSUITE) --clean
+
+$(TESTSUITE): tests/testsuite.at tests/package.m4
+	$(AUTOM4TE) --language=autotest -I$(builddir)/tests -o $@.tmp $@.at
+	mv $@.tmp $@
 
 MAINTAINERCLEANFILES =						\
 	$(srcdir)/INSTALL					\
