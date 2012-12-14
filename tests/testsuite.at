@@ -22,3 +22,14 @@ m4_include([package.m4])
 AT_INIT
 # Cannot use AT_TESTED because of $EXEEXT (Autotest bug)
 
+AT_BANNER([gcab])
+
+# AT_CHECK_... - add exeext automatically
+m4_define([AT_CHECK_GCAB], [
+AT_CHECK([_gcab ]$@)])
+
+AT_SETUP([Invalid command line])
+AT_CHECK_GCAB([], [1], [ignore], [ignore])
+AT_CHECK_GCAB([out.cab], [1], [ignore], [ignore])
+AT_CHECK([test -f out.cab], [1])
+AT_CLEANUP
