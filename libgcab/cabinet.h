@@ -80,9 +80,25 @@ struct cdata
     guint8 data[DATABLOCKSIZE*2];
 };
 
-gssize cheader_write (cheader_t *ch, GOutputStream *out, GError **error);
-gssize cfolder_write (cfolder_t *cf, GOutputStream *out, GError **error);
-gssize cdata_write (cdata_t *cd, GOutputStream *out, int type, guint8 *data, size_t size, GError **error);
-gssize cfile_write (cfile_t *cf, GOutputStream *out, GError **error);
+gboolean     cheader_write                      (cheader_t *ch,
+                                                 GDataOutputStream *out,
+                                                 GCancellable *cancellable,
+                                                 GError **error);
+gboolean     cfolder_write                      (cfolder_t *cf,
+                                                 GDataOutputStream *out,
+                                                 GCancellable *cancellable,
+                                                 GError **error);
+gboolean     cdata_write                        (cdata_t *cd,
+                                                 GDataOutputStream *out,
+                                                 int type,
+                                                 guint8 *data,
+                                                 size_t size,
+                                                 gsize *bytes_written,
+                                                 GCancellable *cancellable,
+                                                 GError **error);
+gboolean     cfile_write                        (cfile_t *cf,
+                                                 GDataOutputStream *out,
+                                                 GCancellable *cancellable,
+                                                 GError **error);
 
 #endif /* CABINET_H */

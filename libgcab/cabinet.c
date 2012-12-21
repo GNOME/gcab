@@ -43,60 +43,64 @@ cdata_set (cdata_t *cd, int type, guint8 *data, size_t size)
     }
 }
 
-#define W(data, count) \
-    g_output_stream_write (out, data, count, NULL, error)
+#define W1(val) \
+    g_data_output_stream_put_byte (out, val, cancellable, error)
+#define W2(val) \
+    g_data_output_stream_put_uint16 (out, val, cancellable, error)
+#define W4(val) \
+    g_data_output_stream_put_uint32 (out, val, cancellable, error)
+#define WS(val) \
+    g_data_output_stream_put_string (out, val, cancellable, error)
 
-G_GNUC_INTERNAL gssize
-cheader_write (cheader_t *ch, GOutputStream *out, GError **error)
+G_GNUC_INTERNAL gboolean
+cheader_write (cheader_t *ch, GDataOutputStream *out,
+               GCancellable *cancellable, GError **error)
 {
-    ch->versionMIN = 3;
-    ch->versionMAJ = 1;
+    if (!W1 ('M') || !W1 ('S') || !W1 ('C') || !W1 ('F') ||
+        !W4 (ch->res1) ||
+        !W4 (ch->size) ||
+        !W4 (ch->res2) ||
+        !W4 (ch->offsetfiles) ||
+        !W4 (ch->res3) ||
+        !W1 (ch->versionMIN = 3) ||
+        !W1 (ch->versionMAJ = 1) ||
+        !W2 (ch->nfolders) ||
+        !W2 (ch->nfiles) ||
+        !W2 (ch->flags) ||
+        !W2 (ch->setID) ||
+        !W2 (ch->cabID))
+        return FALSE;
 
-    if ((W ("MSCF", 4) == -1) ||
-        (W (&ch->res1, 4) == -1) ||
-        (W (&ch->size, 4) == -1) ||
-        (W (&ch->res2, 4) == -1) ||
-        (W (&ch->offsetfiles, 4) == -1) ||
-        (W (&ch->res3, 4) == -1) ||
-        (W (&ch->versionMIN, 1) == -1) ||
-        (W (&ch->versionMAJ, 1) == -1) ||
-        (W (&ch->nfolders, 2) == -1) ||
-        (W (&ch->nfiles, 2) == -1) ||
-        (W (&ch->flags, 2) == -1) ||
-        (W (&ch->setID, 2) == -1) ||
-        (W (&ch->cabID, 2) == -1))
-        return -1;
-
-    return 4 + 4 + 4 + 4 + 4 + 4 + 1 + 1 + 2 + 2 + 2 + 2 + 2;
+    return TRUE;
 }
 
-G_GNUC_INTERNAL gssize
-cfolder_write (cfolder_t *cf, GOutputStream *out, GError **error)
+G_GNUC_INTERNAL gboolean
+cfolder_write (cfolder_t *cf, GDataOutputStream *out,
+               GCancellable *cancellable, GError **error)
 {
-    if ((W (&cf->offsetdata, 4) == -1) ||
-        (W (&cf->ndatab, 2) == -1) ||
-        (W (&cf->typecomp, 2) == -1))
-        return -1;
+    if ((!W4 (cf->offsetdata)) ||
+        (!W2 (cf->ndatab)) ||
+        (!W2 (cf->typecomp)))
+        return FALSE;
 
-    return 4 + 2 + 2;
+    return TRUE;
 }
 
 
-G_GNUC_INTERNAL gssize
-cfile_write (cfile_t *cf, GOutputStream *out, GError **error)
+G_GNUC_INTERNAL gboolean
+cfile_write (cfile_t *cf, GDataOutputStream *out,
+             GCancellable *cancellable, GError **error)
 {
-    const gchar *name = cf->name;
+    if ((!W4 (cf->usize)) ||
+        (!W4 (cf->uoffset)) ||
+        (!W2 (cf->index)) ||
+        (!W2 (cf->date)) ||
+        (!W2 (cf->time)) ||
+        (!W2 (cf->fattr)) ||
+        (!WS (cf->name) || !W1 (0)))
+        return FALSE;
 
-    if ((W (&cf->usize, 4) == -1) ||
-        (W (&cf->uoffset, 4) == -1) ||
-        (W (&cf->index, 2) == -1) ||
-        (W (&cf->date, 2) == -1) ||
-        (W (&cf->time, 2) == -1) ||
-        (W (&cf->fattr, 2) == -1) ||
-        (W (name, strlen (name) + 1) == -1))
-        return -1;
-
-    return 4 + 4 + 2 + 2 + 2 + 2 + strlen (name) + 1;
+    return TRUE;
 }
 
 typedef unsigned long int CHECKSUM;
@@ -133,18 +137,25 @@ compute_checksum (guint8 *in, u2 ncbytes, CHECKSUM seed)
     return csum;
 }
 
-G_GNUC_INTERNAL gssize
-cdata_write(cdata_t *cd, GOutputStream *out, int type, guint8 *data, size_t size, GError **error)
+G_GNUC_INTERNAL gboolean
+cdata_write (cdata_t *cd, GDataOutputStream *out, int type,
+             guint8 *data, size_t size, gsize *bytes_written,
+             GCancellable *cancellable, GError **error)
 {
     cdata_set(cd, type, data, size);
     CHECKSUM datacsum = compute_checksum(cd->data, cd->ncbytes, 0);
     cd->checksum = compute_checksum ((guint8*)&cd->ncbytes, 4, datacsum);
+    GOutputStream *stream = g_filter_output_stream_get_base_stream (G_FILTER_OUTPUT_STREAM (out));
 
-    if ((W (&cd->checksum, 4) == -1) ||
-        (W (&cd->ncbytes, 2) == -1) ||
-        (W (&cd->nubytes, 2) == -1) ||
-        (W (cd->data, cd->ncbytes) == -1))
-        return -1;
+    *bytes_written = 0;
 
-    return 4 + 2 + 2 + cd->ncbytes;
+    if ((!W4 (cd->checksum)) ||
+        (!W2 (cd->ncbytes)) ||
+        (!W2 (cd->nubytes)) ||
+        (g_output_stream_write (stream, cd->data, cd->ncbytes, cancellable, error) == -1))
+        return FALSE;
+
+    *bytes_written = 4 + 2 + 2 + cd->ncbytes;
+
+    return TRUE;
 }

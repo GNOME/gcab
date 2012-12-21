@@ -147,6 +147,12 @@ gcab_cabinet_write (GCabCabinet *self,
     GCabFolder *cabfolder = g_ptr_array_index (self->folders, 0);
     GCabFile *file;
     gsize nfiles = gcab_folder_get_nfiles (cabfolder);
+    GInputStream *in = NULL;
+    GDataOutputStream *dstream = NULL;
+    gboolean success = FALSE;
+
+    dstream = g_data_output_stream_new (out);
+    g_data_output_stream_set_byte_order (dstream, G_DATA_STREAM_BYTE_ORDER_LITTLE_ENDIAN);
 
     size_t sumstr = 0;
     g_hash_table_iter_init (&iter, cabfolder->files);
@@ -159,62 +165,53 @@ gcab_cabinet_write (GCabCabinet *self,
 
     if (!g_seekable_seek (G_SEEKABLE (out), folder.offsetdata,
                           G_SEEK_SET, NULL, error))
-        return FALSE;
-
+        goto end;
     gssize len, offset = 0;
     cdata_t block = { 0, };
     guint8 data[DATABLOCKSIZE];
-
+    gsize written;
     g_hash_table_iter_init (&iter, cabfolder->files);
     while (g_hash_table_iter_next (&iter, NULL, (gpointer*)&file)) {
         if (file_callback)
             file_callback (file, callback_data);
 
-        GInputStream *in = G_INPUT_STREAM (g_file_read (file->file, cancellable, error));
-        if (*error) {
-            g_object_unref (in);
-            return FALSE;
-        }
+        in = G_INPUT_STREAM (g_file_read (file->file, cancellable, error));
+        if (*error)
+            goto end;
 
         while ((len = g_input_stream_read (in,
                                            &data[offset], DATABLOCKSIZE - offset,
                                            cancellable, error)) == (DATABLOCKSIZE - offset)) {
-            ssize_t written = cdata_write (&block, out, folder.typecomp, data, DATABLOCKSIZE, error);
+            if (!cdata_write (&block, dstream, folder.typecomp, data, DATABLOCKSIZE, &written, cancellable, error))
+                goto end;
             header.size += written;
             offset = 0;
         }
 
-        if (len == -1) {
-            g_object_unref (in);
-            return FALSE;
-        }
+        if (len == -1)
+            goto end;
 
         offset += len;
-        g_object_unref (in);
     }
     if (offset != 0) {
-        ssize_t written = cdata_write (&block, out, folder.typecomp, data, offset, error);
-        if (written == -1)
-            return FALSE;
+        if (!cdata_write (&block, dstream, folder.typecomp, data, offset, &written, cancellable, error))
+            goto end;
         header.size += written;
     }
 
-    if (!g_output_stream_flush (out, cancellable, error))
-        return FALSE;
-
     if (!g_seekable_seek (G_SEEKABLE (out), 0,
                           G_SEEK_SET, cancellable, error))
-        return FALSE;
+        goto end;
 
     header.nfiles = nfiles;
     header.size += CFI_START + nfiles * 16; /* 1st part cfile struct = 16 bytes */
     header.size += sumstr;
 
-    if (cheader_write (&header, out, error) == -1)
-        return FALSE;
+    if (!cheader_write (&header, dstream, cancellable, error))
+        goto end;
 
-    if (cfolder_write (&folder, out, error) == -1)
-        return FALSE;
+    if (!cfolder_write (&folder, dstream, cancellable, error))
+        goto end;
 
     cfile_t *prevf = NULL;
     g_hash_table_iter_init (&iter, cabfolder->files);
@@ -222,12 +219,15 @@ gcab_cabinet_write (GCabCabinet *self,
         file->cfile.uoffset = prevf ? prevf->uoffset + prevf->usize : 0;
         prevf = &file->cfile;
 
-        if (cfile_write (&file->cfile, out, error) == -1)
-            return FALSE;
+        if (!cfile_write (&file->cfile, dstream, cancellable, error))
+            goto end;
     }
 
-    return TRUE;
+    success = TRUE;
 
+end:
+    g_clear_object (&dstream);
+    g_clear_object (&in);
 }
 
 /**
