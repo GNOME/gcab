@@ -148,8 +148,8 @@ add_file_info (GCabFolder *self, GCabFile *file, GFileInfo *info,
 
 /**
  * gcab_folder_add_file:
- * @cabfile: a #GCabfile
- * @file: file to be added
+ * @cabfolder: a #GCabFolder
+ * @cabfile: file to be added
  * @recurse: whether to recurse through subdirectories
  * @cancellable: (allow-none): optional #GCancellable object,
  *     %NULL to ignore
@@ -186,7 +186,7 @@ gcab_folder_add_file (GCabFolder *self, GCabFile *file,
 
 /**
  * gcab_folder_get_nfiles:
- * @folder: a #GCabFolder
+ * @cabfolder: a #GCabFolder
  *
  * Returns: Number of files in this @folder.
  **/

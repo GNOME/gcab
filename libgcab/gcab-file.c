@@ -160,7 +160,7 @@ gcab_file_get_name (GCabFile *self)
  * gcab_file_get_file:
  * @file: a #GCabFile
  *
- * Returns: the associated #GFile or %NULL
+ * Returns: (transfer full): the associated #GFile or %NULL
  **/
 GFile *
 gcab_file_get_file (GCabFile *self)

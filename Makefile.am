@@ -90,6 +90,10 @@ GCab_1_0_gir_FILES =				\
 	$(top_srcdir)/libgcab/gcab-enums.h	\
 	$(top_srcdir)/libgcab/gcab-file.h	\
 	$(top_srcdir)/libgcab/gcab-folder.h	\
+	$(top_srcdir)/libgcab/gcab-cabinet.c	\
+	$(top_srcdir)/libgcab/gcab-enums.c	\
+	$(top_srcdir)/libgcab/gcab-file.c	\
+	$(top_srcdir)/libgcab/gcab-folder.c	\
 	$(NULL)
 GCab_1_0_gir_EXPORT_PACKAGES = libgcab-1.0
 GCab_1_0_gir_SCANNERFLAGS =			\

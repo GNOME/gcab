@@ -94,11 +94,9 @@ gcab_cabinet_add_folder (GCabCabinet *self,
 
 /**
  * gcab_cabinet_get_folders:
- * @cabinet:
+ * @cabinet:a #GCabCabinet
  *
- *
- *
- * Returns:
+ * Returns: (element-type GCabFolder) (transfer full): an array of #GCabFolder
  **/
 GPtrArray *
 gcab_cabinet_get_folders (GCabCabinet *self)
@@ -111,7 +109,7 @@ gcab_cabinet_get_folders (GCabCabinet *self)
 /**
  * gcab_cabinet_write:
  * @cabinet: a #GCabCabinet
- * @out: a #GOutputStream also #GSeekable
+ * @stream: a #GOutputStream also #GSeekable
  * @file_callback: (allow-none) (scope call): report current file being saved
  * @progress_callback: (allow-none) (scope call): report saving progress
  * @callback_data: (closure): user data to pass to callbacks
