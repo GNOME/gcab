@@ -16,6 +16,15 @@ LT_INIT([win32-dll disable-fast-install])
 PKG_PROG_PKG_CONFIG
 GOBJECT_INTROSPECTION_CHECK([0.9.4])
 
+# i18 support
+IT_PROG_INTLTOOL(0.40.0)
+
+GETTEXT_PACKAGE=AC_PACKAGE_NAME
+AC_SUBST(GETTEXT_PACKAGE)
+AC_DEFINE_UNQUOTED([GETTEXT_PACKAGE],["$GETTEXT_PACKAGE"],[The name of the gettext domain])
+AM_GNU_GETTEXT([external])
+AM_GNU_GETTEXT_VERSION([0.17])
+
 AM_MISSING_PROG([AUTOM4TE], [autom4te])
 AC_CONFIG_TESTDIR([.])
 AC_CONFIG_FILES([atlocal])
@@ -44,6 +53,7 @@ AC_OUTPUT([
   Makefile
   gcab.1
   libgcab-1.0.pc
+  po/Makefile.in
 ])
 
 AC_MSG_NOTICE([

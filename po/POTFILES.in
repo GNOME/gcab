@@ -1,0 +1,4 @@
+gcab.c
+libgcab/gcab-cabinet.c
+libgcab/gcab-file.c
+libgcab/gcab-folder.c

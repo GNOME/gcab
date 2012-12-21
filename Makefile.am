@@ -5,9 +5,12 @@ DISTCLEANFILES =
 ACLOCAL_AMFLAGS = -I m4
 AM_MAKEFLAGS = --no-print-directory
 
+SUBDIRS = po
+
 AM_CPPFLAGS =					\
         -I$(top_srcdir)				\
         -DG_LOG_DOMAIN=\"gcab\"			\
+	-DLOCALEDIR="\"$(datadir)/locale\""	\
 	$(NULL)
 
 AM_LDFLAGS = -lz $(GLIB2_LIBS)

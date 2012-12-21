@@ -3,6 +3,8 @@
 #include <stdlib.h>
 #include <libgcab.h>
 #include <glib/gprintf.h>
+#include <locale.h>
+#include <glib/gi18n.h>
 
 static void
 gcab_error (const gchar *format, ...)
@@ -75,7 +77,11 @@ main (int argc, char *argv[])
         { NULL }
     };
 
-    g_type_init ();
+    setlocale (LC_ALL, "");
+    textdomain (GETTEXT_PACKAGE);
+    bindtextdomain (GETTEXT_PACKAGE, LOCALEDIR);
+    bind_textdomain_codeset (GETTEXT_PACKAGE, "UTF-8");
+
     g_set_prgname (PACKAGE_NAME);
 
     context = g_option_context_new (_("- create a Cabinet file"));
