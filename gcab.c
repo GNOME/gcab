@@ -50,7 +50,7 @@ remove_leading_path (gchar *name)
         gchar c = name[i];
 
         name[i] = '\0';
-        g_warning ("Removing leading '%s' from member names", name);
+        g_warning (_("Removing leading '%s' from member names"), name);
         name[i] = c;
     }
 
@@ -68,29 +68,35 @@ main (int argc, char *argv[])
     int nopath = 0;
     int compress = 0;
     GOptionEntry entries[] = {
-        { "verbose", 'v', 0, G_OPTION_ARG_NONE, &verbose, "Be verbose", NULL },
-        { "zip", 'z', 0, G_OPTION_ARG_NONE, &compress, "Use zip compression", NULL },
-        { "nopath", 'n', 0, G_OPTION_ARG_NONE, &nopath, "Do not include path", NULL },
-        { G_OPTION_REMAINING, '\0', 0, G_OPTION_ARG_FILENAME_ARRAY, &args, NULL, "FILE INPUT_FILES..." },
+        { "verbose", 'v', 0, G_OPTION_ARG_NONE, &verbose, N_("Be verbose"), NULL },
+        { "zip", 'z', 0, G_OPTION_ARG_NONE, &compress, N_("Use zip compression"), NULL },
+        { "nopath", 'n', 0, G_OPTION_ARG_NONE, &nopath, N_("Do not include path"), NULL },
+        { G_OPTION_REMAINING, '\0', 0, G_OPTION_ARG_FILENAME_ARRAY, &args, NULL, N_("FILE INPUT_FILES...") },
         { NULL }
     };
 
     g_type_init ();
     g_set_prgname (PACKAGE_NAME);
 
-    context = g_option_context_new ("- create a Cabinet file");
-    g_option_context_set_description (context, "Report bugs to <" PACKAGE_BUGREPORT ">");
-    g_option_context_add_main_entries (context, entries, NULL);
+    context = g_option_context_new (_("- create a Cabinet file"));
+    gchar *s = g_strdup_printf (_("Report bugs to <%s>"), PACKAGE_BUGREPORT);
+    g_option_context_set_description (context, s);
+    g_free(s);
+    g_option_context_set_summary (context, "\
+gcab saves many files together into a cabinet archive.\
+");
+    g_option_context_add_main_entries (context, entries, GETTEXT_PACKAGE);
+    g_option_context_set_translation_domain (context, GETTEXT_PACKAGE);
     if (!g_option_context_parse (context, &argc, &argv, &error))
-        gcab_error ("option parsing failed: %s\n", error->message);
+        gcab_error (_("option parsing failed: %s\n"), error->message);
     g_option_context_free(context);
 
 
     if (!args || args[0] == NULL)
-        gcab_error ("output cabinet file must be specified.");
+        gcab_error (_("output cabinet file must be specified."));
 
     if (args[1] == NULL)
-        gcab_error ("please specify input files.");
+        gcab_error (_("please specify input files."));
 
     GCabFolder *folder = gcab_folder_new (compress ? GCAB_COMPRESSION_MSZIP : 0);
 
@@ -101,7 +107,7 @@ main (int argc, char *argv[])
                                  remove_leading_path (name), file);
 
         if (!gcab_folder_add_file (folder, cabfile, TRUE, NULL, &error)) {
-            g_warning ("Can't add file %s: %s", args[i], error->message);
+            g_warning (_("Can't add file %s: %s"), args[i], error->message);
             g_clear_error (&error);
         }
 
@@ -111,18 +117,18 @@ main (int argc, char *argv[])
     }
 
     if (gcab_folder_get_nfiles (folder) == 0)
-        gcab_error ("No files to be archived.");
+        gcab_error (_("no files to be archived."));
 
     GFile *outputfile = g_file_new_for_commandline_arg (args[0]);
     GOutputStream *output = G_OUTPUT_STREAM (g_file_replace (outputfile, NULL, FALSE,
                                                              0, NULL, &error));
     if (error)
-        gcab_error ("Can't create cab file %s: %s", args[0], error->message);
+        gcab_error (_("can't create cab file %s: %s"), args[0], error->message);
 
     GFile *cwd = g_file_new_for_commandline_arg (".");
     GCabCabinet *cabinet = gcab_cabinet_new ();
     if (!gcab_cabinet_add_folder (cabinet, folder, &error))
-        gcab_error ("Can't add folder to cabinet: %s", args[0], error->message);
+        gcab_error (_("can't add folder to cabinet: %s"), args[0], error->message);
 
     if (!gcab_cabinet_write (cabinet, output,
                              file_callback,
@@ -130,7 +136,7 @@ main (int argc, char *argv[])
                              cwd,
                              NULL,
                              &error))
-        gcab_error ("Can't write cab file %s: %s", args[0], error->message);
+        gcab_error (_("can't write cab file %s: %s"), args[0], error->message);
 
     g_object_unref (cabinet);
     g_object_unref (cwd);
