@@ -54,6 +54,7 @@ AC_OUTPUT([
   gcab.1
   libgcab-1.0.pc
   po/Makefile.in
+  libgcab/Makefile
 ])
 
 AC_MSG_NOTICE([

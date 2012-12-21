@@ -5,7 +5,7 @@ DISTCLEANFILES =
 ACLOCAL_AMFLAGS = -I m4
 AM_MAKEFLAGS = --no-print-directory
 
-SUBDIRS = po
+SUBDIRS = po libgcab
 
 AM_CPPFLAGS =					\
         -I$(top_srcdir)				\
@@ -149,6 +149,7 @@ $(TESTSUITE): tests/testsuite.at tests/package.m4
 	mv $@.tmp $@
 
 MAINTAINERCLEANFILES =						\
+	$(srcdir)/ABOUT-NLS					\
 	$(srcdir)/INSTALL					\
 	$(srcdir)/aclocal.m4					\
 	$(srcdir)/autoscan.log					\
@@ -161,8 +162,19 @@ MAINTAINERCLEANFILES =						\
 	$(srcdir)/depcomp					\
 	$(srcdir)/install-sh					\
 	$(srcdir)/ltmain.sh					\
+	$(srcdir)/m4/*.m4					\
 	$(srcdir)/missing					\
 	$(srcdir)/mkinstalldirs					\
+	$(srcdir)/po/Makevars.template				\
+	$(srcdir)/po/Rules-quot					\
+	$(srcdir)/po/boldquot.sed				\
+	$(srcdir)/po/en@boldquot.header				\
+	$(srcdir)/po/en@quot.header				\
+	$(srcdir)/po/insert-header.sin				\
+	$(srcdir)/po/quot.sed					\
+	$(srcdir)/po/remove-potcdate.sin			\
+	$(srcdir)/tests/package.m4				\
+	$(srcdir)/tests/testsuite				\
 	`find "$(srcdir)" -type f -name Makefile.in -print`	\
 	$(NULL)
 
