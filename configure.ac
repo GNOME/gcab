@@ -15,10 +15,9 @@ AC_PROG_INSTALL
 LT_INIT([win32-dll disable-fast-install])
 PKG_PROG_PKG_CONFIG
 GOBJECT_INTROSPECTION_CHECK([0.9.4])
+AM_CONDITIONAL([GIR], [test "x$INTROSPECTION_MAKEFILE" != x])
 
-# i18 support
 IT_PROG_INTLTOOL(0.40.0)
-
 GETTEXT_PACKAGE=AC_PACKAGE_NAME
 AC_SUBST(GETTEXT_PACKAGE)
 AC_DEFINE_UNQUOTED([GETTEXT_PACKAGE],["$GETTEXT_PACKAGE"],[The name of the gettext domain])
@@ -35,10 +34,8 @@ AC_CONFIG_FILES([tests/package.m4.tmp:tests/package.m4.in],
 
 AM_PROG_VALAC([0.14])
 AC_PATH_PROG(VAPIGEN, vapigen, no)
-if test "x$VAPIGEN" == "xno"; then
-  AC_MSG_ERROR([Cannot find the "vapigen" binary in your PATH])
-fi
 AC_SUBST(VAPIGEN)
+AM_CONDITIONAL([VAPI], [test "x$VAPIGEN" != xno])
 
 GLIB_MKENUMS=`$PKG_CONFIG --variable=glib_mkenums glib-2.0`
 AC_SUBST(GLIB_MKENUMS)

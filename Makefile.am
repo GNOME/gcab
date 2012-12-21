@@ -13,7 +13,6 @@ AM_CPPFLAGS =					\
 	-DLOCALEDIR="\"$(datadir)/locale\""	\
 	$(NULL)
 
-AM_LDFLAGS = -lz $(GLIB2_LIBS)
 AM_CFLAGS = $(GLIB2_CFLAGS)
 
 libgcab_includedir = $(includedir)/libgcab-1.0
@@ -36,6 +35,7 @@ libgcab_1_0_la_SOURCES =			\
 	libgcab/cabinet.c			\
 	libgcab/cabinet.h			\
 	$(NULL)
+libgcab_1_0_la_LIBADD = -lz $(GLIB2_LIBS)
 libgcab_1_0_la_LDFLAGS =				\
 	-version-info 0:0:0				\
 	-export-symbols-regex='^gcab_'			\
@@ -76,6 +76,7 @@ EXTRA_DIST =					\
 	libgcab/gcab-enums.h.etemplate		\
 	$(NULL)
 
+if GIR
 INTROSPECTION_SCANNER_ARGS = --warn-all
 
 -include $(INTROSPECTION_MAKEFILE)
@@ -112,6 +113,7 @@ typelib_DATA = $(INTROSPECTION_GIRS:.gir=.typelib)
 
 CLEANFILES += $(gir_DATA) $(typelib_DATA)
 
+if VAPI
 vapidir = $(datadir)/vala/vapi
 vapi_DATA = libgcab-1.0.vapi
 
@@ -126,6 +128,8 @@ libgcab-1.0.vapi: GCab-1.0.gir
 		$<
 
 CLEANFILES += libgcab-1.0.vapi
+endif # VAPI
+endif # GIR
 
 # Autotest support
 
