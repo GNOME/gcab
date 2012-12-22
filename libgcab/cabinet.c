@@ -43,6 +43,98 @@ cdata_set (cdata_t *cd, int type, guint8 *data, size_t size)
     }
 }
 
+static char *
+_data_input_stream_read_until (GDataInputStream  *stream,
+                               const gchar        *stop_chars,
+                               gsize              stop_len,
+                               GCancellable       *cancellable,
+                               GError            **error)
+{
+  GBufferedInputStream *bstream;
+  gchar *result;
+
+  bstream = G_BUFFERED_INPUT_STREAM (stream);
+
+  result = g_data_input_stream_read_upto (stream, stop_chars, stop_len,
+                                          NULL, cancellable, error);
+
+  /* If we're not at end of stream then we have a stop_char to consume. */
+  if (result != NULL && g_buffered_input_stream_get_available (bstream) > 0)
+    {
+      gsize res;
+      gchar b;
+
+      res = g_input_stream_read (G_INPUT_STREAM (stream), &b, 1, NULL, NULL);
+      g_assert (res == 1);
+    }
+
+  return result;
+}
+
+#define R1(val) G_STMT_START{                                           \
+    val = g_data_input_stream_read_byte (in, cancellable, error);       \
+    if (*error)                                                         \
+        goto end;                                                       \
+}G_STMT_END
+#define R2(val) G_STMT_START{                                           \
+    val = g_data_input_stream_read_uint16 (in, cancellable, error);     \
+    if (*error)                                                         \
+        goto end;                                                       \
+}G_STMT_END
+#define R4(val) G_STMT_START{                                           \
+    val = g_data_input_stream_read_uint32 (in, cancellable, error);     \
+    if (*error)                                                         \
+        goto end;                                                       \
+}G_STMT_END
+#define RS(val) G_STMT_START{                                   \
+    val = _data_input_stream_read_until (in, "\0", 1,           \
+                                         cancellable, error);   \
+    if (*error)                                                 \
+        goto end;                                               \
+}G_STMT_END
+#define RN(buff, size) G_STMT_START{                             \
+    if (size) {                                                         \
+        g_input_stream_read (G_INPUT_STREAM (in), buff, size, cancellable, error); \
+        if (*error)                                                     \
+            goto end;                                                   \
+    }                                                                   \
+}G_STMT_END
+
+static void
+hexdump (guchar *p, gsize s)
+{
+    gsize i;
+
+    for (i = 0; i < s; i++) {
+        if (i != 0) {
+            if (i % 16 == 0)
+                g_printerr ("\n");
+            else if (i % 8 == 0)
+                g_printerr ("  ");
+            else
+                g_printerr (" ");
+        }
+
+        if (i % 16 == 0)
+            g_printerr ("%.8x  ", i);
+
+        g_printerr ("%.2x", p[i]);
+    }
+
+    g_printerr ("\n");
+}
+
+#define P1(p, field) \
+    g_debug ("%15s: %.2x", #field, p->field)
+#define P2(p, field) \
+    g_debug ("%15s: %.4x", #field, p->field)
+#define P4(p, field) \
+    g_debug ("%15s: %.8x", #field, p->field)
+#define PS(p, field) \
+    g_debug ("%15s: %s", #field, p->field)
+#define PN(p, field, size) \
+    g_debug ("%15s:", #field), hexdump (p->field, size)
+
 #define W1(val) \
     g_data_output_stream_put_byte (out, val, cancellable, error)
 #define W2(val) \
@@ -75,6 +167,92 @@ cheader_write (cheader_t *ch, GDataOutputStream *out,
 }
 
 G_GNUC_INTERNAL gboolean
+cheader_read (cheader_t *ch, GDataInputStream *in,
+              GCancellable *cancellable, GError **error)
+{
+    gboolean success = FALSE;
+    guint8 sig[4];
+
+    R1 (sig[0]);
+    R1 (sig[1]);
+    R1 (sig[2]);
+    R1 (sig[3]);
+    if (memcmp (sig, "MSCF", 4)) {
+        g_set_error (error, GCAB_ERROR, GCAB_ERROR_FORMAT,
+                     "The input is not of cabinet format");
+        goto end;
+    }
+
+    R4 (ch->res1);
+    R4 (ch->size);
+    R4 (ch->res2);
+    R4 (ch->offsetfiles);
+    R4 (ch->res3);
+    R1 (ch->versionMIN);
+    R1 (ch->versionMAJ);
+    R2 (ch->nfolders);
+    R2 (ch->nfiles);
+    R2 (ch->flags);
+    R2 (ch->setID);
+    R2 (ch->cabID);
+
+    if (ch->flags & CABINET_HEADER_RESERVE) {
+        R2 (ch->res_header);
+        R1 (ch->res_folder);
+        R1 (ch->res_data);
+        ch->reserved = g_malloc (ch->res_header);
+        RN (ch->reserved, ch->res_header);
+    }
+
+    if (ch->flags & CABINET_HEADER_PREV) {
+        RS (ch->cab_prev);
+        RS (ch->disk_prev);
+    }
+
+    if (ch->flags & CABINET_HEADER_NEXT) {
+        RS (ch->cab_next);
+        RS (ch->disk_next);
+    }
+
+    if (g_getenv ("GCAB_DEBUG")) {
+        g_debug ("CFHEADER");
+        P4 (ch, res1);
+        P4 (ch, size);
+        P4 (ch, res2);
+        P4 (ch, offsetfiles);
+        P4 (ch, res3);
+        P1 (ch, versionMIN);
+        P1 (ch, versionMAJ);
+        P2 (ch, nfolders);
+        P2 (ch, nfiles);
+        P2 (ch, flags);
+        P2 (ch, setID);
+        P2 (ch, cabID);
+        if (ch->flags & CABINET_HEADER_RESERVE) {
+            P2 (ch, res_header);
+            P1 (ch, res_folder);
+            P1 (ch, res_data);
+            if (ch->res_header)
+                PN (ch, reserved, ch->res_header);
+        }
+        if (ch->flags & CABINET_HEADER_PREV) {
+            PS (ch, cab_prev);
+            PS (ch, disk_prev);
+        }
+        if (ch->flags & CABINET_HEADER_NEXT) {
+            PS (ch, cab_next);
+            PS (ch, disk_next);
+        }
+
+    }
+
+    success = TRUE;
+
+end:
+    return success;
+}
+
+G_GNUC_INTERNAL gboolean
 cfolder_write (cfolder_t *cf, GDataOutputStream *out,
                GCancellable *cancellable, GError **error)
 {
@@ -86,6 +264,32 @@ cfolder_write (cfolder_t *cf, GDataOutputStream *out,
     return TRUE;
 }
 
+G_GNUC_INTERNAL gboolean
+cfolder_read (cfolder_t *cf, u1 res_size, GDataInputStream *in,
+              GCancellable *cancellable, GError **error)
+{
+    gboolean success = FALSE;
+
+    R4 (cf->offsetdata);
+    R2 (cf->ndatab);
+    R2 (cf->typecomp);
+    cf->reserved = g_malloc (res_size);
+    RN (cf->reserved, res_size);
+
+    if (g_getenv ("GCAB_DEBUG")) {
+        g_debug ("CFOLDER");
+        P4 (cf, offsetdata);
+        P2 (cf, ndatab);
+        P2 (cf, typecomp);
+        if (res_size)
+            PN (cf, reserved, res_size);
+    }
+
+    success = TRUE;
+
+end:
+    return success;
+}
 
 G_GNUC_INTERNAL gboolean
 cfile_write (cfile_t *cf, GDataOutputStream *out,
@@ -101,6 +305,38 @@ cfile_write (cfile_t *cf, GDataOutputStream *out,
         return FALSE;
 
     return TRUE;
+}
+
+
+G_GNUC_INTERNAL gboolean
+cfile_read (cfile_t *cf, GDataInputStream *in,
+            GCancellable *cancellable, GError **error)
+{
+    gboolean success = FALSE;
+
+    R4 (cf->usize);
+    R4 (cf->uoffset);
+    R2 (cf->index);
+    R2 (cf->date);
+    R2 (cf->time);
+    R2 (cf->fattr);
+    RS (cf->name);
+
+    if (g_getenv ("GCAB_DEBUG")) {
+        g_debug ("CFILE");
+        P4 (cf, usize);
+        P4 (cf, uoffset);
+        P2 (cf, index);
+        P2 (cf, date);
+        P2 (cf, time);
+        P2 (cf, fattr);
+        PS (cf, name);
+    }
+
+    success = TRUE;
+
+end:
+    return success;
 }
 
 typedef unsigned long int CHECKSUM;
@@ -158,4 +394,34 @@ cdata_write (cdata_t *cd, GDataOutputStream *out, int type,
     *bytes_written = 4 + 2 + 2 + cd->ncbytes;
 
     return TRUE;
+}
+
+G_GNUC_INTERNAL gboolean
+cdata_read (cdata_t *cd, u1 res_data, GDataInputStream *in,
+            GCancellable *cancellable, GError **error)
+
+{
+    gboolean success = FALSE;
+
+    R4 (cd->checksum);
+    R2 (cd->ncbytes);
+    R2 (cd->nubytes);
+    cd->reserved = g_malloc (res_data);
+    RN (cd->reserved, res_data);
+    RN (cd->data, cd->ncbytes);
+
+    if (g_getenv ("GCAB_DEBUG")) {
+        g_debug ("CDATA");
+        P4 (cd, checksum);
+        P2 (cd, ncbytes);
+        P2 (cd, nubytes);
+        if (res_data)
+            PN (cd, reserved, res_data);
+        PN (cd, data, 64);
+    }
+
+    success = TRUE;
+
+end:
+    return success;
 }

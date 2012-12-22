@@ -69,8 +69,12 @@ main (int argc, char *argv[])
     gchar **args = NULL;
     int nopath = 0;
     int compress = 0;
+    int list = 0;
+    int create = 0;
     GOptionEntry entries[] = {
         { "verbose", 'v', 0, G_OPTION_ARG_NONE, &verbose, N_("Be verbose"), NULL },
+        { "list", 't', 0, G_OPTION_ARG_NONE, &list, N_("List content"), NULL },
+        { "create", 'c', 0, G_OPTION_ARG_NONE, &create, N_("Create archive"), NULL },
         { "zip", 'z', 0, G_OPTION_ARG_NONE, &compress, N_("Use zip compression"), NULL },
         { "nopath", 'n', 0, G_OPTION_ARG_NONE, &nopath, N_("Do not include path"), NULL },
         { G_OPTION_REMAINING, '\0', 0, G_OPTION_ARG_FILENAME_ARRAY, &args, NULL, N_("FILE INPUT_FILES...") },
@@ -89,7 +93,8 @@ main (int argc, char *argv[])
     g_option_context_set_description (context, s);
     g_free(s);
     g_option_context_set_summary (context, "\
-gcab saves many files together into a cabinet archive.\
+gcab saves many files together into a cabinet archive, and can restore\n\
+individual files from the archive.\
 ");
     g_option_context_add_main_entries (context, entries, GETTEXT_PACKAGE);
     g_option_context_set_translation_domain (context, GETTEXT_PACKAGE);
@@ -97,9 +102,35 @@ gcab saves many files together into a cabinet archive.\
         gcab_error (_("option parsing failed: %s\n"), error->message);
     g_option_context_free(context);
 
+    if ((list + create) != 1)
+        gcab_error (_("Please specify a single operation."));
 
     if (!args || args[0] == NULL)
-        gcab_error (_("output cabinet file must be specified."));
+        gcab_error (_("cabinet file must be specified."));
+
+    GCancellable *cancellable = g_cancellable_new ();
+    GCabCabinet *cabinet = gcab_cabinet_new ();
+
+    if (list) {
+        GFile *file = g_file_new_for_commandline_arg (args[0]);
+        GInputStream *in = G_INPUT_STREAM (g_file_read (file, cancellable, &error));
+
+        if (!in)
+            gcab_error (_("can't open %s for reading: %s\n"), args[0], error->message);
+        if (!gcab_cabinet_load (cabinet, in, cancellable, &error))
+            gcab_error (_("error reading %s: %s\n"), args[0], error->message);
+
+        GPtrArray *folders = gcab_cabinet_get_folders (cabinet);
+        for (i = 0; i < folders->len; i++) {
+            GList *l, *list = gcab_folder_get_files (g_ptr_array_index (folders, i));
+            for (l = list; l != NULL; l = l->next)
+                g_print ("%s\n", gcab_file_get_name (GCAB_FILE (l->data)));
+            g_list_free (list);
+        }
+        g_object_unref (in);
+        g_object_unref (file);
+        goto end;
+    }
 
     if (args[1] == NULL)
         gcab_error (_("please specify input files."));
@@ -132,7 +163,6 @@ gcab saves many files together into a cabinet archive.\
         gcab_error (_("can't create cab file %s: %s"), args[0], error->message);
 
     GFile *cwd = g_file_new_for_commandline_arg (".");
-    GCabCabinet *cabinet = gcab_cabinet_new ();
     if (!gcab_cabinet_add_folder (cabinet, folder, &error))
         gcab_error (_("can't add folder to cabinet: %s"), args[0], error->message);
 
@@ -144,10 +174,13 @@ gcab saves many files together into a cabinet archive.\
                              &error))
         gcab_error (_("can't write cab file %s: %s"), args[0], error->message);
 
-    g_object_unref (cabinet);
     g_object_unref (cwd);
     g_object_unref (output);
     g_object_unref (outputfile);
+
+end:
+    g_object_unref (cabinet);
+    g_object_unref (cancellable);
 
     return 0;
 }

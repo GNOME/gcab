@@ -24,7 +24,11 @@ struct _GCabFolder
 
     GHashTable *files;
     GCabCompression compression;
+    GByteArray *reserved;
 };
+
+GCabFolder *     gcab_folder_new_with_cfolder        (const cfolder_t *folder);
+GCabFile *       gcab_file_new_with_cfile            (const cfile_t *file);
 
 gboolean         gcab_file_update_info               (GCabFile *file, GFileInfo *info);
 gboolean         gcab_file_set_uoffset               (GCabFile *file, u4 uoffset);

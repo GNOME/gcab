@@ -35,16 +35,30 @@ G_BEGIN_DECLS
 #define GCAB_IS_CABINET_CLASS(klass)     (G_TYPE_CHECK_CLASS_TYPE ((klass), GCAB_TYPE_CABINET))
 #define GCAB_CABINET_GET_CLASS(cabinet)  (G_TYPE_INSTANCE_GET_CLASS ((cabinet), GCAB_TYPE_CABINET, GCabCabinetClass))
 
+#define GCAB_ERROR gcab_error_quark ()
+GQuark gcab_error_quark (void);
+
+typedef enum GCabError
+{
+    GCAB_ERROR_FORMAT
+} GCabError;
+
 typedef struct _GCabCabinetClass GCabCabinetClass;
 typedef struct _GCabCabinet GCabCabinet;
 
 GType gcab_cabinet_get_type (void) G_GNUC_CONST;
 
 GCabCabinet *      gcab_cabinet_new           (void);
+gboolean           gcab_cabinet_load          (GCabCabinet *cabinet,
+                                               GInputStream *stream,
+                                               GCancellable *cancellable,
+                                               GError **error);
+
+GPtrArray *        gcab_cabinet_get_folders   (GCabCabinet *cabinet);
+
 gboolean           gcab_cabinet_add_folder    (GCabCabinet *cabinet,
                                                GCabFolder *folder,
                                                GError **error);
-GPtrArray *        gcab_cabinet_get_folders   (GCabCabinet *cabinet);
 gboolean           gcab_cabinet_write         (GCabCabinet *cabinet,
                                                GOutputStream *stream,
                                                GCabFileCallback file_callback,

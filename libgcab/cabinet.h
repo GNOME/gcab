@@ -37,7 +37,6 @@ typedef struct cdata cdata_t;
 #define CFO_START               0x24		/* folder offset */
 #define CFI_START               0x2C  	/* file offset */
 
-
 struct cheader
 {
     u4 res1;
@@ -52,13 +51,28 @@ struct cheader
     u2 flags;
     u2 setID;
     u2 cabID;
+    u2 res_header;
+    u1 res_folder;
+    u1 res_data;
+    guint8 *reserved;
+    gchar *cab_prev;
+    gchar *disk_prev;
+    gchar *cab_next;
+    gchar *disk_next;
 };
+
+typedef enum {
+    CABINET_HEADER_PREV = 0x0001,
+    CABINET_HEADER_NEXT = 0x0002,
+    CABINET_HEADER_RESERVE = 0x0004,
+} CabinetHeaderFlags;
 
 struct cfolder
 {
     u4 offsetdata;
     u2 ndatab;
     u2 typecomp;
+    guint8 *reserved;
 };
 
 struct cfile
@@ -77,6 +91,7 @@ struct cdata
     u4 checksum;
     u2 ncbytes;
     u2 nubytes;
+    guint8 *reserved;
     guint8 data[DATABLOCKSIZE*2];
 };
 
@@ -84,8 +99,25 @@ gboolean     cheader_write                      (cheader_t *ch,
                                                  GDataOutputStream *out,
                                                  GCancellable *cancellable,
                                                  GError **error);
+gboolean     cheader_read                       (cheader_t *ch,
+                                                 GDataInputStream *in,
+                                                 GCancellable *cancellable,
+                                                 GError **error);
 gboolean     cfolder_write                      (cfolder_t *cf,
                                                  GDataOutputStream *out,
+                                                 GCancellable *cancellable,
+                                                 GError **error);
+gboolean     cfolder_read                       (cfolder_t *cf,
+                                                 u1 res_folder,
+                                                 GDataInputStream *in,
+                                                 GCancellable *cancellable,
+                                                 GError **error);
+gboolean     cfile_write                        (cfile_t *cf,
+                                                 GDataOutputStream *out,
+                                                 GCancellable *cancellable,
+                                                 GError **error);
+gboolean     cfile_read                         (cfile_t *cf,
+                                                 GDataInputStream *in,
                                                  GCancellable *cancellable,
                                                  GError **error);
 gboolean     cdata_write                        (cdata_t *cd,
@@ -96,8 +128,9 @@ gboolean     cdata_write                        (cdata_t *cd,
                                                  gsize *bytes_written,
                                                  GCancellable *cancellable,
                                                  GError **error);
-gboolean     cfile_write                        (cfile_t *cf,
-                                                 GDataOutputStream *out,
+gboolean     cdata_read                         (cdata_t *cd,
+                                                 u1 res_data,
+                                                 GDataInputStream *in,
                                                  GCancellable *cancellable,
                                                  GError **error);
 

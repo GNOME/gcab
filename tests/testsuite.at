@@ -30,14 +30,14 @@ AT_CHECK([_gcab ]$@)])
 
 AT_SETUP([Invalid command line])
 AT_CHECK_GCAB([], [1], [ignore], [ignore])
-AT_CHECK_GCAB([out.cab], [1], [ignore], [ignore])
+AT_CHECK_GCAB([-c out.cab], [1], [ignore], [ignore])
 AT_CHECK([test -f out.cab], [1])
 AT_CLEANUP
 
 AT_SETUP([Add one file])
 AT_DATA([test.txt], [This is test.txt
 ])
-AT_CHECK_GCAB([out.cab test.txt])
+AT_CHECK_GCAB([-c out.cab test.txt])
 AT_CHECK([cabextract -ql out.cab | tail -n+3 |  cut -d'|' -f3], [0],
 [ test.txt
 ])
@@ -45,7 +45,7 @@ cp test.txt expout
 AT_CHECK([cabextract -q out.cab], [0])
 AT_CHECK([cat test.txt], [0], [expout])
 #compressed
-AT_CHECK_GCAB([-z out.cab test.txt])
+AT_CHECK_GCAB([-cz out.cab test.txt])
 AT_CHECK([cabextract -ql out.cab | tail -n+3 |  cut -d'|' -f3], [0],
 [ test.txt
 ])

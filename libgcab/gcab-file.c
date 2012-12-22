@@ -180,8 +180,24 @@ gcab_file_get_file (GCabFile *self)
 GCabFile *
 gcab_file_new_with_file (const gchar *name, GFile *file)
 {
+    g_return_val_if_fail (name != NULL, NULL);
+    g_return_val_if_fail (G_IS_FILE (file), NULL);
+
     return g_object_new (GCAB_TYPE_FILE,
                          "name", name,
                          "file", file,
                          NULL);
+}
+
+G_GNUC_INTERNAL GCabFile *
+gcab_file_new_with_cfile (const cfile_t *cfile)
+{
+    g_return_val_if_fail (cfile != NULL, NULL);
+
+    GCabFile *file = g_object_new (GCAB_TYPE_FILE,
+                                   "name", cfile->name,
+                                   NULL);
+    file->cfile = *cfile;
+
+    return file;
 }
