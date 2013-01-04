@@ -19,7 +19,10 @@ libgcab_includedir = $(includedir)/libgcab-1.0
 libgcab_priv_includedir = $(libgcab_includedir)/libgcab
 libgcab_include_HEADERS = libgcab.h
 libgcab_priv_include_HEADERS =			\
+	libgcab/gcab-cabinet.h			\
+	libgcab/gcab-enums.h			\
 	libgcab/gcab-file.h			\
+	libgcab/gcab-folder.h			\
 	$(NULL)
 
 lib_LTLIBRARIES = libgcab-1.0.la
