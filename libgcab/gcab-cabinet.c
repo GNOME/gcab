@@ -150,6 +150,7 @@ gcab_cabinet_write (GCabCabinet *self,
     GInputStream *in = NULL;
     GDataOutputStream *dstream = NULL;
     gboolean success = FALSE;
+    int i;
 
     dstream = g_data_output_stream_new (out);
     g_data_output_stream_set_byte_order (dstream, G_DATA_STREAM_BYTE_ORDER_LITTLE_ENDIAN);
@@ -163,9 +164,11 @@ gcab_cabinet_write (GCabCabinet *self,
     folder.offsetdata = CFI_START + nfiles * 16 + sumstr;
     folder.ndatab = gcab_folder_get_ndatablocks (cabfolder);
 
-    if (!g_seekable_seek (G_SEEKABLE (out), folder.offsetdata,
-                          G_SEEK_SET, NULL, error))
-        goto end;
+    /* avoid seeking to allow growing output streams */
+    for (i = 0; i < folder.offsetdata; i++)
+        if (!g_data_output_stream_put_byte (dstream, 0, cancellable, error))
+            goto end;
+
     gssize len, offset = 0;
     cdata_t block = { 0, };
     guint8 data[DATABLOCKSIZE];
