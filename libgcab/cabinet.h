@@ -12,6 +12,7 @@
 #include <dirent.h>
 #include <unistd.h>
 #include <time.h>
+#include "gcab-folder.h"
 
 /* based on the spec
    http://msdn.microsoft.com/en-us/library/bb417343.aspx */
@@ -130,6 +131,7 @@ gboolean     cdata_write                        (cdata_t *cd,
                                                  GError **error);
 gboolean     cdata_read                         (cdata_t *cd,
                                                  u1 res_data,
+                                                 GCabCompression compression,
                                                  GDataInputStream *in,
                                                  GCancellable *cancellable,
                                                  GError **error);

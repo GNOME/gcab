@@ -22,19 +22,26 @@ gcab_error (const gchar *format, ...)
 
 int verbose = 0;
 
-static void
+static gboolean
 file_callback (GCabFile *cabfile, gpointer data)
 {
     GFile *file = gcab_file_get_file (cabfile);
     GFile *cwd = G_FILE (data);
 
-    if (verbose) {
+    if (!verbose)
+        return TRUE;
+
+    if (file) {
         gchar *path =  g_file_get_relative_path (cwd, file);
         if (!path)
             path = g_file_get_parse_name (file);
         g_print ("%s\n", path);
         g_free (path);
+    } else {
+        g_print ("%s\n", gcab_file_get_name (cabfile));
     }
+
+    return TRUE;
 }
 
 static const gchar *

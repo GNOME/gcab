@@ -13,7 +13,7 @@ zfree (voidpf opaque, voidpf address)
         g_free (address);
 }
 
-static void
+static gboolean
 cdata_set (cdata_t *cd, int type, guint8 *data, size_t size)
 {
     cd->nubytes = size;
@@ -24,12 +24,12 @@ cdata_set (cdata_t *cd, int type, guint8 *data, size_t size)
     }
 
     if (type == GCAB_COMPRESSION_MSZIP) {
-        z_stream stream;
+        z_stream stream = { 0, };
 
         stream.zalloc = zalloc;
         stream.zfree = zfree;
         if (deflateInit2 (&stream, Z_DEFAULT_COMPRESSION, Z_DEFLATED, -15, 8, Z_DEFAULT_STRATEGY) != Z_OK)
-            exit(1);
+            return FALSE;
         stream.next_in = data;
         stream.avail_in = size;
         stream.next_out = cd->data + 2;
@@ -41,6 +41,8 @@ cdata_set (cdata_t *cd, int type, guint8 *data, size_t size)
         deflateEnd (&stream);
         cd->ncbytes = stream.total_out + 2;
     }
+
+    return TRUE;
 }
 
 static char *
@@ -73,29 +75,29 @@ _data_input_stream_read_until (GDataInputStream  *stream,
 
 #define R1(val) G_STMT_START{                                           \
     val = g_data_input_stream_read_byte (in, cancellable, error);       \
-    if (*error)                                                         \
+    if (error && *error)                                                \
         goto end;                                                       \
 }G_STMT_END
 #define R2(val) G_STMT_START{                                           \
     val = g_data_input_stream_read_uint16 (in, cancellable, error);     \
-    if (*error)                                                         \
+    if (error && *error)                                                \
         goto end;                                                       \
 }G_STMT_END
 #define R4(val) G_STMT_START{                                           \
     val = g_data_input_stream_read_uint32 (in, cancellable, error);     \
-    if (*error)                                                         \
+    if (error && *error)                                                \
         goto end;                                                       \
 }G_STMT_END
 #define RS(val) G_STMT_START{                                   \
     val = _data_input_stream_read_until (in, "\0", 1,           \
                                          cancellable, error);   \
-    if (*error)                                                 \
+    if (!val || (error && *error))                              \
         goto end;                                               \
 }G_STMT_END
-#define RN(buff, size) G_STMT_START{                             \
+#define RN(buff, size) G_STMT_START{                                    \
     if (size) {                                                         \
-        g_input_stream_read (G_INPUT_STREAM (in), buff, size, cancellable, error); \
-        if (*error)                                                     \
+        gint _val = g_input_stream_read (G_INPUT_STREAM (in), buff, size, cancellable, error); \
+        if (_val == -1 || (error && *error))                            \
             goto end;                                                   \
     }                                                                   \
 }G_STMT_END
@@ -116,20 +118,20 @@ hexdump (guchar *p, gsize s)
         }
 
         if (i % 16 == 0)
-            g_printerr ("%.8x  ", i);
+            g_printerr ("%.8x  ", (guint)i);
 
-        g_printerr ("%.2x", p[i]);
+        g_printerr ("%.2x", (guint)p[i]);
     }
 
     g_printerr ("\n");
 }
 
 #define P1(p, field) \
-    g_debug ("%15s: %.2x", #field, p->field)
+    g_debug ("%15s: %.2x", #field, (guint)p->field)
 #define P2(p, field) \
-    g_debug ("%15s: %.4x", #field, p->field)
+    g_debug ("%15s: %.4x", #field, (guint)p->field)
 #define P4(p, field) \
-    g_debug ("%15s: %.8x", #field, p->field)
+    g_debug ("%15s: %.8x", #field, (guint)p->field)
 #define PS(p, field) \
     g_debug ("%15s: %s", #field, p->field)
 #define PN(p, field, size) \
@@ -378,7 +380,9 @@ cdata_write (cdata_t *cd, GDataOutputStream *out, int type,
              guint8 *data, size_t size, gsize *bytes_written,
              GCancellable *cancellable, GError **error)
 {
-    cdata_set(cd, type, data, size);
+    if (!cdata_set(cd, type, data, size))
+        return FALSE;
+
     CHECKSUM datacsum = compute_checksum(cd->data, cd->ncbytes, 0);
     cd->checksum = compute_checksum ((guint8*)&cd->ncbytes, 4, datacsum);
     GOutputStream *stream = g_filter_output_stream_get_base_stream (G_FILTER_OUTPUT_STREAM (out));
@@ -397,8 +401,8 @@ cdata_write (cdata_t *cd, GDataOutputStream *out, int type,
 }
 
 G_GNUC_INTERNAL gboolean
-cdata_read (cdata_t *cd, u1 res_data, GDataInputStream *in,
-            GCancellable *cancellable, GError **error)
+cdata_read (cdata_t *cd, u1 res_data, GCabCompression compression,
+            GDataInputStream *in, GCancellable *cancellable, GError **error)
 
 {
     gboolean success = FALSE;
@@ -409,6 +413,9 @@ cdata_read (cdata_t *cd, u1 res_data, GDataInputStream *in,
     cd->reserved = g_malloc (res_data);
     RN (cd->reserved, res_data);
     RN (cd->data, cd->ncbytes);
+
+    CHECKSUM datacsum = compute_checksum(cd->data, cd->ncbytes, 0);
+    g_return_val_if_fail (cd->checksum == compute_checksum ((guint8*)&cd->ncbytes, 4, datacsum), FALSE);
 
     if (g_getenv ("GCAB_DEBUG")) {
         g_debug ("CDATA");
