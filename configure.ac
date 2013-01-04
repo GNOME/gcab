@@ -4,7 +4,7 @@ AC_CONFIG_SRCDIR([gcab.c])
 AC_CONFIG_AUX_DIR([build-aux])
 AC_CONFIG_MACRO_DIR([m4])
 
-AM_INIT_AUTOMAKE([1.11 dist-xz no-dist-gzip tar-ustar foreign -Wall -Werror subdir-objects -Wno-portability])
+AM_INIT_AUTOMAKE([1.11 dist-xz no-dist-gzip tar-ustar foreign -Wall subdir-objects -Wno-portability])
 AM_CONFIG_HEADER([config.h])
 AM_MAINTAINER_MODE([enable])
 AM_SILENT_RULES([yes])
