@@ -170,7 +170,6 @@ gcab_cabinet_write (GCabCabinet *self,
     /* FIXME: current limitation of 1 folder */
     g_return_val_if_fail (self->folders->len == 1, FALSE);
 
-    GHashTableIter iter;
     GCabFolder *cabfolder = g_ptr_array_index (self->folders, 0);
     GCabFile *file;
     gsize nfiles = gcab_folder_get_nfiles (cabfolder);
@@ -183,9 +182,10 @@ gcab_cabinet_write (GCabCabinet *self,
     g_data_output_stream_set_byte_order (dstream, G_DATA_STREAM_BYTE_ORDER_LITTLE_ENDIAN);
 
     size_t sumstr = 0;
-    g_hash_table_iter_init (&iter, cabfolder->files);
-    while (g_hash_table_iter_next (&iter, NULL, (gpointer *)&file))
-        sumstr += strlen (file->name) + 1;
+    GSList *l, *files = gcab_folder_get_files (cabfolder);
+
+    for (l = files; l != NULL; l = l->next)
+        sumstr += strlen (GCAB_FILE (l->data)->name) + 1;
 
     folder.typecomp = cabfolder->compression;
     folder.offsetdata = CFI_START + nfiles * 16 + sumstr;
@@ -200,8 +200,8 @@ gcab_cabinet_write (GCabCabinet *self,
     cdata_t block = { 0, };
     guint8 data[DATABLOCKSIZE];
     gsize written;
-    g_hash_table_iter_init (&iter, cabfolder->files);
-    while (g_hash_table_iter_next (&iter, NULL, (gpointer*)&file)) {
+    for (l = files; l != NULL; l = l->next) {
+        file = GCAB_FILE (l->data);
         if (file_callback)
             file_callback (file, callback_data);
 
@@ -244,8 +244,8 @@ gcab_cabinet_write (GCabCabinet *self,
         goto end;
 
     cfile_t *prevf = NULL;
-    g_hash_table_iter_init (&iter, cabfolder->files);
-    while (g_hash_table_iter_next (&iter, NULL, (gpointer*)&file)) {
+    for (l = files; l != NULL; l = l->next) {
+        file = GCAB_FILE (l->data);
         file->cfile.uoffset = prevf ? prevf->uoffset + prevf->usize : 0;
         prevf = &file->cfile;
 
@@ -258,6 +258,7 @@ gcab_cabinet_write (GCabCabinet *self,
 end:
     g_clear_object (&dstream);
     g_clear_object (&in);
+    g_slist_free (files);
 
     return success;
 }

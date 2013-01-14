@@ -22,7 +22,8 @@ struct _GCabFolder
 {
     GObject parent_instance;
 
-    GHashTable *files;
+    GSList *files;
+    GHashTable *hash;
     GCabCompression compression;
     GByteArray *reserved;
 };

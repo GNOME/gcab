@@ -35,7 +35,7 @@ G_BEGIN_DECLS
 typedef struct _GCabFileClass GCabFileClass;
 typedef struct _GCabFile GCabFile;
 
-typedef void (*GCabFileCallback) (GCabFile *current, gpointer data);
+typedef gboolean (*GCabFileCallback) (GCabFile *current, gpointer data);
 
 GType gcab_file_get_type (void) G_GNUC_CONST;
 

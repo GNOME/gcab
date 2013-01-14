@@ -17,7 +17,8 @@ G_DEFINE_TYPE (GCabFolder, gcab_folder, G_TYPE_OBJECT);
 static void
 gcab_folder_init (GCabFolder *self)
 {
-    self->files = g_hash_table_new_full (g_str_hash, g_str_equal, NULL, g_object_unref);
+    self->files = NULL;
+    self->hash = g_hash_table_new_full (g_str_hash, g_str_equal, NULL, g_object_unref);
 }
 
 static void
@@ -25,7 +26,8 @@ gcab_folder_finalize (GObject *object)
 {
     GCabFolder *self = GCAB_FOLDER (object);
 
-    g_hash_table_unref (self->files);
+    g_slist_free_full (self->files, g_object_unref);
+    g_hash_table_unref (self->hash);
     if (self->reserved)
         g_byte_array_unref (self->reserved);
 
@@ -100,12 +102,10 @@ G_GNUC_INTERNAL gsize
 gcab_folder_get_ndatablocks (GCabFolder *self)
 {
     gsize total_size = 0;
-    GHashTableIter iter;
-    GCabFile *file;
+    GSList *l;
 
-    g_hash_table_iter_init (&iter, self->files);
-    while (g_hash_table_iter_next (&iter, NULL, (gpointer*)&file))
-        total_size += file->cfile.usize;
+    for (l = self->files; l != NULL; l = l->next)
+        total_size += GCAB_FILE (l->data)->cfile.usize;
 
     return total_size / DATABLOCKSIZE + 1 ;
 }
@@ -113,11 +113,12 @@ gcab_folder_get_ndatablocks (GCabFolder *self)
 static gboolean
 add_file (GCabFolder *self, GCabFile *file)
 {
-    if (g_hash_table_lookup (self->files, (gpointer)gcab_file_get_name (file)))
+    if (g_hash_table_lookup (self->hash, (gpointer)gcab_file_get_name (file)))
         return FALSE;
 
-    g_hash_table_insert (self->files,
+    g_hash_table_insert (self->hash,
                          (gpointer)gcab_file_get_name (file), g_object_ref (file));
+    self->files = g_slist_prepend (self->files, g_object_ref (file));
 
     return TRUE;
 }
@@ -228,7 +229,7 @@ gcab_folder_get_nfiles (GCabFolder *self)
 {
     g_return_val_if_fail (GCAB_IS_FOLDER (self), 0);
 
-    return g_hash_table_size (self->files);
+    return g_hash_table_size (self->hash);
 }
 
 /**
@@ -259,10 +260,10 @@ gcab_folder_new_with_cfolder (const cfolder_t *folder)
  *
  * Returns: (element-type GCabFile) (transfer full): list of files
  **/
-GList *
+GSList *
 gcab_folder_get_files (GCabFolder *self)
 {
     g_return_val_if_fail (GCAB_IS_FOLDER (self), 0);
 
-    return g_hash_table_get_values (self->files);
+    return g_slist_reverse (g_slist_copy (self->files));
 }

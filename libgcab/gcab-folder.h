@@ -51,7 +51,7 @@ gboolean        gcab_folder_add_file          (GCabFolder *cabfolder,
                                                GCancellable *cancellable,
                                                GError **error);
 guint           gcab_folder_get_nfiles        (GCabFolder *cabfolder);
-GList *         gcab_folder_get_files         (GCabFolder *cabfolder);
+GSList *        gcab_folder_get_files         (GCabFolder *cabfolder);
 
 G_END_DECLS
 

@@ -129,10 +129,10 @@ individual files from the archive.\
 
         GPtrArray *folders = gcab_cabinet_get_folders (cabinet);
         for (i = 0; i < folders->len; i++) {
-            GList *l, *list = gcab_folder_get_files (g_ptr_array_index (folders, i));
+            GSList *l, *list = gcab_folder_get_files (g_ptr_array_index (folders, i));
             for (l = list; l != NULL; l = l->next)
                 g_print ("%s\n", gcab_file_get_name (GCAB_FILE (l->data)));
-            g_list_free (list);
+            g_slist_free (list);
         }
         g_object_unref (in);
         g_object_unref (file);
