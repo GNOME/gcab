@@ -205,6 +205,7 @@ gcab_cabinet_write (GCabCabinet *self,
         if (file_callback)
             file_callback (file, callback_data);
 
+        g_clear_object (&in);
         in = G_INPUT_STREAM (g_file_read (file->file, cancellable, error));
         if (*error)
             goto end;
