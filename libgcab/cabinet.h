@@ -12,6 +12,7 @@
 #include <dirent.h>
 #include <unistd.h>
 #include <time.h>
+#include <zlib.h>
 #include "gcab-folder.h"
 
 /* based on the spec
@@ -93,7 +94,9 @@ struct cdata
     u2 ncbytes;
     u2 nubytes;
     guint8 *reserved;
-    guint8 data[DATABLOCKSIZE*2];
+    guint8 data[DATABLOCKSIZE];
+    guint8 out[DATABLOCKSIZE];
+    z_stream z;
 };
 
 gboolean     cheader_write                      (cheader_t *ch,
@@ -135,5 +138,6 @@ gboolean     cdata_read                         (cdata_t *cd,
                                                  GDataInputStream *in,
                                                  GCancellable *cancellable,
                                                  GError **error);
+void         cdata_finish                       (cdata_t *cd);
 
 #endif /* CABINET_H */

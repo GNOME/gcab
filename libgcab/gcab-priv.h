@@ -27,14 +27,24 @@ struct _GCabFolder
     GHashTable *hash;
     GCabCompression compression;
     GByteArray *reserved;
+    cfolder_t cfolder;
+    GInputStream *stream;
 };
 
-GCabFolder *     gcab_folder_new_with_cfolder        (const cfolder_t *folder);
+GCabFolder *     gcab_folder_new_with_cfolder        (const cfolder_t *folder, GInputStream *stream);
 GCabFile *       gcab_file_new_with_cfile            (const cfile_t *file);
 
 gboolean         gcab_file_update_info               (GCabFile *file, GFileInfo *info);
 gboolean         gcab_file_set_uoffset               (GCabFile *file, u4 uoffset);
 
 gsize            gcab_folder_get_ndatablocks         (GCabFolder *folder);
+gboolean         gcab_folder_extract                 (GCabFolder *self,
+                                                      GFile *path,
+                                                      u1 res_data,
+                                                      GCabFileCallback file_callback,
+                                                      GFileProgressCallback progress_callback,
+                                                      gpointer callback_data,
+                                                      GCancellable *cancellable,
+                                                      GError **error);
 
 #endif /* GCAB_PRIV_H */

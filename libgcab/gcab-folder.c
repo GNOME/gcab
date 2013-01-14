@@ -30,6 +30,8 @@ gcab_folder_finalize (GObject *object)
     g_hash_table_unref (self->hash);
     if (self->reserved)
         g_byte_array_unref (self->reserved);
+    if (self->stream)
+        g_object_unref (self->stream);
 
     G_OBJECT_CLASS (gcab_folder_parent_class)->finalize (object);
 }
@@ -247,11 +249,15 @@ gcab_folder_new (GCabCompression compression)
 }
 
 G_GNUC_INTERNAL GCabFolder *
-gcab_folder_new_with_cfolder (const cfolder_t *folder)
+gcab_folder_new_with_cfolder (const cfolder_t *folder, GInputStream *stream)
 {
-    return g_object_new (GCAB_TYPE_FOLDER,
-                         "compression", folder->typecomp,
-                         NULL);
+    GCabFolder *self = g_object_new (GCAB_TYPE_FOLDER,
+                                     "compression", folder->typecomp,
+                                     NULL);
+    self->stream = g_object_ref (stream);
+    self->cfolder = *folder;
+
+    return self;
 }
 
 /**
@@ -266,4 +272,112 @@ gcab_folder_get_files (GCabFolder *self)
     g_return_val_if_fail (GCAB_IS_FOLDER (self), 0);
 
     return g_slist_reverse (g_slist_copy (self->files));
+}
+
+static gint
+sort_by_offset (GCabFile *a, GCabFile *b)
+{
+    g_return_val_if_fail (a != NULL, 0);
+    g_return_val_if_fail (b != NULL, 0);
+
+    return (gint64)a->cfile.uoffset - (gint64)b->cfile.uoffset;
+}
+
+G_GNUC_INTERNAL gboolean
+gcab_folder_extract (GCabFolder *self,
+                     GFile *path,
+                     u1 res_data,
+                     GCabFileCallback file_callback,
+                     GFileProgressCallback progress_callback,
+                     gpointer callback_data,
+                     GCancellable *cancellable,
+                     GError **error)
+{
+    GError *my_error = NULL;
+    gboolean success = FALSE;
+    GDataInputStream *data = NULL;
+    GOutputStream *out = NULL;
+    GSList *f, *files = NULL;
+    cdata_t cdata = { 0, };
+
+    data = g_data_input_stream_new (self->stream);
+    g_data_input_stream_set_byte_order (data, G_DATA_STREAM_BYTE_ORDER_LITTLE_ENDIAN);
+    g_filter_input_stream_set_close_base_stream (G_FILTER_INPUT_STREAM (data), FALSE);
+
+    if (!g_seekable_seek (G_SEEKABLE (data), self->cfolder.offsetdata, G_SEEK_SET, cancellable, error))
+        goto end;
+
+    files = g_slist_sort (g_slist_copy (self->files), (GCompareFunc)sort_by_offset);
+
+    u4 nubytes = 0;
+    for (f = files; f != NULL; f = f->next) {
+        GCabFile *file = f->data;
+
+        if (file_callback && !file_callback (file, callback_data))
+            continue;
+
+        int i = 0, len = strlen (file->name);
+        gchar *fname = g_strdup (file->name);
+        for (i = 0; i < len; i++)
+            if (fname[i] == '\\')
+                fname[i] = '/';
+
+        GFileOutputStream *out;
+        GFile *gfile = g_file_resolve_relative_path (path, fname);
+        GFile *parent = g_file_get_parent (gfile);
+        g_free (fname);
+
+        if (!g_file_make_directory_with_parents (parent, cancellable, &my_error)) {
+            if (g_error_matches (my_error, G_IO_ERROR, G_IO_ERROR_EXISTS))
+                g_clear_error (&my_error);
+            else {
+                g_object_unref (gfile);
+                g_object_unref (parent);
+                g_propagate_error (error, my_error);
+                goto end;
+            }
+        }
+        g_object_unref (parent);
+
+        out = g_file_replace (gfile, NULL, FALSE, 0, cancellable, error);
+        if (!out) {
+            g_object_unref (gfile);
+            goto end;
+        }
+
+        u4 usize = file->cfile.usize;
+        u4 uoffset = file->cfile.uoffset;
+        do {
+            if ((nubytes + cdata.nubytes) <= uoffset) {
+                nubytes += cdata.nubytes;
+                if (!cdata_read (&cdata, res_data, self->compression,
+                                 data, cancellable, error))
+                    goto end;
+                continue;
+            } else {
+                gsize offset = file->cfile.uoffset > nubytes ?
+                    file->cfile.uoffset - nubytes : 0;
+                const void *p = &cdata.out[offset];
+                gsize count = MIN (usize, cdata.nubytes - offset);
+                if (!g_output_stream_write_all (G_OUTPUT_STREAM (out), p, count,
+                                                NULL, cancellable, error))
+                    goto end;
+                usize -= count;
+                uoffset += count;
+            }
+        } while (usize > 0);
+    }
+
+    success = TRUE;
+
+end:
+    if (files)
+        g_slist_free (files);
+    if (data)
+        g_object_unref (data);
+    if (out)
+        g_object_unref (out);
+    cdata_finish (&cdata);
+
+    return success;
 }

@@ -11,6 +11,7 @@ struct _GCabCabinet
 
     GPtrArray *folders;
     GByteArray *reserved;
+    cheader_t cheader;
 };
 
 enum {
@@ -303,7 +304,9 @@ gcab_cabinet_load (GCabCabinet *self,
     cheader_t cheader;
     int i;
     GDataInputStream *in = g_data_input_stream_new (stream);
+    g_filter_input_stream_set_close_base_stream (G_FILTER_INPUT_STREAM (in), FALSE);
     g_data_input_stream_set_byte_order (in, G_DATA_STREAM_BYTE_ORDER_LITTLE_ENDIAN);
+
     GPtrArray *folders = self->folders;
 
     if (!cheader_read (&cheader, in, cancellable, error))
@@ -319,7 +322,7 @@ gcab_cabinet_load (GCabCabinet *self,
         if (!cfolder_read (&cfolder, cheader.res_folder, in, cancellable, error))
             goto end;
 
-        GCabFolder *folder = gcab_folder_new_with_cfolder (&cfolder);
+        GCabFolder *folder = gcab_folder_new_with_cfolder (&cfolder, stream);
         if (cfolder.reserved)
             g_object_set (folder, "reserved",
                           g_byte_array_new_take (cfolder.reserved, cheader.res_folder),
@@ -346,5 +349,52 @@ gcab_cabinet_load (GCabCabinet *self,
 end:
     if (in)
         g_object_unref (in);
+    return success;
+}
+
+/**
+ * gcab_cabinet_extract:
+ * @cabinet: a #GCabCabinet
+ * @path: the path to extract files
+ * @file_callback: (allow-none) (scope call): an optionnal #GCabFile callback,
+ *     return %FALSE to filter out or skip files.
+ * @progress_callback: (allow-none) (scope call): a progress callback
+ * @callback_data: callback data
+ * @cancellable: (allow-none): optional #GCancellable object,
+ *     %NULL to ignore
+ * @error: (allow-none): #GError to set on error, or %NULL
+ *
+ * Extract files to given path.
+ *
+ * Returns: %TRUE on success.
+ **/
+gboolean
+gcab_cabinet_extract (GCabCabinet *self,
+                      GFile *path,
+                      GCabFileCallback file_callback,
+                      GFileProgressCallback progress_callback,
+                      gpointer callback_data,
+                      GCancellable *cancellable,
+                      GError **error)
+{
+    gboolean success = TRUE;
+    int i;
+
+    g_return_val_if_fail (GCAB_IS_CABINET (self), FALSE);
+    g_return_val_if_fail (G_IS_FILE (path), FALSE);
+    g_return_val_if_fail (!cancellable || G_IS_CANCELLABLE (cancellable), FALSE);
+    g_return_val_if_fail (!error || *error == NULL, FALSE);
+
+    for (i = 0; i < self->folders->len; ++i) {
+        GCabFolder *folder = g_ptr_array_index (self->folders, i);
+        if (!gcab_folder_extract (folder, path, self->cheader.res_data,
+                                  file_callback, progress_callback, callback_data,
+                                  cancellable, error)) {
+            success = FALSE;
+            break;
+        }
+    }
+
+end:
     return success;
 }

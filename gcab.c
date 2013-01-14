@@ -74,14 +74,18 @@ main (int argc, char *argv[])
     int i;
 
     gchar **args = NULL;
+    gchar *change = NULL;
     int nopath = 0;
     int compress = 0;
     int list = 0;
     int create = 0;
+    int extract = 0;
     GOptionEntry entries[] = {
         { "verbose", 'v', 0, G_OPTION_ARG_NONE, &verbose, N_("Be verbose"), NULL },
+        { "change", 'C', 0, G_OPTION_ARG_FILENAME, &change, N_("Change to directory"), NULL },
         { "list", 't', 0, G_OPTION_ARG_NONE, &list, N_("List content"), NULL },
         { "create", 'c', 0, G_OPTION_ARG_NONE, &create, N_("Create archive"), NULL },
+        { "extract", 'x', 0, G_OPTION_ARG_NONE, &extract, N_("Extract all files"), NULL },
         { "zip", 'z', 0, G_OPTION_ARG_NONE, &compress, N_("Use zip compression"), NULL },
         { "nopath", 'n', 0, G_OPTION_ARG_NONE, &nopath, N_("Do not include path"), NULL },
         { G_OPTION_REMAINING, '\0', 0, G_OPTION_ARG_FILENAME_ARRAY, &args, NULL, N_("FILE INPUT_FILES...") },
@@ -109,7 +113,7 @@ individual files from the archive.\
         gcab_error (_("option parsing failed: %s\n"), error->message);
     g_option_context_free(context);
 
-    if ((list + create) != 1)
+    if ((list + extract + create) != 1)
         gcab_error (_("Please specify a single operation."));
 
     if (!args || args[0] == NULL)
@@ -118,7 +122,7 @@ individual files from the archive.\
     GCancellable *cancellable = g_cancellable_new ();
     GCabCabinet *cabinet = gcab_cabinet_new ();
 
-    if (list) {
+    if (list || extract) {
         GFile *file = g_file_new_for_commandline_arg (args[0]);
         GInputStream *in = G_INPUT_STREAM (g_file_read (file, cancellable, &error));
 
@@ -127,13 +131,24 @@ individual files from the archive.\
         if (!gcab_cabinet_load (cabinet, in, cancellable, &error))
             gcab_error (_("error reading %s: %s\n"), args[0], error->message);
 
-        GPtrArray *folders = gcab_cabinet_get_folders (cabinet);
-        for (i = 0; i < folders->len; i++) {
-            GSList *l, *list = gcab_folder_get_files (g_ptr_array_index (folders, i));
-            for (l = list; l != NULL; l = l->next)
-                g_print ("%s\n", gcab_file_get_name (GCAB_FILE (l->data)));
-            g_slist_free (list);
+        if (list) {
+            GPtrArray *folders = gcab_cabinet_get_folders (cabinet);
+            for (i = 0; i < folders->len; i++) {
+                GSList *l, *list = gcab_folder_get_files (g_ptr_array_index (folders, i));
+                for (l = list; l != NULL; l = l->next)
+                    g_print ("%s\n", gcab_file_get_name (GCAB_FILE (l->data)));
+                g_slist_free (list);
+            }
+        } else if (extract) {
+            g_object_unref (file);
+            if (change == NULL)
+                change = g_get_current_dir ();
+            file = g_file_new_for_path (change);
+
+            if (!gcab_cabinet_extract (cabinet, file, file_callback, NULL, NULL, cancellable, &error))
+                gcab_error (_("error during extraction: %s"), error->message);
         }
+
         g_object_unref (in);
         g_object_unref (file);
         goto end;

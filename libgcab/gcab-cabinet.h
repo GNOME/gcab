@@ -40,7 +40,8 @@ GQuark gcab_error_quark (void);
 
 typedef enum GCabError
 {
-    GCAB_ERROR_FORMAT
+    GCAB_ERROR_FORMAT,
+    GCAB_ERROR_FAILED,
 } GCabError;
 
 typedef struct _GCabCabinetClass GCabCabinetClass;
@@ -61,6 +62,13 @@ gboolean           gcab_cabinet_add_folder    (GCabCabinet *cabinet,
                                                GError **error);
 gboolean           gcab_cabinet_write         (GCabCabinet *cabinet,
                                                GOutputStream *stream,
+                                               GCabFileCallback file_callback,
+                                               GFileProgressCallback progress_callback,
+                                               gpointer callback_data,
+                                               GCancellable *cancellable,
+                                               GError **error);
+gboolean           gcab_cabinet_extract       (GCabCabinet *cabinet,
+                                               GFile *path,
                                                GCabFileCallback file_callback,
                                                GFileProgressCallback progress_callback,
                                                gpointer callback_data,
