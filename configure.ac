@@ -1,5 +1,5 @@
 AC_PREREQ(2.57)
-AC_INIT([gcab], [0.0], [marcandre.lureau@gmail.com])
+AC_INIT([gcab], m4_esyscmd([build-aux/git-version-gen .tarball-version]), [marcandre.lureau@gmail.com])
 AC_CONFIG_SRCDIR([gcab.c])
 AC_CONFIG_AUX_DIR([build-aux])
 AC_CONFIG_MACRO_DIR([m4])
