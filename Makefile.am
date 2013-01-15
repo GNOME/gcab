@@ -37,6 +37,8 @@ libgcab_1_0_la_SOURCES =			\
 	libgcab/gcab-priv.h			\
 	libgcab/cabinet.c			\
 	libgcab/cabinet.h			\
+	libgcab/glib-compat.c			\
+	libgcab/glib-compat.h			\
 	$(NULL)
 libgcab_1_0_la_LIBADD = -lz $(GLIB2_LIBS)
 libgcab_1_0_la_LDFLAGS =				\
