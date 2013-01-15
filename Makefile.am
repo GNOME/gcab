@@ -49,6 +49,8 @@ libgcab_1_0_la_LDFLAGS =				\
 pkgconfigdir = $(libdir)/pkgconfig
 pkgconfig_DATA = libgcab-1.0.pc
 
+man1_MANS = gcab.1
+
 bin_PROGRAMS = gcab
 
 gcab_SOURCES =					\
