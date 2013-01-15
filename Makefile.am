@@ -140,6 +140,8 @@ endif # GIR
 
 TESTSUITE = $(srcdir)/tests/testsuite
 EXTRA_DIST += tests/testsuite.at $(srcdir)/tests/package.m4 $(TESTSUITE)
+EXTRA_DIST += build-aux/move-if-change
+
 DISTCLEANFILES += atconfig
 CLEANFILES += testsuite.log
 
