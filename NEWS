@@ -1,0 +1,8 @@
+v0.1
+====
+
+This is the first release of gcab, a tool and library mainly made to
+create Cabinet files, using GObject/GIO API, providing GIR bindings.
+- creation supports plain and basic MSZIP compression
+- can open and list files from cabinet, no extraction
+- provided API/ABI stable
