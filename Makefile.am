@@ -75,7 +75,6 @@ $(GCAB_ENUMS): %: %.etemplate $(ENUMS_FILES)
 	$(AM_V_GEN)$(GLIB_MKENUMS) --template $^ | sed -e 's/g_cab/gcab/g' | sed -e 's/G_CAB/GCAB/g' | sed -e 's/_CAB//g' > $@
 
 EXTRA_DIST =					\
-	MAINTAINERS				\
 	gcab.doap				\
 	libgcab.syms				\
 	$(BUILT_SOURCES)			\
