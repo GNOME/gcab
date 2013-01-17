@@ -266,6 +266,31 @@ end:
 }
 
 /**
+ * gcab_cabinet_write_simple:
+ * @cabinet: a #GCabCabinet
+ * @stream: a #GOutputStream also #GSeekable
+ * @file_callback: (allow-none) (scope call) (closure user_data): report current file being saved
+ * @user_data: (closure): user data to pass to callbacks
+ * @cancellable: (allow-none): optional #GCancellable object,
+ *     %NULL to ignore
+ * @error: (allow-none): #GError to set on error, or %NULL
+ *
+ * Save @cabinet to the output stream @out. @out must be a #GSeekable.
+ *
+ * Returns: %TRUE on success.
+ **/
+gboolean
+gcab_cabinet_write_simple (GCabCabinet *self,
+                           GOutputStream *out,
+                           GCabFileCallback file_callback,
+                           gpointer user_data,
+                           GCancellable *cancellable,
+                           GError **error)
+{
+    return gcab_cabinet_write (self, out, file_callback, NULL, user_data, cancellable, error);
+}
+
+/**
  * gcab_cabinet_new:
  *
  * Returns: a new #GCabCabinet
@@ -397,4 +422,30 @@ gcab_cabinet_extract (GCabCabinet *self,
 
 end:
     return success;
+}
+
+/**
+ * gcab_cabinet_extract_simple:
+ * @cabinet: a #GCabCabinet
+ * @path: the path to extract files
+ * @file_callback: (allow-none) (scope call) (closure user_data): an optionnal #GCabFile callback,
+ *     return %FALSE to filter out or skip files.
+ * @user_data: (closure): callback data
+ * @cancellable: (allow-none): optional #GCancellable object,
+ *     %NULL to ignore
+ * @error: (allow-none): #GError to set on error, or %NULL
+ *
+ * Extract files to given path.
+ *
+ * Returns: %TRUE on success.
+ **/
+gboolean
+gcab_cabinet_extract_simple (GCabCabinet *cabinet,
+                             GFile *path,
+                             GCabFileCallback file_callback,
+                             gpointer user_data,
+                             GCancellable *cancellable,
+                             GError **error)
+{
+    return gcab_cabinet_extract (cabinet, path, file_callback, NULL, user_data, cancellable, error);
 }

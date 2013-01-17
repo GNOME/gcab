@@ -67,10 +67,22 @@ gboolean           gcab_cabinet_write         (GCabCabinet *cabinet,
                                                gpointer user_data,
                                                GCancellable *cancellable,
                                                GError **error);
+gboolean           gcab_cabinet_write_simple  (GCabCabinet *cabinet,
+                                               GOutputStream *stream,
+                                               GCabFileCallback file_callback,
+                                               gpointer user_data,
+                                               GCancellable *cancellable,
+                                               GError **error);
 gboolean           gcab_cabinet_extract       (GCabCabinet *cabinet,
                                                GFile *path,
                                                GCabFileCallback file_callback,
                                                GFileProgressCallback progress_callback,
+                                               gpointer user_data,
+                                               GCancellable *cancellable,
+                                               GError **error);
+gboolean           gcab_cabinet_extract_simple(GCabCabinet *cabinet,
+                                               GFile *path,
+                                               GCabFileCallback file_callback,
                                                gpointer user_data,
                                                GCancellable *cancellable,
                                                GError **error);
