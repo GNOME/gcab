@@ -137,9 +137,9 @@ gcab_cabinet_get_folders (GCabCabinet *self)
  * gcab_cabinet_write:
  * @cabinet: a #GCabCabinet
  * @stream: a #GOutputStream also #GSeekable
- * @file_callback: (allow-none) (scope call): report current file being saved
- * @progress_callback: (allow-none) (scope call): report saving progress
- * @callback_data: (closure): user data to pass to callbacks
+ * @file_callback: (allow-none) (scope call) (closure user_data): report current file being saved
+ * @progress_callback: (allow-none) (scope call) (closure user_data): report saving progress
+ * @user_data: (closure): user data to pass to callbacks
  * @cancellable: (allow-none): optional #GCancellable object,
  *     %NULL to ignore
  * @error: (allow-none): #GError to set on error, or %NULL
@@ -153,7 +153,7 @@ gcab_cabinet_write (GCabCabinet *self,
                     GOutputStream *out,
                     GCabFileCallback file_callback,
                     GFileProgressCallback progress_callback,
-                    gpointer callback_data,
+                    gpointer user_data,
                     GCancellable *cancellable,
                     GError **error)
 {
@@ -204,7 +204,7 @@ gcab_cabinet_write (GCabCabinet *self,
     for (l = files; l != NULL; l = l->next) {
         file = GCAB_FILE (l->data);
         if (file_callback)
-            file_callback (file, callback_data);
+            file_callback (file, user_data);
 
         g_clear_object (&in);
         in = G_INPUT_STREAM (g_file_read (file->file, cancellable, error));
@@ -356,10 +356,10 @@ end:
  * gcab_cabinet_extract:
  * @cabinet: a #GCabCabinet
  * @path: the path to extract files
- * @file_callback: (allow-none) (scope call): an optionnal #GCabFile callback,
+ * @file_callback: (allow-none) (scope call) (closure user_data): an optionnal #GCabFile callback,
  *     return %FALSE to filter out or skip files.
- * @progress_callback: (allow-none) (scope call): a progress callback
- * @callback_data: callback data
+ * @progress_callback: (allow-none) (scope call) (closure user_data): a progress callback
+ * @user_data: (closure): callback data
  * @cancellable: (allow-none): optional #GCancellable object,
  *     %NULL to ignore
  * @error: (allow-none): #GError to set on error, or %NULL
@@ -373,7 +373,7 @@ gcab_cabinet_extract (GCabCabinet *self,
                       GFile *path,
                       GCabFileCallback file_callback,
                       GFileProgressCallback progress_callback,
-                      gpointer callback_data,
+                      gpointer user_data,
                       GCancellable *cancellable,
                       GError **error)
 {
@@ -388,7 +388,7 @@ gcab_cabinet_extract (GCabCabinet *self,
     for (i = 0; i < self->folders->len; ++i) {
         GCabFolder *folder = g_ptr_array_index (self->folders, i);
         if (!gcab_folder_extract (folder, path, self->cheader.res_data,
-                                  file_callback, progress_callback, callback_data,
+                                  file_callback, progress_callback, user_data,
                                   cancellable, error)) {
             success = FALSE;
             break;

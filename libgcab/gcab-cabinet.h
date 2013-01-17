@@ -64,14 +64,14 @@ gboolean           gcab_cabinet_write         (GCabCabinet *cabinet,
                                                GOutputStream *stream,
                                                GCabFileCallback file_callback,
                                                GFileProgressCallback progress_callback,
-                                               gpointer callback_data,
+                                               gpointer user_data,
                                                GCancellable *cancellable,
                                                GError **error);
 gboolean           gcab_cabinet_extract       (GCabCabinet *cabinet,
                                                GFile *path,
                                                GCabFileCallback file_callback,
                                                GFileProgressCallback progress_callback,
-                                               gpointer callback_data,
+                                               gpointer user_data,
                                                GCancellable *cancellable,
                                                GError **error);
 
