@@ -8,7 +8,7 @@
   <bookinfo>
     <title>GCab Reference Manual</title>
     <releaseinfo>
-      This document is generated from the version gcab 0.1.13-ba9f-dirty.
+      This document is generated from the version @PACKAGE_STRING@.
       <!-- <ulink role="online-location"
                   url="http://fixme/gcab/index.html">
              http://fixme/gcab/
