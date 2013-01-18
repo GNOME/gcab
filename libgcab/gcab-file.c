@@ -27,6 +27,7 @@ gcab_file_finalize (GObject *object)
 
     g_object_unref (self->file);
     g_free (self->name);
+    g_free (self->extract_name);
 
     G_OBJECT_CLASS (gcab_file_parent_class)->finalize (object);
 }
@@ -200,4 +201,21 @@ gcab_file_new_with_cfile (const cfile_t *cfile)
     file->cfile = *cfile;
 
     return file;
+}
+
+const gchar *
+gcab_file_get_extract_name (GCabFile *self)
+{
+    g_return_val_if_fail (GCAB_IS_FILE (self), NULL);
+
+    return self->extract_name ? self->extract_name : self->name;
+}
+
+void
+gcab_file_set_extract_name (GCabFile *self, const gchar *name)
+{
+    g_return_if_fail (GCAB_IS_FILE (self));
+
+    g_free (self->extract_name);
+    self->extract_name = g_strdup (name);
 }

@@ -316,8 +316,8 @@ gcab_folder_extract (GCabFolder *self,
         if (file_callback && !file_callback (file, callback_data))
             continue;
 
-        int i = 0, len = strlen (file->name);
-        gchar *fname = g_strdup (file->name);
+        gchar *fname = g_strdup (gcab_file_get_extract_name (file));
+        int i = 0, len = strlen (fname);
         for (i = 0; i < len; i++)
             if (fname[i] == '\\')
                 fname[i] = '/';

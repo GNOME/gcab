@@ -15,6 +15,7 @@ struct _GCabFile
     GObject parent_instance;
 
     gchar *name;
+    gchar *extract_name;
     GFile *file;
     cfile_t cfile;
 };
