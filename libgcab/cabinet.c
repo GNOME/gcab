@@ -402,9 +402,20 @@ cdata_write (cdata_t *cd, GDataOutputStream *out, int type,
 }
 
 G_GNUC_INTERNAL void
-cdata_finish (cdata_t *cd)
+cdata_finish (cdata_t *cd, GError **error)
 {
+    z_stream *z = &cd->z;
+    int zret;
 
+    if (!z->opaque)
+        return;
+
+    zret = inflateEnd (z);
+    z->opaque = NULL;
+
+    if (zret != Z_OK)
+        g_set_error (error, GCAB_ERROR, GCAB_ERROR_FAILED,
+                     "zlib failed: %s", zError (zret));
 }
 
 G_GNUC_INTERNAL gboolean
@@ -485,7 +496,7 @@ cdata_read (cdata_t *cd, u1 res_data, GCabCompression compression,
 end:
     if (zret != Z_OK)
         g_set_error (error, GCAB_ERROR, GCAB_ERROR_FAILED,
-                     "zlib failed: %s", zError(zret));
+                     "zlib failed: %s", zError (zret));
     if (!*error && !success)
         g_set_error (error, GCAB_ERROR, GCAB_ERROR_FAILED,
                      "Invalid cabint chunk");

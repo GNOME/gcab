@@ -138,6 +138,6 @@ gboolean     cdata_read                         (cdata_t *cd,
                                                  GDataInputStream *in,
                                                  GCancellable *cancellable,
                                                  GError **error);
-void         cdata_finish                       (cdata_t *cd);
+void         cdata_finish                       (cdata_t *cd, GError **error);
 
 #endif /* CABINET_H */

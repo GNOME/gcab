@@ -377,7 +377,8 @@ end:
         g_object_unref (data);
     if (out)
         g_object_unref (out);
-    cdata_finish (&cdata);
+
+    cdata_finish (&cdata, NULL);
 
     return success;
 }
