@@ -3,6 +3,7 @@ LIBGCAB1_0.0 {
         gcab_cabinet_add_folder;
         gcab_cabinet_get_folders;
         gcab_cabinet_get_type;
+        gcab_cabinet_load;
         gcab_cabinet_new;
         gcab_cabinet_write;
         gcab_compression_get_type;
@@ -12,7 +13,20 @@ LIBGCAB1_0.0 {
         gcab_file_get_type;
         gcab_file_new_with_file;
         gcab_folder_add_file;
+        gcab_folder_get_files;
         gcab_folder_get_nfiles;
         gcab_folder_get_type;
         gcab_folder_new;
+  local:
+        *;
 };
+
+LIBGCAB1_0.2 {
+        gcab_cabinet_write_simple;
+
+        gcab_cabinet_extract;
+        gcab_cabinet_extract_simple;
+
+        gcab_file_get_extract_name;
+        gcab_file_set_extract_name;
+} LIBGCAB1_0.0;
