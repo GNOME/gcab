@@ -6,9 +6,10 @@ srcdir=`dirname $0`
 test -z "$srcdir" && srcdir=.
 mkdir -p "$srcdir/m4"
 
+gtkdocize
 autoreconf -v --force --install
 intltoolize -f
 
 if [ -z "$NOCONFIGURE" ]; then
-    "$srcdir"/configure "$@"
+    "$srcdir"/configure --enable-gtk-doc "$@"
 fi

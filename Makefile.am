@@ -5,7 +5,7 @@ DISTCLEANFILES =
 ACLOCAL_AMFLAGS = -I m4
 AM_MAKEFLAGS = --no-print-directory
 
-SUBDIRS = po libgcab
+SUBDIRS = docs po libgcab
 
 AM_CPPFLAGS =					\
         -I$(top_srcdir)				\
@@ -160,6 +160,8 @@ clean-local:
 $(TESTSUITE): tests/testsuite.at tests/package.m4
 	$(AUTOM4TE) --language=autotest -I$(builddir)/tests -o $@.tmp $@.at
 	mv $@.tmp $@
+
+DISTCHECK_CONFIGURE_FLAGS = --enable-gtk-doc
 
 MAINTAINERCLEANFILES =						\
 	$(srcdir)/ABOUT-NLS					\

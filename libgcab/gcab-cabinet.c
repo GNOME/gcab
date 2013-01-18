@@ -1,5 +1,17 @@
 #include "gcab-priv.h"
 
+/**
+ * SECTION:gcab-cabinet
+ * @title: GCabCabinet
+ * @short_description: Cabinet archive file operations
+ * @see_also: #GCabFolder
+ * @stability: Stable
+ * @include: libgcab.h
+ *
+ * A GCabCabinet is a handle to a Cabinet archive. It allows examining,
+ * extracting and creation of archives.
+ */
+
 struct _GCabCabinetClass
 {
     GObjectClass parent_class;
@@ -98,8 +110,8 @@ gcab_cabinet_class_init (GCabCabinetClass *klass)
 /**
  * gcab_cabinet_add_folder:
  * @cabinet: a #GCabCabinet
- * @folder:
- * @error:
+ * @folder: a #GCabFolder
+ * @error: (allow-none): #GError to set on error, or %NULL
  *
  * Add @folder to @cabinet.
  *
@@ -122,6 +134,10 @@ gcab_cabinet_add_folder (GCabCabinet *self,
 /**
  * gcab_cabinet_get_folders:
  * @cabinet:a #GCabCabinet
+ *
+ * Get the Cabinet folders within the @cabinet.
+ * Note that Cabinet folders are not like filesystem path, they are
+ * group of files sharing some layout parameters.
  *
  * Returns: (element-type GCabFolder) (transfer full): an array of #GCabFolder
  **/
@@ -292,6 +308,9 @@ gcab_cabinet_write_simple (GCabCabinet *self,
 
 /**
  * gcab_cabinet_new:
+ *
+ * Create a new #GCabCabinet object to read or create a Cabinet
+ * archive.
  *
  * Returns: a new #GCabCabinet
  **/

@@ -36,6 +36,13 @@ G_BEGIN_DECLS
 typedef struct _GCabFolderClass GCabFolderClass;
 typedef struct _GCabFolder GCabFolder;
 
+/**
+ * GCabCompression:
+ * @GCAB_COMPRESSION_NONE: No compression.
+ * @GCAB_COMPRESSION_MSZIP: MSZIP compression.
+ *
+ * Compression used by the #GCabFolder.
+ **/
 typedef enum
 {
     GCAB_COMPRESSION_NONE = 0,

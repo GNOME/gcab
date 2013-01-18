@@ -1,5 +1,25 @@
 #include "gcab-priv.h"
 
+/**
+ * SECTION:gcab-folder
+ * @title: GCabFolder
+ * @short_description: A Cabinet folder
+ * @see_also: #GCabFolder
+ * @stability: Stable
+ * @include: libgcab.h
+ *
+ * A GCabFolder is a handle to a folder within the Cabinet archive. A
+ * Cabinet folder <emphasis>is not</emphasis> like a directory. It is
+ * a sub-container grouping GCabFiles together, sharing some common
+ * settings like the compression method.
+ *
+ * You can retrieve the files withing a folder with
+ * gcab_folder_get_files().
+ *
+ * In order to add a file to a folder for creation, use
+ * gcab_folder_add_file().
+ */
+
 struct _GCabFolderClass
 {
     GObjectClass parent_class;

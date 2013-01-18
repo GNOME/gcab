@@ -35,9 +35,22 @@ G_BEGIN_DECLS
 #define GCAB_IS_CABINET_CLASS(klass)     (G_TYPE_CHECK_CLASS_TYPE ((klass), GCAB_TYPE_CABINET))
 #define GCAB_CABINET_GET_CLASS(cabinet)  (G_TYPE_INSTANCE_GET_CLASS ((cabinet), GCAB_TYPE_CABINET, GCabCabinetClass))
 
+/**
+ * GCAB_ERROR:
+ *
+ * Error domain for the GCab library. See #GError for more information
+ * on error domains.
+ */
 #define GCAB_ERROR gcab_error_quark ()
 GQuark gcab_error_quark (void);
 
+/**
+ * GCabError:
+ * @GCAB_ERROR_FORMAT: The given file is not of Cabinet format.
+ * @GCAB_ERROR_FAILED: General function failure.
+ *
+ * The various errors triggered by the GCab functions.
+ **/
 typedef enum GCabError
 {
     GCAB_ERROR_FORMAT,

@@ -1,6 +1,21 @@
 #include "gcab-priv.h"
 #include "gcab-file.h"
 
+/**
+ * SECTION:gcab-file
+ * @title: GCabFile
+ * @short_description: A file contained in the Cabinet
+ * @see_also: #GCabFolder
+ * @stability: Stable
+ * @include: libgcab.h
+ *
+ * A GCabFile is a handle to a file inside a Cabinet archive.
+ * It can either be a file that is already within an exisiting
+ * archive, or a file that reference a file on disk that will be used
+ * for a new archive creation. In the later case, gcab_file_get_file()
+ * must return a valid handle.
+ */
+
 struct _GCabFileClass
 {
     GObjectClass parent_class;
@@ -147,6 +162,8 @@ gcab_file_set_uoffset (GCabFile *self, u4 uoffset)
  * gcab_file_get_name:
  * @file: a #GCabFile
  *
+ * Get the file name within the cabinet.
+ *
  * Returns: the cabinet file name
  **/
 const gchar *
@@ -160,6 +177,13 @@ gcab_file_get_name (GCabFile *self)
 /**
  * gcab_file_get_file:
  * @file: a #GCabFile
+ *
+ * If the cabinet is being created, get the #GFile associated with
+ * @file. This must be an exisiting file that can be read, in order to
+ * be added to the archive during cabinet creation.
+ *
+ * If @file is from an existing cabinet, the fuction will return
+ * %NULL.
  *
  * Returns: (transfer full): the associated #GFile or %NULL
  **/
@@ -175,6 +199,9 @@ gcab_file_get_file (GCabFile *self)
  * gcab_file_new_with_file:
  * @name: name of the file within the cabinet
  * @file: a #GFile to be added to the cabinet
+ *
+ * Create a #GCabFile from a given #GFile, to be added to a
+ * #GCabCabinet for archive creation.
  *
  * Returns: a new #GCabFile
  **/
@@ -203,6 +230,14 @@ gcab_file_new_with_cfile (const cfile_t *cfile)
     return file;
 }
 
+/**
+ * gcab_file_get_extract_name:
+ * @file: a #GCabFile
+ *
+ * Get the file name to use for extraction, or %NULL.
+ *
+ * Returns: (allow-none): a file name
+ **/
 const gchar *
 gcab_file_get_extract_name (GCabFile *self)
 {
@@ -211,6 +246,14 @@ gcab_file_get_extract_name (GCabFile *self)
     return self->extract_name ? self->extract_name : self->name;
 }
 
+/**
+ * gcab_file_set_extract_name:
+ * @file: a #GCabFile
+ * @name: (allow-none): a file name or %NULL
+ *
+ * Sets the file name to use for extraction, instead of the name
+ * provided by the Cabinet.
+ **/
 void
 gcab_file_set_extract_name (GCabFile *self, const gchar *name)
 {

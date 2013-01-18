@@ -13,6 +13,7 @@ AC_PROG_CC
 AM_PROG_CC_C_O
 AC_PROG_INSTALL
 LT_INIT([win32-dll disable-fast-install])
+GTK_DOC_CHECK([1.14],[--flavour no-tmpl])
 PKG_PROG_PKG_CONFIG
 GOBJECT_INTROSPECTION_CHECK([0.9.4])
 AM_CONDITIONAL([GIR], [test "x$INTROSPECTION_MAKEFILE" != x])
@@ -48,10 +49,13 @@ AC_CHECK_HEADERS([zlib.h], [], [AC_MSG_ERROR([zlib required])])
 
 AC_OUTPUT([
   Makefile
+  docs/Makefile
+  docs/reference/Makefile
+  docs/reference/gcab-docs.sgml
   gcab.1
   libgcab-1.0.pc
-  po/Makefile.in
   libgcab/Makefile
+  po/Makefile.in
 ])
 
 AC_MSG_NOTICE([
