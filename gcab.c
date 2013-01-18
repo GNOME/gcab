@@ -85,7 +85,7 @@ main (int argc, char *argv[])
         { "create", 'c', 0, G_OPTION_ARG_NONE, &create, N_("Create archive"), NULL },
         { "extract", 'x', 0, G_OPTION_ARG_NONE, &extract, N_("Extract all files"), NULL },
         { "list", 't', 0, G_OPTION_ARG_NONE, &list, N_("List content"), NULL },
-        { "directory", 'C', 0, G_OPTION_ARG_FILENAME, &change, N_("Change to directory"), NULL },
+        { "directory", 'C', 0, G_OPTION_ARG_FILENAME, &change, N_("Change to directory DIR"), N_("DIR") },
         { "zip", 'z', 0, G_OPTION_ARG_NONE, &compress, N_("Use zip compression"), NULL },
         { "nopath", 'n', 0, G_OPTION_ARG_NONE, &nopath, N_("Do not include path"), NULL },
         { G_OPTION_REMAINING, '\0', 0, G_OPTION_ARG_FILENAME_ARRAY, &args, NULL, N_("FILE INPUT_FILES...") },
