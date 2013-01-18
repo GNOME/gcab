@@ -47,6 +47,7 @@ libgcab_1_0_la_LDFLAGS =				\
 	-Wl,--version-script=${srcdir}/libgcab.syms	\
 	-no-undefined					\
 	$(NULL)
+libgcab_1_0_la_DEPENDENCIES = libgcab.syms
 
 pkgconfigdir = $(libdir)/pkgconfig
 pkgconfig_DATA = libgcab-1.0.pc
