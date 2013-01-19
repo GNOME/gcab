@@ -33,9 +33,23 @@ G_BEGIN_DECLS
 #define GCAB_FILE_GET_CLASS(file)  (G_TYPE_INSTANCE_GET_CLASS ((file), GCAB_TYPE_FILE, GCabFileClass))
 
 typedef struct _GCabFileClass GCabFileClass;
+
+/**
+ * GCabFile:
+ *
+ * An opaque object, referencing a file in a Cabinet.
+ **/
 typedef struct _GCabFile GCabFile;
 
-typedef gboolean (*GCabFileCallback) (GCabFile *current, gpointer user_data);
+/**
+ * GCabFileCallback:
+ * @file: the file being processed
+ * @user_data: user data passed to the callback.
+ *
+ * The type used for callback called when processing Cabinet archive
+ * files.
+ **/
+typedef gboolean (*GCabFileCallback) (GCabFile *file, gpointer user_data);
 
 GType gcab_file_get_type (void) G_GNUC_CONST;
 

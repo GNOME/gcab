@@ -58,6 +58,12 @@ typedef enum GCabError
 } GCabError;
 
 typedef struct _GCabCabinetClass GCabCabinetClass;
+
+/**
+ * GCabCabinet:
+ *
+ * An opaque object holding a Cabinet file reference.
+ **/
 typedef struct _GCabCabinet GCabCabinet;
 
 GType gcab_cabinet_get_type (void) G_GNUC_CONST;

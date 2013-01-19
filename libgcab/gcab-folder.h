@@ -34,6 +34,12 @@ G_BEGIN_DECLS
 #define GCAB_FOLDER_GET_CLASS(folder) (G_TYPE_INSTANCE_GET_CLASS ((folder), GCAB_TYPE_FOLDER, GCabFolderClass))
 
 typedef struct _GCabFolderClass GCabFolderClass;
+
+/**
+ * GCabFolder:
+ *
+ * An opaque object, referencing a folder in a Cabinet.
+ **/
 typedef struct _GCabFolder GCabFolder;
 
 /**

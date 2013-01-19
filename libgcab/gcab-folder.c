@@ -244,7 +244,9 @@ gcab_folder_add_file (GCabFolder *self, GCabFile *file,
  * gcab_folder_get_nfiles:
  * @cabfolder: a #GCabFolder
  *
- * Returns: Number of files in this @folder.
+ * Get the number of files in this @folder.
+ *
+ * Returns: a #guint
  **/
 guint
 gcab_folder_get_nfiles (GCabFolder *self)
@@ -256,7 +258,12 @@ gcab_folder_get_nfiles (GCabFolder *self)
 
 /**
  * gcab_folder_new:
- * @compression: compression used by the folder
+ * @compression: compression to used in this folder
+ *
+ * Creates a new empty Cabinet folder. Use gcab_folder_add_file() to
+ * add files to an archive.
+ *
+ * A Cabinet folder is not a file path, it is a container for files.
  *
  * Returns: a new #GCabFolder
  **/
@@ -283,6 +290,8 @@ gcab_folder_new_with_cfolder (const cfolder_t *folder, GInputStream *stream)
 /**
  * gcab_folder_get_files:
  * @cabfolder: a #GCabFolder
+ *
+ * Get the list of #GCabFile files contained in the @cabfolder.
  *
  * Returns: (element-type GCabFile) (transfer full): list of files
  **/
