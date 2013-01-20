@@ -186,6 +186,7 @@ cheader_read (cheader_t *ch, GDataInputStream *in,
         goto end;
     }
 
+    memset (ch, 0, sizeof (cheader_t));
     R4 (ch->res1);
     R4 (ch->size);
     R4 (ch->res2);
