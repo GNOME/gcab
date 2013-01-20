@@ -38,19 +38,19 @@ AT_SETUP([Add one file])
 AT_DATA([test.txt], [This is test.txt
 ])
 AT_CHECK_GCAB([-c out.cab test.txt])
-AT_CHECK([cabextract -ql out.cab | tail -n+3 |  cut -d'|' -f3], [0],
-[ test.txt
+AT_CHECK_GCAB([-t out.cab], [0],
+[test.txt
 ])
 cp test.txt expout
-AT_CHECK([cabextract -q out.cab], [0])
+AT_CHECK_GCAB([-x out.cab], [0])
 AT_CHECK([cat test.txt], [0], [expout])
 #compressed
 AT_CHECK_GCAB([-cz out.cab test.txt])
-AT_CHECK([cabextract -ql out.cab | tail -n+3 |  cut -d'|' -f3], [0],
-[ test.txt
+AT_CHECK_GCAB([-t out.cab], [0],
+[test.txt
 ])
 cp test.txt expout
-AT_CHECK([cabextract -q out.cab], [0])
+AT_CHECK([gcab -x out.cab], [0])
 AT_CHECK([cat test.txt], [0], [expout])
 AT_CLEANUP
 
