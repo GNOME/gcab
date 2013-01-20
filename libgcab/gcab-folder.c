@@ -369,10 +369,9 @@ gcab_folder_extract (GCabFolder *self,
         g_object_unref (parent);
 
         out = g_file_replace (gfile, NULL, FALSE, 0, cancellable, error);
-        if (!out) {
-            g_object_unref (gfile);
+        g_object_unref (gfile);
+        if (!out)
             goto end;
-        }
 
         u4 usize = file->cfile.usize;
         u4 uoffset = file->cfile.uoffset;
