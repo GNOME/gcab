@@ -1,3 +1,11 @@
+v0.2
+====
+
+- add support for extraction of MSZIP cabinets
+- add 100% gtk-doc API documentation
+- make check doesn't require cabextract anymore
+- fix a few memleaks and misc bugs
+
 v0.1
 ====
 
