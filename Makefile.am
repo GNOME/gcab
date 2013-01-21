@@ -175,6 +175,7 @@ MAINTAINERCLEANFILES =						\
 	$(srcdir)/config.sub					\
 	$(srcdir)/configure.scan				\
 	$(srcdir)/depcomp					\
+	$(srcdir)/gtk-doc.make					\
 	$(srcdir)/install-sh					\
 	$(srcdir)/ltmain.sh					\
 	$(srcdir)/m4/*.m4					\
