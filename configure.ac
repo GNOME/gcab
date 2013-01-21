@@ -18,12 +18,19 @@ PKG_PROG_PKG_CONFIG
 GOBJECT_INTROSPECTION_CHECK([0.9.4])
 AM_CONDITIONAL([GIR], [test "x$INTROSPECTION_MAKEFILE" != x])
 
-IT_PROG_INTLTOOL(0.40.0)
+IT_PROG_INTLTOOL([0.40.0])
 GETTEXT_PACKAGE=AC_PACKAGE_NAME
 AC_SUBST(GETTEXT_PACKAGE)
 AC_DEFINE_UNQUOTED([GETTEXT_PACKAGE],["$GETTEXT_PACKAGE"],[The name of the gettext domain])
-AM_GNU_GETTEXT([external])
-AM_GNU_GETTEXT_VERSION([0.17])
+AM_GLIB_GNU_GETTEXT
+
+AM_PATH_GLIB_2_0([2.22.0], [], [AC_MSG_ERROR([glib required])], [gio])
+AM_PROG_VALAC([0.14])
+AC_PATH_PROG(VAPIGEN, vapigen, no)
+AC_SUBST(VAPIGEN)
+AM_CONDITIONAL([VAPI], [test "x$VAPIGEN" != xno])
+
+AC_CHECK_HEADERS([zlib.h], [], [AC_MSG_ERROR([zlib required])])
 
 AM_MISSING_PROG([AUTOM4TE], [autom4te])
 AC_CONFIG_TESTDIR([.])
@@ -32,20 +39,6 @@ AC_CONFIG_FILES([tests/package.m4.tmp:tests/package.m4.in],
                 [$srcdir/build-aux/move-if-change tests/package.m4.tmp $srcdir/tests/package.m4
                  cp $srcdir/tests/package.m4 tests/package.m4.tmp])
 
-
-AM_PROG_VALAC([0.14])
-AC_PATH_PROG(VAPIGEN, vapigen, no)
-AC_SUBST(VAPIGEN)
-AM_CONDITIONAL([VAPI], [test "x$VAPIGEN" != xno])
-
-GLIB_MKENUMS=`$PKG_CONFIG --variable=glib_mkenums glib-2.0`
-AC_SUBST(GLIB_MKENUMS)
-
-PKG_CHECK_MODULES(GLIB2, glib-2.0 >= 2.22 gio-2.0 >= 2.22)
-AC_SUBST(GLIB2_CFLAGS)
-AC_SUBST(GLIB2_LIBS)
-
-AC_CHECK_HEADERS([zlib.h], [], [AC_MSG_ERROR([zlib required])])
 
 AC_OUTPUT([
   Makefile

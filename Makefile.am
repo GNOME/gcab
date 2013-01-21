@@ -13,7 +13,7 @@ AM_CPPFLAGS =					\
 	-DLOCALEDIR="\"$(datadir)/locale\""	\
 	$(NULL)
 
-AM_CFLAGS = $(GLIB2_CFLAGS)
+AM_CFLAGS = $(GLIB_CFLAGS)
 
 libgcab_includedir = $(includedir)/libgcab-1.0
 libgcab_priv_includedir = $(libgcab_includedir)/libgcab
@@ -40,7 +40,7 @@ libgcab_1_0_la_SOURCES =			\
 	libgcab/glib-compat.c			\
 	libgcab/glib-compat.h			\
 	$(NULL)
-libgcab_1_0_la_LIBADD = -lz $(GLIB2_LIBS)
+libgcab_1_0_la_LIBADD = -lz $(GLIB_LIBS)
 libgcab_1_0_la_LDFLAGS =				\
 	-version-info 0:0:0				\
 	-export-symbols-regex='^gcab_'			\
