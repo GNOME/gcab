@@ -75,12 +75,14 @@ main (int argc, char *argv[])
 
     gchar **args = NULL;
     gchar *change = NULL;
+    int version = 0;
     int nopath = 0;
     int compress = 0;
     int list = 0;
     int create = 0;
     int extract = 0;
     GOptionEntry entries[] = {
+        { "version", 0, 0, G_OPTION_ARG_NONE, &version, N_("Print program version"), NULL },
         { "verbose", 'v', 0, G_OPTION_ARG_NONE, &verbose, N_("Be verbose"), NULL },
         { "create", 'c', 0, G_OPTION_ARG_NONE, &create, N_("Create archive"), NULL },
         { "extract", 'x', 0, G_OPTION_ARG_NONE, &extract, N_("Extract all files"), NULL },
@@ -103,15 +105,20 @@ main (int argc, char *argv[])
     gchar *s = g_strdup_printf (_("Report bugs to <%s>"), PACKAGE_BUGREPORT);
     g_option_context_set_description (context, s);
     g_free(s);
-    g_option_context_set_summary (context, "\
+    g_option_context_set_summary (context, _("\
 gcab saves many files together into a cabinet archive, and can restore\n\
 individual files from the archive.\
-");
+"));
     g_option_context_add_main_entries (context, entries, GETTEXT_PACKAGE);
     g_option_context_set_translation_domain (context, GETTEXT_PACKAGE);
     if (!g_option_context_parse (context, &argc, &argv, &error))
         gcab_error (_("option parsing failed: %s\n"), error->message);
     g_option_context_free(context);
+
+    if (version) {
+        g_printf (PACKAGE_STRING "\n");
+        return 0;
+    }
 
     if ((list + extract + create) != 1)
         gcab_error (_("Please specify a single operation."));
