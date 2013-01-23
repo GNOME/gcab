@@ -405,7 +405,6 @@ cdata_write (cdata_t *cd, GDataOutputStream *out, int type,
 G_GNUC_INTERNAL void
 cdata_finish (cdata_t *cd, GError **error)
 {
-#ifdef TRY_BUGGY_ZLIB_MSIZP
     z_stream *z = &cd->z;
     int zret;
 
@@ -418,7 +417,6 @@ cdata_finish (cdata_t *cd, GError **error)
     if (zret != Z_OK)
         g_set_error (error, GCAB_ERROR, GCAB_ERROR_FAILED,
                      "zlib failed: %s", zError (zret));
-#endif
 }
 
 G_GNUC_INTERNAL gboolean
@@ -454,7 +452,6 @@ cdata_read (cdata_t *cd, u1 res_data, GCabCompression compression,
         if (cd->in[0] != 'C' || cd->in[1] != 'K')
             goto end;
 
-#ifdef TRY_BUGGY_ZLIB_MSIZP
         z_stream *z = &cd->z;
 
         z->avail_in = cd->ncbytes - 2;
@@ -496,29 +493,12 @@ cdata_read (cdata_t *cd, u1 res_data, GCabCompression compression,
     }
 
     success = TRUE;
+
 end:
     if (zret != Z_OK)
         g_set_error (error, GCAB_ERROR, GCAB_ERROR_FAILED,
                      "zlib failed: %s", zError (zret));
 
-#else /* !zlib */
-
-        if (cd->fdi.alloc == NULL) {
-            cd->fdi.alloc = g_malloc;
-            cd->fdi.free = g_free;
-            cd->decomp.fdi = &cd->fdi;
-            cd->decomp.inbuf = cd->in;
-            cd->decomp.outbuf = cd->out;
-        }
-
-        zret = ZIPfdi_decomp(cd->ncbytes, cd->nubytes, &cd->decomp);
-        if (zret < 0)
-            goto end;
-     }
-
-    success = TRUE;
-end:
-#endif
     if (!*error && !success)
         g_set_error (error, GCAB_ERROR, GCAB_ERROR_FAILED,
                      "Invalid cabinet chunk");

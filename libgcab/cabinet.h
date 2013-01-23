@@ -98,12 +98,7 @@ struct cdata
     guint8 *reserved;
     guint8 in[CAB_INPUTMAX+2];
     guint8 out[CAB_BLOCKMAX];
-#ifdef TRY_BUGGY_ZLIB_MSIZP
     z_stream z;
-#else
-    FDI_Int fdi;
-    fdi_decomp_state decomp;
-#endif
 };
 
 gboolean     cheader_write                      (cheader_t *ch,
