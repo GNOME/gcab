@@ -18,7 +18,7 @@ cdata_set (cdata_t *cd, int type, guint8 *data, size_t size)
     cd->nubytes = size;
 
     if (type == 0) {
-        memcpy (cd->data, data, size);
+        memcpy (cd->in, data, size);
         cd->ncbytes = size;
     }
 
@@ -31,11 +31,11 @@ cdata_set (cdata_t *cd, int type, guint8 *data, size_t size)
             return FALSE;
         stream.next_in = data;
         stream.avail_in = size;
-        stream.next_out = cd->data + 2;
-        stream.avail_out = sizeof (cd->data) - 2;
+        stream.next_out = cd->in + 2;
+        stream.avail_out = sizeof (cd->in) - 2;
         /* insert the signature */
-        cd->data[0] = 'C';
-        cd->data[1] = 'K';
+        cd->in[0] = 'C';
+        cd->in[1] = 'K';
         deflate (&stream, Z_FINISH);
         deflateEnd (&stream);
         cd->ncbytes = stream.total_out + 2;
@@ -385,7 +385,7 @@ cdata_write (cdata_t *cd, GDataOutputStream *out, int type,
     if (!cdata_set(cd, type, data, size))
         return FALSE;
 
-    CHECKSUM datacsum = compute_checksum(cd->data, cd->ncbytes, 0);
+    CHECKSUM datacsum = compute_checksum(cd->in, cd->ncbytes, 0);
     cd->checksum = compute_checksum ((guint8*)&cd->ncbytes, 4, datacsum);
     GOutputStream *stream = g_filter_output_stream_get_base_stream (G_FILTER_OUTPUT_STREAM (out));
 
@@ -394,7 +394,7 @@ cdata_write (cdata_t *cd, GDataOutputStream *out, int type,
     if ((!W4 (cd->checksum)) ||
         (!W2 (cd->ncbytes)) ||
         (!W2 (cd->nubytes)) ||
-        (g_output_stream_write (stream, cd->data, cd->ncbytes, cancellable, error) == -1))
+        (g_output_stream_write (stream, cd->in, cd->ncbytes, cancellable, error) == -1))
         return FALSE;
 
     *bytes_written = 4 + 2 + 2 + cd->ncbytes;
@@ -405,6 +405,7 @@ cdata_write (cdata_t *cd, GDataOutputStream *out, int type,
 G_GNUC_INTERNAL void
 cdata_finish (cdata_t *cd, GError **error)
 {
+#ifdef TRY_BUGGY_ZLIB_MSIZP
     z_stream *z = &cd->z;
     int zret;
 
@@ -417,6 +418,7 @@ cdata_finish (cdata_t *cd, GError **error)
     if (zret != Z_OK)
         g_set_error (error, GCAB_ERROR, GCAB_ERROR_FAILED,
                      "zlib failed: %s", zError (zret));
+#endif
 }
 
 G_GNUC_INTERNAL gboolean
@@ -426,16 +428,16 @@ cdata_read (cdata_t *cd, u1 res_data, GCabCompression compression,
 {
     gboolean success = FALSE;
     int zret = Z_OK;
-    gchar *data = compression == GCAB_COMPRESSION_NONE ? cd->out : cd->data;
+    gchar *buf = compression == GCAB_COMPRESSION_NONE ? cd->out : cd->in;
 
     R4 (cd->checksum);
     R2 (cd->ncbytes);
     R2 (cd->nubytes);
     cd->reserved = g_malloc (res_data);
     RN (cd->reserved, res_data);
-    RN (data, cd->ncbytes);
+    RN (buf, cd->ncbytes);
 
-    CHECKSUM datacsum = compute_checksum(data, cd->ncbytes, 0);
+    CHECKSUM datacsum = compute_checksum(buf, cd->ncbytes, 0);
     g_return_val_if_fail (cd->checksum == compute_checksum ((guint8*)&cd->ncbytes, 4, datacsum), FALSE);
 
     if (g_getenv ("GCAB_DEBUG")) {
@@ -445,38 +447,39 @@ cdata_read (cdata_t *cd, u1 res_data, GCabCompression compression,
         P2 (cd, nubytes);
         if (res_data)
             PN (cd, reserved, res_data);
-        PND (cd, data, 64);
+        PND (cd, buf, 64);
     }
 
     if (compression == GCAB_COMPRESSION_MSZIP) {
-        z_stream *z = &cd->z;
-
-        if (cd->data[0] != 'C' || cd->data[1] != 'K')
+        if (cd->in[0] != 'C' || cd->in[1] != 'K')
             goto end;
 
+#ifdef TRY_BUGGY_ZLIB_MSIZP
+        z_stream *z = &cd->z;
+
         z->avail_in = cd->ncbytes - 2;
-        z->next_in = cd->data + 2;
+        z->next_in = cd->in + 2;
         z->avail_out = cd->nubytes;
         z->next_out = cd->out;
+        z->total_out = 0;
 
         if (!z->opaque) {
             z->zalloc = zalloc;
             z->zfree = zfree;
             z->opaque = cd;
 
-            zret = inflateInit2 (z, -15);
+            zret = inflateInit2 (z, -MAX_WBITS);
             if (zret != Z_OK)
                 goto end;
         }
 
         while (1) {
             zret = inflate (z, Z_BLOCK);
-            if (zret != Z_OK)
+            if (zret == Z_STREAM_END)
                 break;
+            if (zret != Z_OK)
+                goto end;
         }
-
-        if (zret != Z_STREAM_END)
-            goto end;
 
         g_warn_if_fail (z->avail_in == 0);
         g_warn_if_fail (z->avail_out == 0);
@@ -493,14 +496,32 @@ cdata_read (cdata_t *cd, u1 res_data, GCabCompression compression,
     }
 
     success = TRUE;
-
 end:
     if (zret != Z_OK)
         g_set_error (error, GCAB_ERROR, GCAB_ERROR_FAILED,
                      "zlib failed: %s", zError (zret));
+
+#else /* !zlib */
+
+        if (cd->fdi.alloc == NULL) {
+            cd->fdi.alloc = g_malloc;
+            cd->fdi.free = g_free;
+            cd->decomp.fdi = &cd->fdi;
+            cd->decomp.inbuf = cd->in;
+            cd->decomp.outbuf = cd->out;
+        }
+
+        zret = ZIPfdi_decomp(cd->ncbytes, cd->nubytes, &cd->decomp);
+        if (zret < 0)
+            goto end;
+     }
+
+    success = TRUE;
+end:
+#endif
     if (!*error && !success)
         g_set_error (error, GCAB_ERROR, GCAB_ERROR_FAILED,
-                     "Invalid cabint chunk");
+                     "Invalid cabinet chunk");
 
     return success;
 }

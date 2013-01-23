@@ -13,7 +13,9 @@
 #include <unistd.h>
 #include <time.h>
 #include <zlib.h>
+
 #include "gcab-folder.h"
+#include "decomp.h"
 
 /* based on the spec
    http://msdn.microsoft.com/en-us/library/bb417343.aspx */
@@ -94,9 +96,14 @@ struct cdata
     u2 ncbytes;
     u2 nubytes;
     guint8 *reserved;
-    guint8 data[DATABLOCKSIZE];
-    guint8 out[DATABLOCKSIZE];
+    guint8 in[CAB_INPUTMAX+2];
+    guint8 out[CAB_BLOCKMAX];
+#ifdef TRY_BUGGY_ZLIB_MSIZP
     z_stream z;
+#else
+    FDI_Int fdi;
+    fdi_decomp_state decomp;
+#endif
 };
 
 gboolean     cheader_write                      (cheader_t *ch,

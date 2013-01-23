@@ -37,6 +37,8 @@ libgcab_1_0_la_SOURCES =			\
 	libgcab/gcab-priv.h			\
 	libgcab/cabinet.c			\
 	libgcab/cabinet.h			\
+	libgcab/decomp.c			\
+	libgcab/decomp.h			\
 	libgcab/glib-compat.c			\
 	libgcab/glib-compat.h			\
 	$(NULL)
