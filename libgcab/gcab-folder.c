@@ -325,7 +325,7 @@ gcab_folder_extract (GCabFolder *self,
     GError *my_error = NULL;
     gboolean success = FALSE;
     GDataInputStream *data = NULL;
-    GOutputStream *out = NULL;
+    GFileOutputStream *out = NULL;
     GSList *f, *files = NULL;
     cdata_t cdata = { 0, };
 
@@ -351,7 +351,6 @@ gcab_folder_extract (GCabFolder *self,
             if (fname[i] == '\\')
                 fname[i] = '/';
 
-        GFileOutputStream *out;
         GFile *gfile = g_file_resolve_relative_path (path, fname);
         GFile *parent = g_file_get_parent (gfile);
         g_free (fname);
@@ -368,7 +367,8 @@ gcab_folder_extract (GCabFolder *self,
         }
         g_object_unref (parent);
 
-        out = g_file_replace (gfile, NULL, FALSE, 0, cancellable, error);
+        g_clear_object (&out);
+        out = g_file_replace (gfile, NULL, FALSE, G_FILE_CREATE_REPLACE_DESTINATION, cancellable, error);
         g_object_unref (gfile);
         if (!out)
             goto end;
@@ -401,11 +401,9 @@ gcab_folder_extract (GCabFolder *self,
 end:
     if (files)
         g_slist_free (files);
-    if (data)
-        g_object_unref (data);
-    if (out)
-        g_object_unref (out);
 
+    g_clear_object (&data);
+    g_clear_object (&out);
     cdata_finish (&cdata, NULL);
 
     return success;
