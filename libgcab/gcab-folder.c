@@ -279,7 +279,7 @@ G_GNUC_INTERNAL GCabFolder *
 gcab_folder_new_with_cfolder (const cfolder_t *folder, GInputStream *stream)
 {
     GCabFolder *self = g_object_new (GCAB_TYPE_FOLDER,
-                                     "compression", folder->typecomp,
+                                     "compression", folder->typecomp & GCAB_COMPRESSION_MASK,
                                      NULL);
     self->stream = g_object_ref (stream);
     self->cfolder = *folder;

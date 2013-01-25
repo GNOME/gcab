@@ -46,6 +46,9 @@ typedef struct _GCabFolder GCabFolder;
  * GCabCompression:
  * @GCAB_COMPRESSION_NONE: No compression.
  * @GCAB_COMPRESSION_MSZIP: MSZIP compression.
+ * @GCAB_COMPRESSION_QUANTUM: QUANTUM compression.
+ * @GCAB_COMPRESSION_LZX: LZX compression.
+ * @GCAB_COMPRESSION_MASK: compression value mask.
  *
  * Compression used by the #GCabFolder.
  **/
@@ -53,6 +56,10 @@ typedef enum
 {
     GCAB_COMPRESSION_NONE = 0,
     GCAB_COMPRESSION_MSZIP = 1,
+    GCAB_COMPRESSION_QUANTUM = 2,
+    GCAB_COMPRESSION_LZX = 3,
+
+    GCAB_COMPRESSION_MASK = 0xf,
 } GCabCompression;
 
 GType gcab_folder_get_type (void) G_GNUC_CONST;
