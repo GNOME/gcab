@@ -26,7 +26,7 @@ struct _GCabFolder
 
     GSList *files;
     GHashTable *hash;
-    GCabCompression compression;
+    gint comptype;
     GByteArray *reserved;
     cfolder_t cfolder;
     GInputStream *stream;

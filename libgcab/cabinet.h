@@ -98,7 +98,11 @@ struct cdata
     guint8 *reserved;
     guint8 in[CAB_INPUTMAX+2];
     guint8 out[CAB_BLOCKMAX];
+    /* using zlib */
     z_stream z;
+    /* using wine decomp.h */
+    FDI_Int fdi;
+    fdi_decomp_state decomp;
 };
 
 gboolean     cheader_write                      (cheader_t *ch,
@@ -136,7 +140,7 @@ gboolean     cdata_write                        (cdata_t *cd,
                                                  GError **error);
 gboolean     cdata_read                         (cdata_t *cd,
                                                  u1 res_data,
-                                                 GCabCompression compression,
+                                                 gint comptype,
                                                  GDataInputStream *in,
                                                  GCancellable *cancellable,
                                                  GError **error);

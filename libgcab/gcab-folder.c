@@ -29,6 +29,7 @@ enum {
     PROP_0,
 
     PROP_COMPRESSION,
+    PROP_COMPTYPE,
     PROP_RESERVED
 };
 
@@ -63,8 +64,8 @@ gcab_folder_set_property (GObject *object, guint prop_id, const GValue *value, G
     GCabFolder *self = GCAB_FOLDER (object);
 
     switch (prop_id) {
-    case PROP_COMPRESSION:
-        self->compression = g_value_get_enum (value);
+    case PROP_COMPTYPE:
+        self->comptype = g_value_get_int (value);
         break;
     case PROP_RESERVED:
         if (self->reserved)
@@ -85,7 +86,10 @@ gcab_folder_get_property (GObject *object, guint prop_id, GValue *value, GParamS
 
     switch (prop_id) {
     case PROP_COMPRESSION:
-        g_value_set_enum (value, self->compression);
+        g_value_set_enum (value, self->comptype & GCAB_COMPRESSION_MASK);
+        break;
+    case PROP_COMPTYPE:
+        g_value_set_int (value, self->comptype);
         break;
     case PROP_RESERVED:
         g_value_set_boxed (value, self->reserved);
@@ -108,8 +112,14 @@ gcab_folder_class_init (GCabFolderClass *klass)
     g_object_class_install_property (object_class, PROP_COMPRESSION,
         g_param_spec_enum ("compression", "compression", "compression",
                            GCAB_TYPE_COMPRESSION, 0,
-                           G_PARAM_CONSTRUCT_ONLY | G_PARAM_READWRITE |
+                           G_PARAM_READABLE |
                            G_PARAM_STATIC_STRINGS));
+
+    g_object_class_install_property (object_class, PROP_COMPTYPE,
+        g_param_spec_int ("comptype", "comptype", "comptype",
+                          0, G_MAXINT, 0,
+                          G_PARAM_CONSTRUCT_ONLY | G_PARAM_READWRITE |
+                          G_PARAM_STATIC_STRINGS));
 
     g_object_class_install_property (object_class, PROP_RESERVED,
          g_param_spec_boxed ("reserved", "Reserved", "Reserved",
@@ -258,7 +268,7 @@ gcab_folder_get_nfiles (GCabFolder *self)
 
 /**
  * gcab_folder_new:
- * @compression: compression to used in this folder
+ * @comptype: compression to used in this folder
  *
  * Creates a new empty Cabinet folder. Use gcab_folder_add_file() to
  * add files to an archive.
@@ -268,10 +278,10 @@ gcab_folder_get_nfiles (GCabFolder *self)
  * Returns: a new #GCabFolder
  **/
 GCabFolder *
-gcab_folder_new (GCabCompression compression)
+gcab_folder_new (gint comptype)
 {
     return g_object_new (GCAB_TYPE_FOLDER,
-                         "compression", compression,
+                         "comptype", comptype,
                          NULL);
 }
 
@@ -279,7 +289,7 @@ G_GNUC_INTERNAL GCabFolder *
 gcab_folder_new_with_cfolder (const cfolder_t *folder, GInputStream *stream)
 {
     GCabFolder *self = g_object_new (GCAB_TYPE_FOLDER,
-                                     "compression", folder->typecomp & GCAB_COMPRESSION_MASK,
+                                     "comptype", folder->typecomp,
                                      NULL);
     self->stream = g_object_ref (stream);
     self->cfolder = *folder;
@@ -378,7 +388,7 @@ gcab_folder_extract (GCabFolder *self,
         do {
             if ((nubytes + cdata.nubytes) <= uoffset) {
                 nubytes += cdata.nubytes;
-                if (!cdata_read (&cdata, res_data, self->compression,
+                if (!cdata_read (&cdata, res_data, self->comptype,
                                  data, cancellable, error))
                     goto end;
                 continue;

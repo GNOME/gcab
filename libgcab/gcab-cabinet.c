@@ -207,7 +207,7 @@ gcab_cabinet_write (GCabCabinet *self,
     for (l = files; l != NULL; l = l->next)
         sumstr += strlen (GCAB_FILE (l->data)->name) + 1;
 
-    folder.typecomp = cabfolder->compression;
+    folder.typecomp = cabfolder->comptype;
     folder.offsetdata = CFI_START + nfiles * 16 + sumstr;
     folder.ndatab = gcab_folder_get_ndatablocks (cabfolder);
 

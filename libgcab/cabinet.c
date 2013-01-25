@@ -426,15 +426,17 @@ cdata_finish (cdata_t *cd, GError **error)
 }
 
 G_GNUC_INTERNAL gboolean
-cdata_read (cdata_t *cd, u1 res_data, GCabCompression compression,
+cdata_read (cdata_t *cd, u1 res_data, gint comptype,
             GDataInputStream *in, GCancellable *cancellable, GError **error)
 
 {
     gboolean success = FALSE;
-    int zret = Z_OK;
+    int ret, zret = Z_OK;
+    gint compression = comptype & GCAB_COMPRESSION_MASK;
     gchar *buf = compression == GCAB_COMPRESSION_NONE ? cd->out : cd->in;
 
-    if (compression > GCAB_COMPRESSION_MSZIP) {
+    if (compression > GCAB_COMPRESSION_MSZIP &&
+        compression != GCAB_COMPRESSION_LZX) {
         g_set_error (error, GCAB_ERROR, GCAB_ERROR_FAILED,
                      _("unsupported compression method %d"), compression);
         return FALSE;
@@ -458,6 +460,24 @@ cdata_read (cdata_t *cd, u1 res_data, GCabCompression compression,
         if (res_data)
             PN (cd, reserved, res_data);
         PND (cd, buf, 64);
+    }
+
+    if (compression == GCAB_COMPRESSION_LZX) {
+        if (cd->fdi.alloc == NULL) {
+            cd->fdi.alloc = g_malloc;
+            cd->fdi.free = g_free;
+            cd->decomp.fdi = &cd->fdi;
+            cd->decomp.inbuf = cd->in;
+            cd->decomp.outbuf = cd->out;
+
+            ret = LZXfdi_init((comptype >> 8) & 0x1f, &cd->decomp);
+            if (ret < 0)
+                goto end;
+        }
+
+        ret = LZXfdi_decomp (cd->ncbytes, cd->nubytes, &cd->decomp);
+        if (ret < 0)
+            goto end;
     }
 
     if (compression == GCAB_COMPRESSION_MSZIP) {
