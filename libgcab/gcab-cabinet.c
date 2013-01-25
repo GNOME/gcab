@@ -97,6 +97,9 @@ gcab_cabinet_class_init (GCabCabinetClass *klass)
 {
     GObjectClass* object_class = G_OBJECT_CLASS (klass);
 
+    bindtextdomain (GETTEXT_PACKAGE, LOCALEDIR);
+    bind_textdomain_codeset (GETTEXT_PACKAGE, "UTF-8");
+
     object_class->finalize = gcab_cabinet_finalize;
     object_class->set_property = gcab_cabinet_set_property;
     object_class->get_property = gcab_cabinet_get_property;

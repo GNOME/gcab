@@ -42,6 +42,10 @@ libgcab_1_0_la_SOURCES =			\
 	libgcab/glib-compat.c			\
 	libgcab/glib-compat.h			\
 	$(NULL)
+libgcab_1_0_la_CPPFLAGS =				\
+	$(AM_CPPFLAGS)					\
+	-DGETTEXT_PACKAGE="\"$(GETTEXT_PACKAGE)\""	\
+	$(NULL)
 libgcab_1_0_la_LIBADD = -lz $(GLIB_LIBS)
 libgcab_1_0_la_LDFLAGS =				\
 	-version-info 0:0:0				\

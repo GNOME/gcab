@@ -1,4 +1,5 @@
 #include "gcab-priv.h"
+#include <glib/gi18n-lib.h>
 
 static voidpf
 zalloc (voidpf opaque, uInt items, uInt size)
