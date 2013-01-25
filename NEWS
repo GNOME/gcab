@@ -1,3 +1,10 @@
+v0.3
+====
+
+- add LZX decompression, thanks to Wine project!
+- gcab learned the ubiquitous --version
+- overwrite files on extract
+
 v0.2
 ====
 
