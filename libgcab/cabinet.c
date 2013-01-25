@@ -17,7 +17,7 @@ static gboolean
 cdata_set (cdata_t *cd, int type, guint8 *data, size_t size)
 {
     if (type > GCAB_COMPRESSION_MSZIP) {
-        g_critical (_("unsupported compression method"));
+        g_critical (_("unsupported compression method %d"), type);
         return FALSE;
     }
 
