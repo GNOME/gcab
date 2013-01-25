@@ -45,7 +45,6 @@ libgcab_1_0_la_SOURCES =			\
 libgcab_1_0_la_LIBADD = -lz $(GLIB_LIBS)
 libgcab_1_0_la_LDFLAGS =				\
 	-version-info 0:0:0				\
-	-export-symbols-regex='^gcab_'			\
 	-Wl,--version-script=${srcdir}/libgcab.syms	\
 	-no-undefined					\
 	$(NULL)
