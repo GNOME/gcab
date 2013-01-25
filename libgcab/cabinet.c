@@ -16,6 +16,11 @@ zfree (voidpf opaque, voidpf address)
 static gboolean
 cdata_set (cdata_t *cd, int type, guint8 *data, size_t size)
 {
+    if (type > GCAB_COMPRESSION_MSZIP) {
+        g_critical (_("unsupported compression method"));
+        return FALSE;
+    }
+
     cd->nubytes = size;
 
     if (type == 0) {
@@ -428,6 +433,12 @@ cdata_read (cdata_t *cd, u1 res_data, GCabCompression compression,
     gboolean success = FALSE;
     int zret = Z_OK;
     gchar *buf = compression == GCAB_COMPRESSION_NONE ? cd->out : cd->in;
+
+    if (compression > GCAB_COMPRESSION_MSZIP) {
+        g_set_error (error, GCAB_ERROR, GCAB_ERROR_FAILED,
+                     _("unsupported compression method %d"), compression);
+        return FALSE;
+    }
 
     R4 (cd->checksum);
     R2 (cd->ncbytes);
