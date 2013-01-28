@@ -9,14 +9,14 @@ msgstr ""
 "Project-Id-Version: gcab master\n"
 "Report-Msgid-Bugs-To: http://bugzilla.gnome.org/enter_bug.cgi?"
 "product=gcab&keywords=I18N+L10N&component=general\n"
-"POT-Creation-Date: 2013-01-22 14:12+0000\n"
-"PO-Revision-Date: 2013-01-24 18:13+0100\n"
+"POT-Creation-Date: 2013-01-28 10:39+0000\n"
+"PO-Revision-Date: 2013-01-28 11:43+0100\n"
 "Last-Translator: Daniel Mustieles <daniel.mustieles@gmail.com>\n"
 "Language-Team: Español <gnome-es-list@gnome.org>\n"
-"Language: es\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Language: es\n"
 "Plural-Forms: nplurals=2; plural=(n!=1);\n"
 
 #: ../gcab.c:62
@@ -137,3 +137,8 @@ msgstr "no se puede añadir una carpeta al archivo cabinet: %s"
 #, c-format
 msgid "can't write cab file %s: %s"
 msgstr "no se puede escribir el archivo cab %s: %s"
+
+#: ../libgcab/cabinet.c:20 ../libgcab/cabinet.c:441
+#, c-format
+msgid "unsupported compression method %d"
+msgstr "método de compresión %d no soportado"
