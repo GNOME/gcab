@@ -10,8 +10,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gcab\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-01-22 16:42+0100\n"
-"PO-Revision-Date: 2013-01-22 16:44+0100\n"
+"POT-Creation-Date: 2013-01-29 17:11+0100\n"
+"PO-Revision-Date: 2013-01-29 17:12+0100\n"
 "Last-Translator: Piotr Drąg <piotrdrag@gmail.com>\n"
 "Language-Team: Polish <gnomepl@aviary.pl>\n"
 "Language: pl\n"
@@ -140,3 +140,8 @@ msgstr "nie można dodać katalogu do pliku Cabinet: %s"
 #, c-format
 msgid "can't write cab file %s: %s"
 msgstr "nie można zapisać pliku Cabinet %s: %s"
+
+#: ../libgcab/cabinet.c:20 ../libgcab/cabinet.c:441
+#, c-format
+msgid "unsupported compression method %d"
+msgstr "nieobsługiwana metoda kompresji %d"
