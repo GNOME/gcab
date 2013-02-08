@@ -1,3 +1,4 @@
+#include <glib/gi18n-lib.h>
 #include "gcab-priv.h"
 
 /**
@@ -196,14 +197,19 @@ gcab_cabinet_write (GCabCabinet *self,
     GInputStream *in = NULL;
     GDataOutputStream *dstream = NULL;
     gboolean success = FALSE;
+    gssize len, offset = 0;
+    cdata_t block = { 0, };
+    guint8 data[DATABLOCKSIZE];
+    gsize written;
+    size_t sumstr = 0;
+    GSList *l, *files;
+    cfile_t *prevf = NULL;
     int i;
 
     dstream = g_data_output_stream_new (out);
     g_data_output_stream_set_byte_order (dstream, G_DATA_STREAM_BYTE_ORDER_LITTLE_ENDIAN);
 
-    size_t sumstr = 0;
-    GSList *l, *files = gcab_folder_get_files (cabfolder);
-
+    files = gcab_folder_get_files (cabfolder);
     for (l = files; l != NULL; l = l->next)
         sumstr += strlen (GCAB_FILE (l->data)->name) + 1;
 
@@ -216,10 +222,6 @@ gcab_cabinet_write (GCabCabinet *self,
         if (!g_data_output_stream_put_byte (dstream, 0, cancellable, error))
             goto end;
 
-    gssize len, offset = 0;
-    cdata_t block = { 0, };
-    guint8 data[DATABLOCKSIZE];
-    gsize written;
     for (l = files; l != NULL; l = l->next) {
         file = GCAB_FILE (l->data);
         if (file_callback)
@@ -264,7 +266,6 @@ gcab_cabinet_write (GCabCabinet *self,
     if (!cfolder_write (&folder, dstream, cancellable, error))
         goto end;
 
-    cfile_t *prevf = NULL;
     for (l = files; l != NULL; l = l->next) {
         file = GCAB_FILE (l->data);
         file->cfile.uoffset = prevf ? prevf->uoffset + prevf->usize : 0;
@@ -442,7 +443,6 @@ gcab_cabinet_extract (GCabCabinet *self,
         }
     }
 
-end:
     return success;
 }
 

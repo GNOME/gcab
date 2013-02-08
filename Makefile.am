@@ -3,17 +3,20 @@ BUILT_SOURCES =
 CLEANFILES =
 DISTCLEANFILES =
 ACLOCAL_AMFLAGS = -I m4
-AM_MAKEFLAGS = --no-print-directory
+
+makeflags_ = $(am__v_lt_$(AM_DEFAULT_VERBOSITY))
+makeflags_0 = --no-print-directory -s
+AM_MAKEFLAGS = $(makeflags_$(V))
 
 SUBDIRS = docs po libgcab
 
+AM_CFLAGS = $(WARN_CFLAGS)
 AM_CPPFLAGS =					\
         -I$(top_srcdir)				\
         -DG_LOG_DOMAIN=\"gcab\"			\
 	-DLOCALEDIR="\"$(datadir)/locale\""	\
+	$(GLIB_CFLAGS)				\
 	$(NULL)
-
-AM_CFLAGS = $(GLIB_CFLAGS)
 
 libgcab_includedir = $(includedir)/libgcab-1.0
 libgcab_priv_includedir = $(libgcab_includedir)/libgcab

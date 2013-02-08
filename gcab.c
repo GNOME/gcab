@@ -47,7 +47,7 @@ file_callback (GCabFile *cabfile, gpointer data)
 static const gchar *
 remove_leading_path (gchar *name)
 {
-    int i;
+    unsigned i;
 
     i = 0;
     if (name[0] == G_DIR_SEPARATOR)
@@ -128,6 +128,10 @@ individual files from the archive.\
 
     GCancellable *cancellable = g_cancellable_new ();
     GCabCabinet *cabinet = gcab_cabinet_new ();
+    GCabFolder *folder;
+    GFile *outputfile;
+    GOutputStream *output;
+    GFile *cwd;
 
     if (list || extract) {
         GFile *file = g_file_new_for_commandline_arg (args[0]);
@@ -141,10 +145,10 @@ individual files from the archive.\
         if (list) {
             GPtrArray *folders = gcab_cabinet_get_folders (cabinet);
             for (i = 0; i < folders->len; i++) {
-                GSList *l, *list = gcab_folder_get_files (g_ptr_array_index (folders, i));
-                for (l = list; l != NULL; l = l->next)
+                GSList *l, *files = gcab_folder_get_files (g_ptr_array_index (folders, i));
+                for (l = files; l != NULL; l = l->next)
                     g_print ("%s\n", gcab_file_get_name (GCAB_FILE (l->data)));
-                g_slist_free (list);
+                g_slist_free (files);
             }
         } else if (extract) {
             g_object_unref (file);
@@ -164,7 +168,7 @@ individual files from the archive.\
     if (args[1] == NULL)
         gcab_error (_("please specify input files."));
 
-    GCabFolder *folder = gcab_folder_new (compress ? GCAB_COMPRESSION_MSZIP : 0);
+    folder = gcab_folder_new (compress ? GCAB_COMPRESSION_MSZIP : 0);
 
     for (i = 1; args[i]; i++) {
         GFile *file = g_file_new_for_commandline_arg (args[i]);
@@ -185,13 +189,13 @@ individual files from the archive.\
     if (gcab_folder_get_nfiles (folder) == 0)
         gcab_error (_("no files to be archived."));
 
-    GFile *outputfile = g_file_new_for_commandline_arg (args[0]);
-    GOutputStream *output = G_OUTPUT_STREAM (g_file_replace (outputfile, NULL, FALSE,
-                                                             0, NULL, &error));
+    outputfile = g_file_new_for_commandline_arg (args[0]);
+    output = G_OUTPUT_STREAM (g_file_replace (outputfile, NULL, FALSE,
+                                              0, NULL, &error));
     if (error)
         gcab_error (_("can't create cab file %s: %s"), args[0], error->message);
 
-    GFile *cwd = g_file_new_for_commandline_arg (".");
+    cwd = g_file_new_for_commandline_arg (".");
     if (!gcab_cabinet_add_folder (cabinet, folder, &error))
         gcab_error (_("can't add folder to cabinet: %s"), args[0], error->message);
 

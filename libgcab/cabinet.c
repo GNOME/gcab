@@ -433,7 +433,8 @@ cdata_read (cdata_t *cd, u1 res_data, gint comptype,
     gboolean success = FALSE;
     int ret, zret = Z_OK;
     gint compression = comptype & GCAB_COMPRESSION_MASK;
-    gchar *buf = compression == GCAB_COMPRESSION_NONE ? cd->out : cd->in;
+    guint8 *buf = compression == GCAB_COMPRESSION_NONE ? cd->out : cd->in;
+    CHECKSUM datacsum;
 
     if (compression > GCAB_COMPRESSION_MSZIP &&
         compression != GCAB_COMPRESSION_LZX) {
@@ -449,7 +450,7 @@ cdata_read (cdata_t *cd, u1 res_data, gint comptype,
     RN (cd->reserved, res_data);
     RN (buf, cd->ncbytes);
 
-    CHECKSUM datacsum = compute_checksum(buf, cd->ncbytes, 0);
+    datacsum = compute_checksum(buf, cd->ncbytes, 0);
     g_return_val_if_fail (cd->checksum == compute_checksum ((guint8*)&cd->ncbytes, 4, datacsum), FALSE);
 
     if (g_getenv ("GCAB_DEBUG")) {

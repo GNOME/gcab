@@ -29,8 +29,25 @@ AM_PROG_VALAC([0.14])
 AC_PATH_PROG(VAPIGEN, vapigen, no)
 AC_SUBST(VAPIGEN)
 AM_CONDITIONAL([VAPI], [test "x$VAPIGEN" != xno])
-
 AC_CHECK_HEADERS([zlib.h], [], [AC_MSG_ERROR([zlib required])])
+
+gl_MANYWARN_ALL_GCC([warnings])
+nw=
+nw="$nw -Wsystem-headers"       # Don't let system headers trigger warnings
+nw="$nw -Wundef"                # All compiler preprocessors support #if UNDEF
+nw="$nw -Wtraditional"          # All compilers nowadays support ANSI C
+nw="$nw -Wconversion"           # These warnings usually don't point to mistakes.
+nw="$nw -Wsign-conversion"      # Likewise.
+nw="$nw -Wunused-parameter"     # Likewise.
+nw="$nw -Wunused-local-typedefs" # Likewise.
+nw="$nw -Wunsafe-loop-optimizations" # Likewise.
+# Enable all GCC warnings not in this list.
+gl_MANYWARN_COMPLEMENT([warnings], [$warnings], [$nw])
+for w in $warnings; do
+  gl_WARN_ADD([$w])
+done
+gl_WARN_ADD([-Wno-sign-compare])
+gl_WARN_ADD([-Wno-unused-parameter])
 
 AM_MISSING_PROG([AUTOM4TE], [autom4te])
 AC_CONFIG_TESTDIR([.])

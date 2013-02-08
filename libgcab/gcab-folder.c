@@ -338,6 +338,7 @@ gcab_folder_extract (GCabFolder *self,
     GFileOutputStream *out = NULL;
     GSList *f, *files = NULL;
     cdata_t cdata = { 0, };
+    u4 nubytes = 0;
 
     data = g_data_input_stream_new (self->stream);
     g_data_input_stream_set_byte_order (data, G_DATA_STREAM_BYTE_ORDER_LITTLE_ENDIAN);
@@ -348,7 +349,6 @@ gcab_folder_extract (GCabFolder *self,
 
     files = g_slist_sort (g_slist_copy (self->files), (GCompareFunc)sort_by_offset);
 
-    u4 nubytes = 0;
     for (f = files; f != NULL; f = f->next) {
         GCabFile *file = f->data;
 
