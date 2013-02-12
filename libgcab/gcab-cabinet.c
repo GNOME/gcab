@@ -209,12 +209,21 @@ gcab_cabinet_write (GCabCabinet *self,
     dstream = g_data_output_stream_new (out);
     g_data_output_stream_set_byte_order (dstream, G_DATA_STREAM_BYTE_ORDER_LITTLE_ENDIAN);
 
+    if (self->reserved) {
+        header.offsetfiles += self->reserved->len + 4;
+        header.flags = CABINET_HEADER_RESERVE;
+        header.res_header = self->reserved->len;
+        header.res_folder = 0;
+        header.res_data = 0;
+        header.reserved = self->reserved->data;
+    }
+
     files = gcab_folder_get_files (cabfolder);
     for (l = files; l != NULL; l = l->next)
         sumstr += strlen (GCAB_FILE (l->data)->name) + 1;
 
     folder.typecomp = cabfolder->comptype;
-    folder.offsetdata = CFI_START + nfiles * 16 + sumstr;
+    folder.offsetdata = header.offsetfiles + nfiles * 16 + sumstr;
     folder.ndatab = gcab_folder_get_ndatablocks (cabfolder);
 
     /* avoid seeking to allow growing output streams */
@@ -257,7 +266,7 @@ gcab_cabinet_write (GCabCabinet *self,
         goto end;
 
     header.nfiles = nfiles;
-    header.size += CFI_START + nfiles * 16; /* 1st part cfile struct = 16 bytes */
+    header.size += header.offsetfiles + nfiles * 16; /* 1st part cfile struct = 16 bytes */
     header.size += sumstr;
 
     if (!cheader_write (&header, dstream, cancellable, error))

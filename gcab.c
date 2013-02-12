@@ -77,6 +77,7 @@ main (int argc, char *argv[])
     gchar *change = NULL;
     int version = 0;
     int nopath = 0;
+    int space = 0;
     int compress = 0;
     int list = 0;
     int create = 0;
@@ -90,6 +91,7 @@ main (int argc, char *argv[])
         { "directory", 'C', 0, G_OPTION_ARG_FILENAME, &change, N_("Change to directory DIR"), N_("DIR") },
         { "zip", 'z', 0, G_OPTION_ARG_NONE, &compress, N_("Use zip compression"), NULL },
         { "nopath", 'n', 0, G_OPTION_ARG_NONE, &nopath, N_("Do not include path"), NULL },
+        { "space", 's', 0, G_OPTION_ARG_INT, &space, N_("Reserve space in cabinet for signing (e.g. -s 6144 reserves 6K bytes)"), NULL },
         { G_OPTION_REMAINING, '\0', 0, G_OPTION_ARG_FILENAME_ARRAY, &args, NULL, N_("FILE INPUT_FILES...") },
         { NULL }
     };
@@ -170,6 +172,13 @@ individual files from the archive.\
 
     if (args[1] == NULL)
         gcab_error (_("please specify input files."));
+
+    if (space) {
+        GByteArray *reserved = g_byte_array_sized_new (space);
+        g_byte_array_set_size (reserved, space);
+        g_object_set (cabinet, "reserved", reserved, NULL);
+        g_byte_array_unref (reserved);
+    }
 
     folder = gcab_folder_new (compress ? GCAB_COMPRESSION_MSZIP : 0);
 

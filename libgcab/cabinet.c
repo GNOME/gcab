@@ -157,6 +157,8 @@ G_GNUC_INTERNAL gboolean
 cheader_write (cheader_t *ch, GDataOutputStream *out,
                GCancellable *cancellable, GError **error)
 {
+    GOutputStream *stream = g_filter_output_stream_get_base_stream (G_FILTER_OUTPUT_STREAM (out));
+
     if (!W1 ('M') || !W1 ('S') || !W1 ('C') || !W1 ('F') ||
         !W4 (ch->res1) ||
         !W4 (ch->size) ||
@@ -171,6 +173,15 @@ cheader_write (cheader_t *ch, GDataOutputStream *out,
         !W2 (ch->setID) ||
         !W2 (ch->cabID))
         return FALSE;
+
+    if (ch->flags & CABINET_HEADER_RESERVE) {
+        W2 (ch->res_header);
+        W1 (ch->res_folder);
+        W1 (ch->res_data);
+        if (g_output_stream_write (stream, ch->reserved, ch->res_header,
+                                   cancellable, error) == -1)
+            return FALSE;
+    }
 
     return TRUE;
 }

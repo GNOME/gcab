@@ -24,6 +24,9 @@ create files without pathnames
 \fB\-C, --directory DIR\fR
 change or extract to directory DIR
 .TP
+\fB\-s, --space\fR
+Reserve space in cabinet for signing (e.g. -s 6144 reserves 6K bytes)
+.TP
 \fB\-v, --verbose\fR
 verbosely list files processed
 .TP
