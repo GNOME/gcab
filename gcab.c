@@ -82,11 +82,13 @@ main (int argc, char *argv[])
     int list = 0;
     int create = 0;
     int extract = 0;
+    int dump_reserved = 0;
     GOptionEntry entries[] = {
         { "version", 0, 0, G_OPTION_ARG_NONE, &version, N_("Print program version"), NULL },
         { "verbose", 'v', 0, G_OPTION_ARG_NONE, &verbose, N_("Be verbose"), NULL },
         { "create", 'c', 0, G_OPTION_ARG_NONE, &create, N_("Create archive"), NULL },
         { "extract", 'x', 0, G_OPTION_ARG_NONE, &extract, N_("Extract all files"), NULL },
+        { "dump-reserved", 'D', 0, G_OPTION_ARG_NONE, &dump_reserved, N_("Dump reserved data"), NULL },
         { "list", 't', 0, G_OPTION_ARG_NONE, &list, N_("List content"), NULL },
         { "directory", 'C', 0, G_OPTION_ARG_FILENAME, &change, N_("Change to directory DIR"), N_("DIR") },
         { "zip", 'z', 0, G_OPTION_ARG_NONE, &compress, N_("Use zip compression"), NULL },
@@ -125,7 +127,7 @@ individual files from the archive.\
         return 0;
     }
 
-    if ((list + extract + create) != 1)
+    if ((list + extract + create + dump_reserved) != 1)
         gcab_error (_("Please specify a single operation."));
 
     if (!args || args[0] == NULL)
@@ -138,7 +140,7 @@ individual files from the archive.\
     GOutputStream *output;
     GFile *cwd;
 
-    if (list || extract) {
+    if (list || extract || dump_reserved) {
         GFile *file = g_file_new_for_commandline_arg (args[0]);
         GInputStream *in = G_INPUT_STREAM (g_file_read (file, cancellable, &error));
 
@@ -163,6 +165,26 @@ individual files from the archive.\
 
             if (!gcab_cabinet_extract (cabinet, file, file_callback, NULL, NULL, cancellable, &error))
                 gcab_error (_("error during extraction: %s"), error->message);
+        } else if (dump_reserved) {
+            GByteArray *reserved;
+
+            g_object_get (cabinet, "reserved", &reserved, NULL);
+            if (reserved != NULL) {
+                gchar *resname = g_strdup_printf ("%s%s", args[0], ".header");
+                g_print (_("Dumping header reserved data to: %s ...\n"), resname);
+                outputfile = g_file_new_for_commandline_arg (resname);
+                output = G_OUTPUT_STREAM (g_file_replace (outputfile, NULL, FALSE, 0, NULL, &error));
+                if (!error)
+                    g_output_stream_write_all (output, reserved->data, reserved->len, NULL, NULL, &error);
+
+                if (error)
+                    gcab_error (_("can't write file %s: %s"), resname, error->message);
+
+                g_object_unref (output);
+                g_object_unref (outputfile);
+                g_free (resname);
+                g_byte_array_unref (reserved);
+            }
         }
 
         g_object_unref (in);
