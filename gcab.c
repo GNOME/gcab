@@ -91,7 +91,7 @@ main (int argc, char *argv[])
         { "directory", 'C', 0, G_OPTION_ARG_FILENAME, &change, N_("Change to directory DIR"), N_("DIR") },
         { "zip", 'z', 0, G_OPTION_ARG_NONE, &compress, N_("Use zip compression"), NULL },
         { "nopath", 'n', 0, G_OPTION_ARG_NONE, &nopath, N_("Do not include path"), NULL },
-        { "space", 's', 0, G_OPTION_ARG_INT, &space, N_("Reserve space in cabinet for signing (e.g. -s 6144 reserves 6K bytes)"), NULL },
+        { "space", 's', G_OPTION_FLAG_HIDDEN, G_OPTION_ARG_INT, &space, N_("Reserve space in cabinet for signing (e.g. -s 6144 reserves 6K bytes)"), NULL },
         { G_OPTION_REMAINING, '\0', 0, G_OPTION_ARG_FILENAME_ARRAY, &args, NULL, N_("FILE INPUT_FILES...") },
         { NULL }
     };
