@@ -25,12 +25,15 @@ struct _GCabCabinet
     GPtrArray *folders;
     GByteArray *reserved;
     cheader_t cheader;
+    GByteArray *signature;
+    GInputStream *stream;
 };
 
 enum {
     PROP_0,
 
-    PROP_RESERVED
+    PROP_RESERVED,
+    PROP_SIGNATURE,
 };
 
 G_DEFINE_TYPE (GCabCabinet, gcab_cabinet, G_TYPE_OBJECT);
@@ -55,6 +58,9 @@ gcab_cabinet_finalize (GObject *object)
     g_ptr_array_unref (self->folders);
     if (self->reserved)
         g_byte_array_unref (self->reserved);
+    if (self->signature)
+        g_byte_array_unref (self->signature);
+    g_clear_object (&self->stream);
 
     G_OBJECT_CLASS (gcab_cabinet_parent_class)->finalize (object);
 }
@@ -70,6 +76,11 @@ gcab_cabinet_set_property (GObject *object, guint prop_id, const GValue *value, 
         if (self->reserved)
             g_byte_array_unref (self->reserved);
         self->reserved = g_value_dup_boxed (value);
+	break;
+    case PROP_SIGNATURE:
+        if (self->signature)
+            g_byte_array_unref (self->signature);
+        self->signature = g_value_dup_boxed (value);
 	break;
     default:
         G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
@@ -87,6 +98,9 @@ gcab_cabinet_get_property (GObject *object, guint prop_id, GValue *value, GParam
     case PROP_RESERVED:
         g_value_set_boxed (value, self->reserved);
 	break;
+    case PROP_SIGNATURE:
+        g_value_set_boxed (value, gcab_cabinet_get_signature (self, NULL, NULL));
+        break;
     default:
         G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
         break;
@@ -107,6 +121,11 @@ gcab_cabinet_class_init (GCabCabinetClass *klass)
 
     g_object_class_install_property (object_class, PROP_RESERVED,
          g_param_spec_boxed ("reserved", "Reserved", "Reserved",
+                            G_TYPE_BYTE_ARRAY,
+                            G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
+
+    g_object_class_install_property (object_class, PROP_SIGNATURE,
+         g_param_spec_boxed ("signature", "Signature", "Signature",
                             G_TYPE_BYTE_ARRAY,
                             G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
 }
@@ -356,6 +375,9 @@ gcab_cabinet_load (GCabCabinet *self,
     g_return_val_if_fail (!cancellable || G_IS_CANCELLABLE (cancellable), FALSE);
     g_return_val_if_fail (!error || *error == NULL, FALSE);
     g_return_val_if_fail (self->folders->len == 0, FALSE);
+    g_return_val_if_fail (self->stream == NULL, FALSE);
+
+    self->stream = g_object_ref (stream);
 
     gboolean success = FALSE;
     cheader_t cheader;
@@ -479,4 +501,61 @@ gcab_cabinet_extract_simple (GCabCabinet *cabinet,
                              GError **error)
 {
     return gcab_cabinet_extract (cabinet, path, file_callback, NULL, user_data, cancellable, error);
+}
+
+/**
+ * gcab_cabinet_get_signature:
+ * @cabinet: a #GCabCabinet
+ * @cancellable: (allow-none): optional #GCancellable object,
+ *     %NULL to ignore
+ * @error: (allow-none): #GError to set on error, or %NULL
+ *
+ * Lookup the cabinet authenticode signature if any.
+ *
+ * Returns: the array containing the PKCS#7 signed data or %NULL if
+ * none found or error.
+ **/
+const GByteArray *
+gcab_cabinet_get_signature (GCabCabinet *self,
+                            GCancellable *cancellable,
+                            GError **error)
+{
+    const guint8 magic[] = { 0x00, 0x00, 0x10, 0x00 };
+    guint8 *reserved;
+    guint32 offset;
+    guint32 size;
+
+    g_return_val_if_fail (GCAB_IS_CABINET (self), NULL);
+    g_return_val_if_fail (!cancellable || G_IS_CANCELLABLE (cancellable), NULL);
+    g_return_val_if_fail (!error || *error == NULL, NULL);
+
+    if (self->signature)
+        return self->signature;
+
+    if (!G_IS_SEEKABLE (self->stream))
+        return NULL;
+
+    if (!self->reserved || self->reserved->len != 20)
+        return NULL;
+
+    reserved = self->reserved->data;
+    if (memcmp (reserved, magic, sizeof (magic)) != 0)
+        return NULL;
+
+    offset = GCAB_READ_UINT32_LE (reserved + 4);
+    size = GCAB_READ_UINT32_LE (reserved + 8);
+    if (g_getenv ("GCAB_DEBUG"))
+        g_debug ("signature offset: %u size: %u", offset, size);
+
+    self->signature = g_byte_array_sized_new (size);
+    g_byte_array_set_size (self->signature, size);
+
+    if (!g_seekable_seek (G_SEEKABLE (self->stream), offset, G_SEEK_SET, cancellable, error))
+        return NULL;
+
+    if (g_input_stream_read (self->stream, self->signature->data, self->signature->len,
+                             cancellable, error) != self->signature->len)
+        return NULL;
+
+    return self->signature;
 }

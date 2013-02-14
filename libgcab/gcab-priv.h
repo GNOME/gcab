@@ -10,6 +10,16 @@
 #include "gcab-cabinet.h"
 #include "gcab-enums.h"
 
+/* Copied from GStream, FIXME that should be in GLib imho */
+#define _GCAB_GET(__data, __idx, __size, __shift) \
+    (((guint##__size) (((const guint8 *) (__data))[__idx])) << (__shift))
+
+#define GCAB_READ_UINT32_LE(data)        (_GCAB_GET (data, 3, 32, 24) | \
+                                          _GCAB_GET (data, 2, 32, 16) |  \
+                                          _GCAB_GET (data, 1, 32,  8) |  \
+                                          _GCAB_GET (data, 0, 32,  0))
+
+
 struct _GCabFile
 {
     GObject parent_instance;

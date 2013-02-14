@@ -30,3 +30,7 @@ LIBGCAB1_0.2 {
         gcab_file_get_extract_name;
         gcab_file_set_extract_name;
 } LIBGCAB1_0.0;
+
+LIBGCAB1_0.5 {
+        gcab_cabinet_get_signature;
+} LIBGCAB1_0.2;

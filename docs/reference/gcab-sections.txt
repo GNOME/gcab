@@ -9,6 +9,7 @@ gcab_cabinet_get_folders
 gcab_cabinet_add_folder
 gcab_cabinet_write
 gcab_cabinet_write_simple
+gcab_cabinet_get_signature
 GCAB_ERROR
 GCabError
 <SUBSECTION Standard>

@@ -105,6 +105,9 @@ gboolean           gcab_cabinet_extract_simple(GCabCabinet *cabinet,
                                                gpointer user_data,
                                                GCancellable *cancellable,
                                                GError **error);
+const GByteArray * gcab_cabinet_get_signature (GCabCabinet *cabinet,
+                                               GCancellable *cancellable,
+                                               GError **error);
 
 G_END_DECLS
 
