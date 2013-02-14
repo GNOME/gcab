@@ -66,6 +66,27 @@ remove_leading_path (gchar *name)
     return name + i;
 }
 
+static
+void save_array_to_file (const GByteArray *array, const gchar *base, const gchar *suffix)
+{
+    GError *error = NULL;
+    gchar *resname = g_strdup_printf ("%s.%s", base, suffix);
+    g_print (_("Dumping %s data to: %s ...\n"), suffix, resname);
+    GFile *outputfile = g_file_new_for_commandline_arg (resname);
+    GOutputStream *output = G_OUTPUT_STREAM (g_file_replace (outputfile, NULL, FALSE, 0, NULL, &error));
+
+    if (!error)
+        g_output_stream_write_all (output, array->data, array->len, NULL, NULL, &error);
+
+    if (error)
+        gcab_error (_("can't write file %s: %s"), resname, error->message);
+
+    g_object_unref (output);
+    g_object_unref (outputfile);
+    g_free (resname);
+    g_clear_error (&error);
+}
+
 int
 main (int argc, char *argv[])
 {
@@ -88,7 +109,7 @@ main (int argc, char *argv[])
         { "verbose", 'v', 0, G_OPTION_ARG_NONE, &verbose, N_("Be verbose"), NULL },
         { "create", 'c', 0, G_OPTION_ARG_NONE, &create, N_("Create archive"), NULL },
         { "extract", 'x', 0, G_OPTION_ARG_NONE, &extract, N_("Extract all files"), NULL },
-        { "dump-reserved", 'D', 0, G_OPTION_ARG_NONE, &dump_reserved, N_("Dump reserved data"), NULL },
+        { "dump-reserved", 'D', 0, G_OPTION_ARG_NONE, &dump_reserved, N_("Dump reserved and extra data"), NULL },
         { "list", 't', 0, G_OPTION_ARG_NONE, &list, N_("List content"), NULL },
         { "directory", 'C', 0, G_OPTION_ARG_FILENAME, &change, N_("Change to directory DIR"), N_("DIR") },
         { "zip", 'z', 0, G_OPTION_ARG_NONE, &compress, N_("Use zip compression"), NULL },
@@ -170,21 +191,15 @@ individual files from the archive.\
 
             g_object_get (cabinet, "reserved", &reserved, NULL);
             if (reserved != NULL) {
-                gchar *resname = g_strdup_printf ("%s%s", args[0], ".header");
-                g_print (_("Dumping header reserved data to: %s ...\n"), resname);
-                outputfile = g_file_new_for_commandline_arg (resname);
-                output = G_OUTPUT_STREAM (g_file_replace (outputfile, NULL, FALSE, 0, NULL, &error));
-                if (!error)
-                    g_output_stream_write_all (output, reserved->data, reserved->len, NULL, NULL, &error);
-
-                if (error)
-                    gcab_error (_("can't write file %s: %s"), resname, error->message);
-
-                g_object_unref (output);
-                g_object_unref (outputfile);
-                g_free (resname);
+                save_array_to_file (reserved, args[0], "header");
                 g_byte_array_unref (reserved);
             }
+
+            reserved = (GByteArray *)gcab_cabinet_get_signature (cabinet, cancellable, &error);
+            if (error)
+                gcab_error (_("error while reading signature: %s"), error->message);
+            if (reserved != NULL)
+                save_array_to_file (reserved, args[0], "signature");
         }
 
         g_object_unref (in);
