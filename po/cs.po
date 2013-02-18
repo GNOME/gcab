@@ -1,0 +1,169 @@
+# Czech translation for gcab.
+# Copyright (C) 2013 gcab's COPYRIGHT HOLDER
+# This file is distributed under the same license as the gcab package.
+#
+# Marek Černocký <marek@manet.cz>, 2013.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: gcab master\n"
+"Report-Msgid-Bugs-To: http://bugzilla.gnome.org/enter_bug.cgi?"
+"product=gcab&keywords=I18N+L10N&component=general\n"
+"POT-Creation-Date: 2013-02-17 01:17+0000\n"
+"PO-Revision-Date: 2013-02-18 18:02+0100\n"
+"Last-Translator: Marek Černocký <marek@manet.cz>\n"
+"Language-Team: Czech <gnome-cs-list@gnome.org>\n"
+"Language: cs\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2;\n"
+"X-Generator: Gtranslator 2.91.6\n"
+
+#: ../gcab.c:62
+#, c-format
+msgid "Removing leading '%s' from member names"
+msgstr "Odstraňuje se úvodní „%s“ z názvů členů"
+
+#: ../gcab.c:74
+#, c-format
+msgid "Dumping %s data to: %s ...\n"
+msgstr "Vypisují se data %s do: %s…\n"
+
+#: ../gcab.c:82
+#, c-format
+msgid "can't write file %s: %s"
+msgstr "nelze zapsat soubor %s: %s"
+
+#: ../gcab.c:108
+msgid "Print program version"
+msgstr "Vypsat verzi programu"
+
+#: ../gcab.c:109
+msgid "Be verbose"
+msgstr "Podrobnosti"
+
+#: ../gcab.c:110
+msgid "Create archive"
+msgstr "Vytvořit archiv"
+
+#: ../gcab.c:111
+msgid "Extract all files"
+msgstr "Rozbalit všechny soubory"
+
+#: ../gcab.c:112
+msgid "Dump reserved and extra data"
+msgstr "Vypsat rezervovaná a doplňková data"
+
+#: ../gcab.c:113
+msgid "List content"
+msgstr "Vypsat obsah"
+
+#: ../gcab.c:114
+msgid "Change to directory DIR"
+msgstr "Změnit složku na SLOŽKA"
+
+#: ../gcab.c:114
+msgid "DIR"
+msgstr "SLOŽKA"
+
+#: ../gcab.c:115
+msgid "Use zip compression"
+msgstr "Použít komprimaci zip"
+
+#: ../gcab.c:116
+msgid "Do not include path"
+msgstr "Nezahrnovat cestu"
+
+#: ../gcab.c:117
+msgid "Reserve space in cabinet for signing (e.g. -s 6144 reserves 6K bytes)"
+msgstr ""
+"Rezervovat v souboru CAB místo pro podpis (např. -s 6144 rezervuje 6 "
+"kilobajůt)"
+
+#: ../gcab.c:118
+msgid "FILE INPUT_FILES..."
+msgstr "SOUBOR VSTUPNÍ_SOUBORY…"
+
+#: ../gcab.c:132
+msgid "- create a Cabinet file"
+msgstr "– vytvořit soubor CAB"
+
+#: ../gcab.c:133
+#, c-format
+msgid "Report bugs to <%s>"
+msgstr "Chyby hlaste na <%s>"
+
+#: ../gcab.c:136
+msgid ""
+"gcab saves many files together into a cabinet archive, and can restore\n"
+"individual files from the archive."
+msgstr ""
+"gcab ukládá více souborů dohromady do archivu CAB a jednotlivé soubory\n"
+"umí z takového archivu obnovit"
+
+#: ../gcab.c:143
+#, c-format
+msgid "option parsing failed: %s\n"
+msgstr "selhalo zpracování voleb: %s\n"
+
+#: ../gcab.c:152
+msgid "Please specify a single operation."
+msgstr "Určete prosím jednu z operací."
+
+#: ../gcab.c:155
+msgid "cabinet file must be specified."
+msgstr "soubor CAB musí být zadán."
+
+#: ../gcab.c:169
+#, c-format
+msgid "can't open %s for reading: %s\n"
+msgstr "nelze otevřít %s pro čtení: %s\n"
+
+#: ../gcab.c:171
+#, c-format
+msgid "error reading %s: %s\n"
+msgstr "chyba čtení %s: %s\n"
+
+#: ../gcab.c:188
+#, c-format
+msgid "error during extraction: %s"
+msgstr "chyba během rozbalování: %s"
+
+#: ../gcab.c:200
+#, c-format
+msgid "error while reading signature: %s"
+msgstr "chyba při čtení podpisu: %s"
+
+#: ../gcab.c:211
+msgid "please specify input files."
+msgstr "zadejte prosím vstupní soubor"
+
+#: ../gcab.c:229
+#, c-format
+msgid "Can't add file %s: %s"
+msgstr "Nelze přidat soubor %s: %s"
+
+#: ../gcab.c:239
+msgid "no files to be archived."
+msgstr "žádné soubory k archivaci."
+
+#: ../gcab.c:245
+#, c-format
+msgid "can't create cab file %s: %s"
+msgstr "nelze vytvořit soubor CAB %s: %s"
+
+#: ../gcab.c:249
+#, c-format
+msgid "can't add folder to cabinet: %s"
+msgstr "nelze přidat složku do souboru CAB: %s"
+
+#: ../gcab.c:257
+#, c-format
+msgid "can't write cab file %s: %s"
+msgstr "nelze zapsat soubor CAB %s: %s"
+
+#: ../libgcab/cabinet.c:20 ../libgcab/cabinet.c:453
+#, c-format
+msgid "unsupported compression method %d"
+msgstr "nepodporovaná metoda komprimace %d"
