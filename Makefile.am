@@ -4,8 +4,9 @@ CLEANFILES =
 DISTCLEANFILES =
 ACLOCAL_AMFLAGS = -I m4
 
-makeflags_ = $(am__v_lt_$(AM_DEFAULT_VERBOSITY))
+makeflags_ = $(makeflags_$(AM_DEFAULT_VERBOSITY))
 makeflags_0 = --no-print-directory -s
+makeflags_1 =
 AM_MAKEFLAGS = $(makeflags_$(V))
 
 SUBDIRS = docs po libgcab
