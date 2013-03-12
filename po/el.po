@@ -1,0 +1,170 @@
+# Greek translation for gcab.
+# Copyright (C) 2013 gcab's COPYRIGHT HOLDER
+# This file is distributed under the same license as the gcab package.
+# Dimitris Spingos <dmtrs32@gmail.com>, 2013.
+# Dimitris Spingos (Δημήτρης Σπίγγος) <dmtrs32@gmail.com>, 2013.
+msgid ""
+msgstr ""
+"Project-Id-Version: gcab master\n"
+"Report-Msgid-Bugs-To: http://bugzilla.gnome.org/enter_bug.cgi?product=gcab&k"
+"eywords=I18N+L10N&component=general\n"
+"POT-Creation-Date: 2013-02-26 14:13+0000\n"
+"PO-Revision-Date: 2013-03-12 15:14+0300\n"
+"Last-Translator: Dimitris Spingos (Δημήτρης Σπίγγος) <dmtrs32@gmail.com>\n"
+"Language-Team: team@gnome.gr\n"
+"Language: el\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Generator: Virtaal 0.7.1\n"
+"X-Project-Style: gnome\n"
+
+#: ../gcab.c:62
+#, c-format
+msgid "Removing leading '%s' from member names"
+msgstr "Αφαίρεση αρχικού '%s' από ονόματα μέλους"
+
+#: ../gcab.c:74
+#, c-format
+msgid "Dumping %s data to: %s ...\n"
+msgstr "Αποτύπωση δεδομένων %s σε %s ...\n"
+
+#: ../gcab.c:82
+#, c-format
+msgid "can't write file %s: %s"
+msgstr "αδύνατη η εγγραφή στο αρχείο %s: %s"
+
+#: ../gcab.c:108
+msgid "Print program version"
+msgstr "Εμφάνιση έκδοσης προγράμματος"
+
+#: ../gcab.c:109
+msgid "Be verbose"
+msgstr "Αναλυτικά"
+
+#: ../gcab.c:110
+msgid "Create archive"
+msgstr "Δημιουργία αρχειοθήκης"
+
+#: ../gcab.c:111
+msgid "Extract all files"
+msgstr "Εξαγωγή όλων των αρχείων"
+
+#: ../gcab.c:112
+msgid "Dump reserved and extra data"
+msgstr "Αποτύπωση δεσμευμένων και πρόσθετων δεδομένων"
+
+#: ../gcab.c:113
+msgid "List content"
+msgstr "Περιεχόμενο λίστας"
+
+#: ../gcab.c:114
+msgid "Change to directory DIR"
+msgstr "Αλλαγή στον κατάλογο DIR"
+
+#: ../gcab.c:114
+msgid "DIR"
+msgstr "DIR"
+
+#: ../gcab.c:115
+msgid "Use zip compression"
+msgstr "Χρήση συμπίεσης zip"
+
+#: ../gcab.c:116
+msgid "Do not include path"
+msgstr "Να μην περιληφθεί η διαδρομή"
+
+#: ../gcab.c:117
+msgid "Reserve space in cabinet for signing (e.g. -s 6144 reserves 6K bytes)"
+msgstr ""
+"Δέσμευση χώρου σε cabinet για υπογραφή (π.χ. -s 6144 δεσμεύει 6Κ "
+"ψηφιολέξεις)"
+
+#: ../gcab.c:118
+msgid "FILE INPUT_FILES..."
+msgstr "FILE INPUT_FILES..."
+
+#: ../gcab.c:132
+msgid "- create a Cabinet file"
+msgstr "- δημιουργία αρχείου Cabinet"
+
+#: ../gcab.c:133
+#, c-format
+msgid "Report bugs to <%s>"
+msgstr "Αναφορά σφαλμάτων σε <%s>"
+
+#: ../gcab.c:136
+msgid ""
+"gcab saves many files together into a cabinet archive, and can restore\n"
+"individual files from the archive."
+msgstr ""
+"Το gcab αποθηκεύει πολλά αρχεία μαζί σε μια αρχειοθήκη cabinet και μπορεί να "
+"επαναφέρει\n"
+"μεμονωμένα αρχεία από την αρχειοθήκη."
+
+#: ../gcab.c:143
+#, c-format
+msgid "option parsing failed: %s\n"
+msgstr "αποτυχία ανάλυσης επιλογής: %s\n"
+
+#: ../gcab.c:152
+msgid "Please specify a single operation."
+msgstr "Παρακαλώ ορίστε μία μόνο λειτουργία."
+
+#: ../gcab.c:155
+msgid "cabinet file must be specified."
+msgstr "το αρχείο cabinet πρέπει να καθοριστεί."
+
+#: ../gcab.c:169
+#, c-format
+msgid "can't open %s for reading: %s\n"
+msgstr "αδυναμία ανοίγματος του %s για ανάγνωση: %s\n"
+
+#: ../gcab.c:171
+#, c-format
+msgid "error reading %s: %s\n"
+msgstr "σφάλμα ανάγνωσης του %s: %s\n"
+
+#: ../gcab.c:188
+#, c-format
+msgid "error during extraction: %s"
+msgstr "σφάλμα κατά την εξαγωγή: %s"
+
+#: ../gcab.c:200
+#, c-format
+msgid "error while reading signature: %s"
+msgstr "σφάλμα κατά την ανάγνωση της υπογραφής: %s"
+
+#: ../gcab.c:211
+msgid "please specify input files."
+msgstr "παρακαλώ ορίστε αρχεία εισόδου."
+
+#: ../gcab.c:229
+#, c-format
+msgid "Can't add file %s: %s"
+msgstr "Αδύνατη η προσθήκη αρχείου %s: %s"
+
+#: ../gcab.c:239
+msgid "no files to be archived."
+msgstr "δεν υπάρχουν αρχεία για αρχειοθέτηση."
+
+#: ../gcab.c:245
+#, c-format
+msgid "can't create cab file %s: %s"
+msgstr "αδύνατη η δημιουργία αρχείου cab %s: %s"
+
+#: ../gcab.c:249
+#, c-format
+msgid "can't add folder to cabinet: %s"
+msgstr "αδύνατη η προσθήκη φακέλου στο cabinet: %s"
+
+#: ../gcab.c:257
+#, c-format
+msgid "can't write cab file %s: %s"
+msgstr "αδύνατη η εγγραφή αρχείου cab %s: %s"
+
+#: ../libgcab/cabinet.c:20 ../libgcab/cabinet.c:453
+#, c-format
+msgid "unsupported compression method %d"
+msgstr "ανυποστήρικτη μέθοδος συμπίεσης %d"
