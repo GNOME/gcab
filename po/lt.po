@@ -1,0 +1,168 @@
+# Lithuanian translation for gcab.
+# Copyright (C) 2013 gcab's COPYRIGHT HOLDER
+# This file is distributed under the same license as the gcab package.
+# Aurimas Černius <aurisc4@gmail.com>, 2013.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: gcab master\n"
+"Report-Msgid-Bugs-To: http://bugzilla.gnome.org/enter_bug.cgi?"
+"product=gcab&keywords=I18N+L10N&component=general\n"
+"POT-Creation-Date: 2013-03-13 10:22+0000\n"
+"PO-Revision-Date: 2013-03-16 22:52+0200\n"
+"Last-Translator: Aurimas Černius <aurisc4@gmail.com>\n"
+"Language-Team: Lietuvių <gnome-lt@lists.akl.lt>\n"
+"Language: lt\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && (n"
+"%100<10 || n%100>=20) ? 1 : 2);\n"
+"X-Generator: Gtranslator 2.91.6\n"
+
+#: ../gcab.c:62
+#, c-format
+msgid "Removing leading '%s' from member names"
+msgstr "Šalinami „%s“ narių pavadinimų pradžiose"
+
+#: ../gcab.c:74
+#, c-format
+msgid "Dumping %s data to: %s ...\n"
+msgstr "Įrašomi %s duomenys į: %s ...\n"
+
+#: ../gcab.c:82
+#, c-format
+msgid "can't write file %s: %s"
+msgstr "nepavyksta įrašyti failo %s: %s"
+
+#: ../gcab.c:108
+msgid "Print program version"
+msgstr "Atspausdinti programos versiją"
+
+#: ../gcab.c:109
+msgid "Be verbose"
+msgstr "Būti išsamiu"
+
+#: ../gcab.c:110
+msgid "Create archive"
+msgstr "Sukurti archyvą"
+
+#: ../gcab.c:111
+msgid "Extract all files"
+msgstr "Išskleisti visus failus"
+
+#: ../gcab.c:112
+msgid "Dump reserved and extra data"
+msgstr "Įrašyti rezervuotus ir papildomus duomenis"
+
+#: ../gcab.c:113
+msgid "List content"
+msgstr "Išvardinti turinį"
+
+#: ../gcab.c:114
+msgid "Change to directory DIR"
+msgstr "Keisti aplanką į KAT"
+
+#: ../gcab.c:114
+msgid "DIR"
+msgstr "KAT"
+
+#: ../gcab.c:115
+msgid "Use zip compression"
+msgstr "Naudoti zip suspaudimą"
+
+#: ../gcab.c:116
+msgid "Do not include path"
+msgstr "Neįtraukti kelio"
+
+#: ../gcab.c:117
+msgid "Reserve space in cabinet for signing (e.g. -s 6144 reserves 6K bytes)"
+msgstr ""
+"Rezervuoti vietos archyve pasirašymui (pvz. -s 6144 rezervuoja 6K baitų)"
+
+#: ../gcab.c:118
+msgid "FILE INPUT_FILES..."
+msgstr "FILE ĮVESTIES_FAILAI..."
+
+#: ../gcab.c:132
+msgid "- create a Cabinet file"
+msgstr "- sukurti Cabinet failą"
+
+#: ../gcab.c:133
+#, c-format
+msgid "Report bugs to <%s>"
+msgstr "Pranešti apie klaidas <%s>"
+
+#: ../gcab.c:136
+msgid ""
+"gcab saves many files together into a cabinet archive, and can restore\n"
+"individual files from the archive."
+msgstr ""
+"gcab įrašo daug failų kartu viename cabinet archyve ir gali atkurti\n"
+"pavienius failus iš archyvo."
+
+#: ../gcab.c:143
+#, c-format
+msgid "option parsing failed: %s\n"
+msgstr "nepavyko perskaityti parinkties: %s\n"
+
+#: ../gcab.c:152
+msgid "Please specify a single operation."
+msgstr "Nurodykite vieną veiksmą."
+
+#: ../gcab.c:155
+msgid "cabinet file must be specified."
+msgstr "turi būti nurodytas cabinet failas."
+
+#: ../gcab.c:169
+#, c-format
+msgid "can't open %s for reading: %s\n"
+msgstr "nepavyksta atverti %s skaitymui: %s\n"
+
+#: ../gcab.c:171
+#, c-format
+msgid "error reading %s: %s\n"
+msgstr "klaida skaitant %s: %s\n"
+
+#: ../gcab.c:188
+#, c-format
+msgid "error during extraction: %s"
+msgstr "klaida išskleidžiant: %s"
+
+#: ../gcab.c:200
+#, c-format
+msgid "error while reading signature: %s"
+msgstr "klaida skaitant parašą: %s"
+
+#: ../gcab.c:211
+msgid "please specify input files."
+msgstr "nurodykite įvesties failus."
+
+#: ../gcab.c:229
+#, c-format
+msgid "Can't add file %s: %s"
+msgstr "Nepavyksta pridėti failo %s: %s"
+
+#: ../gcab.c:239
+msgid "no files to be archived."
+msgstr "nėra archyvuojamų failų."
+
+#: ../gcab.c:245
+#, c-format
+msgid "can't create cab file %s: %s"
+msgstr "nepavyksta sukurti cab failo %s: %s"
+
+#: ../gcab.c:249
+#, c-format
+msgid "can't add folder to cabinet: %s"
+msgstr "nepavyksta pridėti aplanko į archyvą: %s"
+
+#: ../gcab.c:257
+#, c-format
+msgid "can't write cab file %s: %s"
+msgstr "nepavyksta įrašyti cab failo %s: %s"
+
+#: ../libgcab/cabinet.c:20 ../libgcab/cabinet.c:453
+#, c-format
+msgid "unsupported compression method %d"
+msgstr "nepalaikomas suspaudimo metodas %d"
