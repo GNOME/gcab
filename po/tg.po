@@ -1,0 +1,170 @@
+# Tajik translation for gcab.
+# Copyright (C) 2013 gcab's COPYRIGHT HOLDER
+# This file is distributed under the same license as the gcab package.
+# Victor Ibragimov <victor.ibragimov@gmail.com>, 2013.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: gcab master\n"
+"Report-Msgid-Bugs-To: http://bugzilla.gnome.org/enter_bug.cgi?"
+"product=gcab&keywords=I18N+L10N&component=general\n"
+"POT-Creation-Date: 2013-03-24 21:58+0000\n"
+"PO-Revision-Date: 2013-04-04 11:22+0500\n"
+"Last-Translator: Victor Ibragimov <victor.ibragimov@gmail.com>\n"
+"Language-Team: Tajik <victor.ibragimov@gmail.com>\n"
+"Language: tg\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=1;\n"
+"X-Generator: Poedit 1.5.4\n"
+"X-Poedit-SourceCharset: UTF-8\n"
+
+#: ../gcab.c:62
+#, c-format
+msgid "Removing leading '%s' from member names"
+msgstr "Тозакунии '%s' аз номҳои аъзо"
+
+#: ../gcab.c:74
+#, c-format
+msgid "Dumping %s data to: %s ...\n"
+msgstr "Нусхабардории иттилооти %s ба: %s ...\n"
+
+#: ../gcab.c:82
+#, c-format
+msgid "can't write file %s: %s"
+msgstr "файли %s сабт карда намешавад: %s"
+
+#: ../gcab.c:108
+msgid "Print program version"
+msgstr "Чоп кардани версияи барнома"
+
+#: ../gcab.c:109
+msgid "Be verbose"
+msgstr "Ботафсил"
+
+#: ../gcab.c:110
+msgid "Create archive"
+msgstr "Эҷод кардани бойгонӣ"
+
+#: ../gcab.c:111
+msgid "Extract all files"
+msgstr "Баровардани ҳамаи файлҳо"
+
+#: ../gcab.c:112
+msgid "Dump reserved and extra data"
+msgstr "Нусхабардории иттилооти ҳифзшуда ва иловагӣ"
+
+#: ../gcab.c:113
+msgid "List content"
+msgstr "Рӯйхати мӯҳтаво"
+
+#: ../gcab.c:114
+msgid "Change to directory DIR"
+msgstr "Тағйир додан ба директорияи DIR"
+
+#: ../gcab.c:114
+msgid "DIR"
+msgstr "DIR"
+
+#: ../gcab.c:115
+msgid "Use zip compression"
+msgstr "Истифода бурдани фушурдани zip"
+
+#: ../gcab.c:116
+msgid "Do not include path"
+msgstr "Масирро илова накунед"
+
+#: ../gcab.c:117
+msgid "Reserve space in cabinet for signing (e.g. -s 6144 reserves 6K bytes)"
+msgstr ""
+"Нигоҳ доштани фазо дар cab барои имзокунӣ (мисол -s 6144 тақрибан 6K байтро "
+"захира мекунад)"
+
+#: ../gcab.c:118
+msgid "FILE INPUT_FILES..."
+msgstr "ҚАЙДКУНИИ _ФАЙЛҲОИ ВУРУДӢ..."
+
+#: ../gcab.c:132
+msgid "- create a Cabinet file"
+msgstr "- эҷод кардани файли CAB"
+
+#: ../gcab.c:133
+#, c-format
+msgid "Report bugs to <%s>"
+msgstr "Гузоришдиҳии хатоҳо ба <%s>"
+
+#: ../gcab.c:136
+msgid ""
+"gcab saves many files together into a cabinet archive, and can restore\n"
+"individual files from the archive."
+msgstr ""
+"Барномаи gcab бисёр файлҳоро ба бойгонии cab якҷоя захира мекунад, ва "
+"метавонад\n"
+"файлҳои алоҳидаро аз бойгонӣ барқарор кунад."
+
+#: ../gcab.c:143
+#, c-format
+msgid "option parsing failed: %s\n"
+msgstr "таҷзияи интихобӣ қатъ шудааст: %s\n"
+
+#: ../gcab.c:152
+msgid "Please specify a single operation."
+msgstr "Лутфан, кори ягонаро муайян кунед."
+
+#: ../gcab.c:155
+msgid "cabinet file must be specified."
+msgstr "файли cab бояд муайян карда шавад."
+
+#: ../gcab.c:169
+#, c-format
+msgid "can't open %s for reading: %s\n"
+msgstr "%s барои хониш кушода намешавад: %s\n"
+
+#: ../gcab.c:171
+#, c-format
+msgid "error reading %s: %s\n"
+msgstr "хатои хониши %s: %s\n"
+
+#: ../gcab.c:188
+#, c-format
+msgid "error during extraction: %s"
+msgstr "ҳангоми барориш хатогӣ ба вуҷуд омад: %s"
+
+#: ../gcab.c:200
+#, c-format
+msgid "error while reading signature: %s"
+msgstr "ҳангоми хониши имзо хатогӣ ба вуҷуд омад: %s"
+
+#: ../gcab.c:211
+msgid "please specify input files."
+msgstr "лутфан, файлҳои вурудиро муайян кунед."
+
+#: ../gcab.c:229
+#, c-format
+msgid "Can't add file %s: %s"
+msgstr "Файли %s илова намешавад: %s"
+
+#: ../gcab.c:239
+msgid "no files to be archived."
+msgstr "ягон файл бойгонӣ карда намешавад."
+
+#: ../gcab.c:245
+#, c-format
+msgid "can't create cab file %s: %s"
+msgstr "файли cab-и %s эҷод карда намешавад: %s"
+
+#: ../gcab.c:249
+#, c-format
+msgid "can't add folder to cabinet: %s"
+msgstr "ҷузвдон ба cab илова намешавад: %s"
+
+#: ../gcab.c:257
+#, c-format
+msgid "can't write cab file %s: %s"
+msgstr "файли cab-и %s сабт карда намешавад: %s"
+
+#: ../libgcab/cabinet.c:20 ../libgcab/cabinet.c:453
+#, c-format
+msgid "unsupported compression method %d"
+msgstr "тарзи фушурдани нодурусти %d"
