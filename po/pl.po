@@ -10,8 +10,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gcab\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-02-14 17:02+0100\n"
-"PO-Revision-Date: 2013-02-14 17:03+0100\n"
+"POT-Creation-Date: 2013-07-05 20:54+0200\n"
+"PO-Revision-Date: 2013-07-05 20:55+0200\n"
 "Last-Translator: Piotr Drąg <piotrdrag@gmail.com>\n"
 "Language-Team: Polish <gnomepl@aviary.pl>\n"
 "Language: pl\n"
@@ -158,8 +158,8 @@ msgstr "nie można utworzyć pliku Cabinet %s: %s"
 
 #: ../gcab.c:249
 #, c-format
-msgid "can't add folder to cabinet: %s"
-msgstr "nie można dodać katalogu do pliku Cabinet: %s"
+msgid "can't add folder to cab file %s: %s"
+msgstr "nie można dodać katalogu do pliku Cabinet %s: %s"
 
 #: ../gcab.c:257
 #, c-format
