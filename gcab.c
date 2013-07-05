@@ -6,7 +6,7 @@
 #include <locale.h>
 #include <glib/gi18n.h>
 
-static void
+G_GNUC_PRINTF(1, 2) static void
 gcab_error (const gchar *format, ...)
 {
     va_list args;
@@ -246,7 +246,7 @@ individual files from the archive.\
 
     cwd = g_file_new_for_commandline_arg (".");
     if (!gcab_cabinet_add_folder (cabinet, folder, &error))
-        gcab_error (_("can't add folder to cabinet: %s"), args[0], error->message);
+        gcab_error (_("can't add folder to cab file %s: %s"), args[0], error->message);
 
     if (!gcab_cabinet_write (cabinet, output,
                              file_callback,
