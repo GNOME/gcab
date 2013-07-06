@@ -8,15 +8,15 @@ msgstr ""
 "Project-Id-Version: gcab master\n"
 "Report-Msgid-Bugs-To: http://bugzilla.gnome.org/enter_bug.cgi?"
 "product=gcab&keywords=I18N+L10N&component=general\n"
-"POT-Creation-Date: 2013-06-23 21:43+0000\n"
-"PO-Revision-Date: 2013-07-02 15:48+0700\n"
+"POT-Creation-Date: 2013-07-05 12:04+0000\n"
+"PO-Revision-Date: 2013-07-06 13:28+0700\n"
 "Last-Translator: Andika Triwidada <andika@gmail.com>\n"
 "Language-Team: Indonesian <gnome-l10n-id@googlegroups.com>\n"
 "Language: id\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: Poedit 1.5.5\n"
+"X-Generator: Poedit 1.5.6\n"
 
 #: ../gcab.c:62
 #, c-format
@@ -153,8 +153,8 @@ msgstr "tak bisa buat berkas kab %s: %s"
 
 #: ../gcab.c:249
 #, c-format
-msgid "can't add folder to cabinet: %s"
-msgstr "tak bisa tambahkan folder ke kabinet: %s"
+msgid "can't add folder to cab file %s: %s"
+msgstr "tak bisa tambahkan folder ke berkas kab %s: %s"
 
 #: ../gcab.c:257
 #, c-format
