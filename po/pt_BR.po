@@ -9,8 +9,8 @@ msgstr ""
 "Project-Id-Version: gcab master\n"
 "Report-Msgid-Bugs-To: http://bugzilla.gnome.org/enter_bug.cgi?"
 "product=gcab&keywords=I18N+L10N&component=general\n"
-"POT-Creation-Date: 2013-02-14 16:03+0000\n"
-"PO-Revision-Date: 2013-02-15 17:19-0300\n"
+"POT-Creation-Date: 2013-07-08 11:37+0000\n"
+"PO-Revision-Date: 2013-07-10 14:01-0300\n"
 "Last-Translator: Enrico Nicoletto <liverig@gmail.com>\n"
 "Language-Team: Brazilian Portuguese <gnome-pt_br-list@gnome.org>\n"
 "Language: pt_BR\n"
@@ -78,7 +78,7 @@ msgstr "Não inclui caminho"
 #: ../gcab.c:117
 msgid "Reserve space in cabinet for signing (e.g. -s 6144 reserves 6K bytes)"
 msgstr ""
-"Reservar espaço no cabinet para assinatura (ex: -s 6144 reserva  6K bytes)"
+"Reservar espaço no cabinet para assinatura (ex: -s 6144 reserva 6K bytes)"
 
 #: ../gcab.c:118
 msgid "FILE INPUT_FILES..."
@@ -154,8 +154,8 @@ msgstr "não foi possível criar o arquivo cab %s: %s"
 
 #: ../gcab.c:249
 #, c-format
-msgid "can't add folder to cabinet: %s"
-msgstr "não foi possível adicionar a pasta ao cabinet: %s"
+msgid "can't add folder to cab file %s: %s"
+msgstr "não foi possível adicionar a pasta ao arquivo cab: %s: %s"
 
 #: ../gcab.c:257
 #, c-format
