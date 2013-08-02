@@ -5,10 +5,9 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: gcab master\n"
-"Report-Msgid-Bugs-To: http://bugzilla.gnome.org/enter_bug.cgi?product=gcab&k"
-"eywords=I18N+L10N&component=general\n"
-"POT-Creation-Date: 2013-03-16 20:53+0000\n"
-"PO-Revision-Date: 2013-03-24 22:56+0200\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2013-08-02 12:30+0200\n"
+"PO-Revision-Date: 2013-08-02 12:30+0200\n"
 "Last-Translator: Fran Dieguez <frandieguez@gnome.org>\n"
 "Language-Team: gnome-l10n-gl@gnome.org\n"
 "Language: gl\n"
@@ -153,8 +152,8 @@ msgstr "non é posíebel crear o ficheiro cab %s: %s"
 
 #: ../gcab.c:249
 #, c-format
-msgid "can't add folder to cabinet: %s"
-msgstr "Non é posíbel engadir o ficheiro ao cabinet: %s"
+msgid "can't add folder to cab file %s: %s"
+msgstr "non é posíbel engadir o ficheiro ao cab %s: %s"
 
 #: ../gcab.c:257
 #, c-format
