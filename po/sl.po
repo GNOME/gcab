@@ -9,8 +9,8 @@ msgstr ""
 "Project-Id-Version: gcab master\n"
 "Report-Msgid-Bugs-To: http://bugzilla.gnome.org/enter_bug.cgi?"
 "product=gcab&keywords=I18N+L10N&component=general\n"
-"POT-Creation-Date: 2013-02-18 17:36+0000\n"
-"PO-Revision-Date: 2013-02-24 20:44+0100\n"
+"POT-Creation-Date: 2013-08-12 20:17+0000\n"
+"PO-Revision-Date: 2013-08-17 15:00+0100\n"
 "Last-Translator: Matej Urbančič <mateju@svn.gnome.org>\n"
 "Language-Team: Slovenian GNOME Translation Team <gnome-si@googlegroups.com>\n"
 "Language: sl_SI\n"
@@ -157,8 +157,8 @@ msgstr "ni mogoče ustvariti datoteke cab %s: %s"
 
 #: ../gcab.c:249
 #, c-format
-msgid "can't add folder to cabinet: %s"
-msgstr "ni mogoče dodati mape v datoteko cab: %s"
+msgid "can't add folder to cab file %s: %s"
+msgstr "ni mogoče dodati mape v datoteko cab %s: %s"
 
 #: ../gcab.c:257
 #, c-format
