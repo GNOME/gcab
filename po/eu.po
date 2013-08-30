@@ -105,7 +105,7 @@ msgstr ""
 #: ../gcab.c:143
 #, c-format
 msgid "option parsing failed: %s\n"
-msgstr "huts egin du aukerak aztertzean: %s\n"
+msgstr "Huts egin du aukera aztertzean: %s\n"
 
 #: ../gcab.c:152
 msgid "Please specify a single operation."
