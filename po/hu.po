@@ -1,0 +1,169 @@
+# Hungarian translation for gcab.
+# Copyright (C) 2013 gcab's COPYRIGHT HOLDER
+# This file is distributed under the same license as the gcab package.
+#
+# Balázs Úr <urbalazs at gmail dot com>, 2013.
+msgid ""
+msgstr ""
+"Project-Id-Version: gcab master\n"
+"Report-Msgid-Bugs-To: http://bugzilla.gnome.org/enter_bug.cgi?"
+"product=gcab&keywords=I18N+L10N&component=general\n"
+"POT-Creation-Date: 2013-09-20 17:37+0000\n"
+"PO-Revision-Date: 2013-10-13 15:45+0200\n"
+"Last-Translator: Balázs Úr <urbalazs at gmail dot com>\n"
+"Language-Team: Hungarian <gnome-hu-list@gnome.org>\n"
+"Language: hu\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Generator: Lokalize 1.2\n"
+
+#: ../gcab.c:62
+#, c-format
+msgid "Removing leading '%s' from member names"
+msgstr "A vezető „%s” eltávolítása a tag neveiből"
+
+#: ../gcab.c:74
+#, c-format
+msgid "Dumping %s data to: %s ...\n"
+msgstr "%s adatok kiírása ide: %s …\n"
+
+#: ../gcab.c:82
+#, c-format
+msgid "can't write file %s: %s"
+msgstr "nem írható a(z) %s fájl: %s"
+
+#: ../gcab.c:108
+msgid "Print program version"
+msgstr "Programverzió kiírása"
+
+#: ../gcab.c:109
+msgid "Be verbose"
+msgstr "Legyen bőbeszédű"
+
+#: ../gcab.c:110
+msgid "Create archive"
+msgstr "Archívum létrehozása"
+
+#: ../gcab.c:111
+msgid "Extract all files"
+msgstr "Minden fájl kibontása"
+
+#: ../gcab.c:112
+msgid "Dump reserved and extra data"
+msgstr "Foglalt és extra adatok kiírása"
+
+#: ../gcab.c:113
+msgid "List content"
+msgstr "Tartalom listázása"
+
+#: ../gcab.c:114
+msgid "Change to directory DIR"
+msgstr "Váltás a DIR könyvtárra"
+
+#: ../gcab.c:114
+msgid "DIR"
+msgstr "DIR"
+
+#: ../gcab.c:115
+msgid "Use zip compression"
+msgstr "Zip tömörítés használata"
+
+#: ../gcab.c:116
+msgid "Do not include path"
+msgstr "Ne vegyen fel útvonalat"
+
+#: ../gcab.c:117
+msgid "Reserve space in cabinet for signing (e.g. -s 6144 reserves 6K bytes)"
+msgstr ""
+"Szóköz lefoglalása a cabinetben aláíráshoz (például -s 6144 lefoglal 6K "
+"bájtot)"
+
+#: ../gcab.c:118
+msgid "FILE INPUT_FILES..."
+msgstr "FILE INPUT_FILES…"
+
+#: ../gcab.c:132
+msgid "- create a Cabinet file"
+msgstr "- egy Cabinet fájl létrehozása"
+
+#: ../gcab.c:133
+#, c-format
+msgid "Report bugs to <%s>"
+msgstr "Hibák jelentése itt: <%s>"
+
+#: ../gcab.c:136
+msgid ""
+"gcab saves many files together into a cabinet archive, and can restore\n"
+"individual files from the archive."
+msgstr ""
+"A gcab több fájlt együtt ment egy cabinet archívumba, és képes\n"
+"visszaállítani egyedüli fájlokat az archívumból."
+
+#: ../gcab.c:143
+#, c-format
+msgid "option parsing failed: %s\n"
+msgstr "kapcsoló feldolgozás sikertelen: %s\n"
+
+#: ../gcab.c:152
+msgid "Please specify a single operation."
+msgstr "Kérjük adjon meg egy egyedüli műveletet."
+
+#: ../gcab.c:155
+msgid "cabinet file must be specified."
+msgstr "cabinet fájl megadása kötelező."
+
+#: ../gcab.c:169
+#, c-format
+msgid "can't open %s for reading: %s\n"
+msgstr "%s nem nyitható meg olvasásra: %s\n"
+
+#: ../gcab.c:171
+#, c-format
+msgid "error reading %s: %s\n"
+msgstr "hiba %s olvasása közben: %s\n"
+
+#: ../gcab.c:188
+#, c-format
+msgid "error during extraction: %s"
+msgstr "hiba a kibontás során: %s"
+
+#: ../gcab.c:200
+#, c-format
+msgid "error while reading signature: %s"
+msgstr "hiba az aláírás olvasása közben: %s"
+
+#: ../gcab.c:211
+msgid "please specify input files."
+msgstr "kérjük adjon meg bemeneti fájlokat."
+
+#: ../gcab.c:229
+#, c-format
+msgid "Can't add file %s: %s"
+msgstr "Nem sikerült hozzáadni a(z) %s fájlt: %s"
+
+#: ../gcab.c:239
+msgid "no files to be archived."
+msgstr "nincsenek archiválandó fájlok."
+
+#: ../gcab.c:245
+#, c-format
+msgid "can't create cab file %s: %s"
+msgstr "nem sikerült létrehozni a(z) %s cab fájlt: %s"
+
+#: ../gcab.c:249
+#, c-format
+msgid "can't add folder to cab file %s: %s"
+msgstr "nem sikerült mappát hozzáadni a(z) %s cab fájlhoz: %s"
+
+#: ../gcab.c:257
+#, c-format
+msgid "can't write cab file %s: %s"
+msgstr "nem írható a(z) %s cab fájl: %s"
+
+#: ../libgcab/cabinet.c:20 ../libgcab/cabinet.c:453
+#, c-format
+msgid "unsupported compression method %d"
+msgstr "nem támogatott tömörítési mód: %d"
+
