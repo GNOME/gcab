@@ -1,0 +1,168 @@
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+#
+# Rūdolfs Mazurs <rudolfs.mazurs@gmail.com>, 2013.
+msgid ""
+msgstr ""
+"Project-Id-Version: \n"
+"Report-Msgid-Bugs-To: http://bugzilla.gnome.org/enter_bug.cgi?"
+"product=gcab&keywords=I18N+L10N&component=general\n"
+"POT-Creation-Date: 2013-10-13 13:46+0000\n"
+"PO-Revision-Date: 2013-10-14 20:10+0300\n"
+"Last-Translator: Rūdolfs Mazurs <rudolfs.mazurs@gmail.com>\n"
+"Language-Team: Latvian <lata-l10n@googlegroups.com>\n"
+"Language: lv\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n != 0 ? 1 : "
+"2);\n"
+"X-Generator: Lokalize 1.5\n"
+
+#: ../gcab.c:62
+#, c-format
+msgid "Removing leading '%s' from member names"
+msgstr "Noņem sākuma “%s” no biedru nosaukumiem"
+
+#: ../gcab.c:74
+#, c-format
+msgid "Dumping %s data to: %s ...\n"
+msgstr "Nomet %s datus uz: %s ...\n"
+
+#: ../gcab.c:82
+#, c-format
+msgid "can't write file %s: %s"
+msgstr "nevar ierakstīt datnē %s — %s"
+
+#: ../gcab.c:108
+msgid "Print program version"
+msgstr "Drukāt programmas versiju"
+
+#: ../gcab.c:109
+msgid "Be verbose"
+msgstr "Rādīt detalizētāku informāciju"
+
+#: ../gcab.c:110
+msgid "Create archive"
+msgstr "Izveidot arhīvu"
+
+#: ../gcab.c:111
+msgid "Extract all files"
+msgstr "Atspiest visas datnes"
+
+#: ../gcab.c:112
+msgid "Dump reserved and extra data"
+msgstr "Nomest rezervētos un papildu datus"
+
+#: ../gcab.c:113
+msgid "List content"
+msgstr "Saraksta saturs"
+
+#: ../gcab.c:114
+msgid "Change to directory DIR"
+msgstr "Pāriet uz direktoriju DIR"
+
+#: ../gcab.c:114
+msgid "DIR"
+msgstr "DIR"
+
+#: ../gcab.c:115
+msgid "Use zip compression"
+msgstr "Lietot zip saspiešanu"
+
+#: ../gcab.c:116
+msgid "Do not include path"
+msgstr "Neiekļaut ceļu"
+
+#: ../gcab.c:117
+msgid "Reserve space in cabinet for signing (e.g. -s 6144 reserves 6K bytes)"
+msgstr ""
+"Kabinetā rezervēt vietu parakstīšanai (piemēram, -s 6144 rezervē 6K baitus)"
+
+#: ../gcab.c:118
+msgid "FILE INPUT_FILES..."
+msgstr "DATNE IEVADES_DATNES..."
+
+#: ../gcab.c:132
+msgid "- create a Cabinet file"
+msgstr "- izveidot Cabinet datni"
+
+#: ../gcab.c:133
+#, c-format
+msgid "Report bugs to <%s>"
+msgstr "Ziņot <%s> par kļūdām"
+
+#: ../gcab.c:136
+msgid ""
+"gcab saves many files together into a cabinet archive, and can restore\n"
+"individual files from the archive."
+msgstr ""
+"gcab kopā saglabā vairākas datnes kabineta arhīvā, un var\n"
+"atjaunot atsevišķas datnes no arhīva."
+
+#: ../gcab.c:143
+#, c-format
+msgid "option parsing failed: %s\n"
+msgstr "neizdevās parsēt opcijas: %s\n"
+
+#: ../gcab.c:152
+msgid "Please specify a single operation."
+msgstr "Lūdzu, norādiet vienu darbību."
+
+#: ../gcab.c:155
+msgid "cabinet file must be specified."
+msgstr "jānorāda kabineta datne."
+
+#: ../gcab.c:169
+#, c-format
+msgid "can't open %s for reading: %s\n"
+msgstr "nevar atvērt %s lasīšanai: %s\n"
+
+#: ../gcab.c:171
+#, c-format
+msgid "error reading %s: %s\n"
+msgstr "kļūda, nolasot \"%s\": %s\n"
+
+#: ../gcab.c:188
+#, c-format
+msgid "error during extraction: %s"
+msgstr "kļūda, izvilkšanas laikā: %s"
+
+#: ../gcab.c:200
+#, c-format
+msgid "error while reading signature: %s"
+msgstr "Kļūda, nolasot parakstu: %s"
+
+#: ../gcab.c:211
+msgid "please specify input files."
+msgstr "lūdzu, norādiet ievades datnes."
+
+#: ../gcab.c:229
+#, c-format
+msgid "Can't add file %s: %s"
+msgstr "Nevar pievienot datni %s — %s"
+
+#: ../gcab.c:239
+msgid "no files to be archived."
+msgstr "nav datņu, ko arhivēt."
+
+#: ../gcab.c:245
+#, c-format
+msgid "can't create cab file %s: %s"
+msgstr "nevar izveidot cab datni %s — %s"
+
+#: ../gcab.c:249
+#, c-format
+msgid "can't add folder to cab file %s: %s"
+msgstr "nevar pievienot mapi cab datnei %s — %s"
+
+#: ../gcab.c:257
+#, c-format
+msgid "can't write cab file %s: %s"
+msgstr "nevar ierakstīt cab datnē %s — %s"
+
+#: ../libgcab/cabinet.c:20 ../libgcab/cabinet.c:453
+#, c-format
+msgid "unsupported compression method %d"
+msgstr "neatbalstīta saspiešanas metode %d"
+
