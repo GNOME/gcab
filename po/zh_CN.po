@@ -1,0 +1,162 @@
+# Chinese (China) translation for gcab.
+# Copyright (C) 2014 gcab's COPYRIGHT HOLDER
+# This file is distributed under the same license as the gcab package.
+# Wylmer Wang <wantinghard@gmail.com>, 2014.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: gcab master\n"
+"Report-Msgid-Bugs-To: http://bugzilla.gnome.org/enter_bug.cgi?"
+"product=gcab&keywords=I18N+L10N&component=general\n"
+"POT-Creation-Date: 2013-12-18 18:10+0000\n"
+"PO-Revision-Date: 2014-01-05 15:17+0800\n"
+"Last-Translator: Wylmer Wang <wantinghard@gmail.com>\n"
+"Language-Team: Chinese (Simplified) <i18n-zh@googlegroups.com>\n"
+"Language: zh_CN\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: ../gcab.c:62
+#, c-format
+msgid "Removing leading '%s' from member names"
+msgstr "正在移除成员名称开头的“%s”"
+
+#: ../gcab.c:74
+#, c-format
+msgid "Dumping %s data to: %s ...\n"
+msgstr "正在将 %s 数据转储到：%s ...\n"
+
+#: ../gcab.c:82
+#, c-format
+msgid "can't write file %s: %s"
+msgstr "无法写入文件 %s：%s"
+
+#: ../gcab.c:108
+msgid "Print program version"
+msgstr "打印程序版本"
+
+#: ../gcab.c:109
+msgid "Be verbose"
+msgstr "详尽模式"
+
+#: ../gcab.c:110
+msgid "Create archive"
+msgstr "创建归档"
+
+#: ../gcab.c:111
+msgid "Extract all files"
+msgstr "提取所有文件"
+
+#: ../gcab.c:112
+msgid "Dump reserved and extra data"
+msgstr "转储保留和额外的数据"
+
+#: ../gcab.c:113
+msgid "List content"
+msgstr "列出内容"
+
+#: ../gcab.c:114
+msgid "Change to directory DIR"
+msgstr "切换到 DIR 目录"
+
+#: ../gcab.c:114
+msgid "DIR"
+msgstr "DIR"
+
+#: ../gcab.c:115
+msgid "Use zip compression"
+msgstr "使用 zip 压缩"
+
+#: ../gcab.c:116
+msgid "Do not include path"
+msgstr "不包括路径"
+
+#: ../gcab.c:117
+msgid "Reserve space in cabinet for signing (e.g. -s 6144 reserves 6K bytes)"
+msgstr "在 cabinet 归档中预留签名空间(例如 -s 6144 会预留 6k 字节)"
+
+#: ../gcab.c:118
+msgid "FILE INPUT_FILES..."
+msgstr "FILE INPUT_FILES..."
+
+#: ../gcab.c:132
+msgid "- create a Cabinet file"
+msgstr "- 创建 Cabinet 归档文件"
+
+#: ../gcab.c:133
+#, c-format
+msgid "Report bugs to <%s>"
+msgstr "向 <%s> 报告问题"
+
+#: ../gcab.c:136
+msgid ""
+"gcab saves many files together into a cabinet archive, and can restore\n"
+"individual files from the archive."
+msgstr "gcab 可以将多个文件保存为 cabinet 归档，及从归档中恢复单独的文件。"
+
+#: ../gcab.c:143
+#, c-format
+msgid "option parsing failed: %s\n"
+msgstr "解析选项失败：%s\n"
+
+#: ../gcab.c:152
+msgid "Please specify a single operation."
+msgstr "请只指定一项操作。"
+
+#: ../gcab.c:155
+msgid "cabinet file must be specified."
+msgstr "必须指定 cabinet 归档文件。"
+
+#: ../gcab.c:169
+#, c-format
+msgid "can't open %s for reading: %s\n"
+msgstr "无法打开 %s 进行读取：%s\n"
+
+#: ../gcab.c:171
+#, c-format
+msgid "error reading %s: %s\n"
+msgstr "读取 %s 出错：%s\n"
+
+#: ../gcab.c:188
+#, c-format
+msgid "error during extraction: %s"
+msgstr "提取时出错：%s"
+
+#: ../gcab.c:200
+#, c-format
+msgid "error while reading signature: %s"
+msgstr "读取签名时出错：%s"
+
+#: ../gcab.c:211
+msgid "please specify input files."
+msgstr "请指定输入文件。"
+
+#: ../gcab.c:229
+#, c-format
+msgid "Can't add file %s: %s"
+msgstr "无法添加文件 %s：%s"
+
+#: ../gcab.c:239
+msgid "no files to be archived."
+msgstr "没有要归档的文件。"
+
+#: ../gcab.c:245
+#, c-format
+msgid "can't create cab file %s: %s"
+msgstr "无法创建 cab 文件 %s：%s"
+
+#: ../gcab.c:249
+#, c-format
+msgid "can't add folder to cab file %s: %s"
+msgstr "无法向 cab 文件 %s 添加文件夹：%s"
+
+#: ../gcab.c:257
+#, c-format
+msgid "can't write cab file %s: %s"
+msgstr "无法写入 cab 文件 %s：%s"
+
+#: ../libgcab/cabinet.c:20 ../libgcab/cabinet.c:453
+#, c-format
+msgid "unsupported compression method %d"
+msgstr "不支持压缩方法 %d"
