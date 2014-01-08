@@ -2,14 +2,14 @@
 # Copyright (C) 2013 gcab's COPYRIGHT HOLDER
 # This file is distributed under the same license as the gcab package.
 # Dimitris Spingos <dmtrs32@gmail.com>, 2013.
-# Dimitris Spingos (Δημήτρης Σπίγγος) <dmtrs32@gmail.com>, 2013.
+# Dimitris Spingos (Δημήτρης Σπίγγος) <dmtrs32@gmail.com>, 2013, 2014.
 msgid ""
 msgstr ""
 "Project-Id-Version: gcab master\n"
 "Report-Msgid-Bugs-To: http://bugzilla.gnome.org/enter_bug.cgi?product=gcab&k"
 "eywords=I18N+L10N&component=general\n"
-"POT-Creation-Date: 2013-02-26 14:13+0000\n"
-"PO-Revision-Date: 2013-03-12 15:14+0300\n"
+"POT-Creation-Date: 2013-12-18 18:10+0000\n"
+"PO-Revision-Date: 2014-01-08 08:56+0300\n"
 "Last-Translator: Dimitris Spingos (Δημήτρης Σπίγγος) <dmtrs32@gmail.com>\n"
 "Language-Team: team@gnome.gr\n"
 "Language: el\n"
@@ -78,8 +78,7 @@ msgstr "Να μην περιληφθεί η διαδρομή"
 #: ../gcab.c:117
 msgid "Reserve space in cabinet for signing (e.g. -s 6144 reserves 6K bytes)"
 msgstr ""
-"Δέσμευση χώρου σε cabinet για υπογραφή (π.χ. -s 6144 δεσμεύει 6Κ "
-"ψηφιολέξεις)"
+"Δέσμευση χώρου σε cabinet για υπογραφή (π.χ. -s 6144 δεσμεύει 6Κ ψηφιολέξεις)"
 
 #: ../gcab.c:118
 msgid "FILE INPUT_FILES..."
@@ -156,8 +155,9 @@ msgstr "αδύνατη η δημιουργία αρχείου cab %s: %s"
 
 #: ../gcab.c:249
 #, c-format
-msgid "can't add folder to cabinet: %s"
-msgstr "αδύνατη η προσθήκη φακέλου στο cabinet: %s"
+#| msgid "can't add folder to cabinet: %s"
+msgid "can't add folder to cab file %s: %s"
+msgstr "αδύνατη η προσθήκη φακέλου στο αρχείο cab %s: %s"
 
 #: ../gcab.c:257
 #, c-format
