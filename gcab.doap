@@ -6,7 +6,8 @@
 
   <name xml:lang="en">Cabinet file library and tool</name>
   <shortdesc xml:lang="en">A GObject library to create cabinet files</shortdesc>
-  <description>No long description yet</description>
+  <homepage rdf:resource="https://wiki.gnome.org/msitools" />
+  <download-page rdf:resource="http://download.gnome.org/sources/gcab/" />
 
   <maintainer>
     <foaf:Person>
