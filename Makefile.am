@@ -9,7 +9,7 @@ makeflags_0 = --no-print-directory -s
 makeflags_1 =
 AM_MAKEFLAGS = $(makeflags_$(V))
 
-SUBDIRS = docs po libgcab
+SUBDIRS = . po libgcab docs
 
 AM_CFLAGS = $(WARN_CFLAGS)
 AM_CPPFLAGS =					\
