@@ -8,10 +8,10 @@ msgstr ""
 "Project-Id-Version: gcab\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2014-07-25 14:09+0200\n"
-"PO-Revision-Date: 2014-07-25 14:13+0200\n"
+"PO-Revision-Date: 2014-07-25 14:19+0200\n"
 "Last-Translator: Kjartan Maraas <kmaraas@gnome.org>\n"
 "Language-Team: Norwegian bokmål <i18n-nb@lister.ping.uio.no>\n"
-"Language: \n"
+"Language:nb \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -115,7 +115,7 @@ msgstr ""
 #: ../gcab.c:171
 #, c-format
 msgid "error reading %s: %s\n"
-msgstr "feil ved lesing av %s: %s"
+msgstr "feil ved lesing av %s: %s\n"
 
 #: ../gcab.c:188
 #, c-format
