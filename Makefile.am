@@ -68,7 +68,10 @@ bin_PROGRAMS = gcab
 gcab_SOURCES =					\
 	gcab.c					\
 	$(NULL)
-gcab_LDADD = libgcab-1.0.la
+gcab_LDADD =                                    \
+	$(GLIB_LIBS)                            \
+	libgcab-1.0.la                          \
+	$(NULL)
 
 GCAB_ENUMS =					\
 	libgcab/gcab-enums.c			\
