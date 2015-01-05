@@ -362,8 +362,24 @@ gcab_folder_extract (GCabFolder *self,
                 fname[i] = '/';
 
         GFile *gfile = g_file_resolve_relative_path (path, fname);
-        GFile *parent = g_file_get_parent (gfile);
         g_free (fname);
+
+        if (!g_file_has_prefix (gfile, path)) {
+            // "Rebase" the file in the given path, to ensure we never escape it
+            char *rawpath = g_file_get_path (gfile);
+            if (rawpath != NULL) {
+                char *newpath = rawpath;
+                while (*newpath != 0 && *newpath == G_DIR_SEPARATOR) {
+                    newpath++;
+                }
+                GFile *newgfile = g_file_resolve_relative_path (path, newpath);
+                g_free (rawpath);
+                g_object_unref (gfile);
+                gfile = newgfile;
+            }
+        }
+
+        GFile *parent = g_file_get_parent (gfile);
 
         if (!g_file_make_directory_with_parents (parent, cancellable, &my_error)) {
             if (g_error_matches (my_error, G_IO_ERROR, G_IO_ERROR_EXISTS))
