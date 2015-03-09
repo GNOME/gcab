@@ -1,3 +1,11 @@
+v0.5
+====
+
+- fix path traversal: do not escape from output directory
+- add gcab_cabinet_get_signature()
+- translations updates
+- build warning fixes
+
 v0.4
 ====
 
