@@ -512,6 +512,7 @@ gcab_cabinet_extract_simple (GCabCabinet *cabinet,
  *
  * Lookup the cabinet authenticode signature if any.
  *
+ * Since: 0.5
  * Returns: the array containing the PKCS#7 signed data or %NULL if
  * none found or error.
  **/
