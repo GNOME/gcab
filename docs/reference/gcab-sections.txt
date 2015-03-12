@@ -27,12 +27,16 @@ gcab_error_quark
 
 <SECTION>
 <FILE>gcab-file</FILE>
+GCabFileAttribute
 GCabFileCallback
 GCabFile
-gcab_file_new_with_file
+gcab_file_get_attributes
+gcab_file_get_date
+gcab_file_get_extract_name
 gcab_file_get_file
 gcab_file_get_name
-gcab_file_get_extract_name
+gcab_file_get_size
+gcab_file_new_with_file
 gcab_file_set_extract_name
 <SUBSECTION Standard>
 GCAB_FILE
@@ -69,4 +73,3 @@ gcab_compression_get_type
 <SUBSECTION Private>
 GCabFolderClass
 </SECTION>
-
