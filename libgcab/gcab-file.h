@@ -35,6 +35,25 @@ G_BEGIN_DECLS
 typedef struct _GCabFileClass GCabFileClass;
 
 /**
+ * GCabFileAttribute:
+ * @GCAB_FILE_ATTRIBUTE_RDONLY: file is read-only
+ * @GCAB_FILE_ATTRIBUTE_HIDDEN: file is hidden
+ * @GCAB_FILE_ATTRIBUTE_SYSTEM: file is a system file
+ * @GCAB_FILE_ATTRIBUTE_ARCH: file modified since last backup
+ * @GCAB_FILE_ATTRIBUTE_EXEC: run after extraction
+ * @GCAB_FILE_ATTRIBUTE_NAME_IS_UTF: name contains UTF
+ **/
+typedef enum
+{
+  GCAB_FILE_ATTRIBUTE_RDONLY      = 0x01,
+  GCAB_FILE_ATTRIBUTE_HIDDEN      = 0x02,
+  GCAB_FILE_ATTRIBUTE_SYSTEM      = 0x04,
+  GCAB_FILE_ATTRIBUTE_ARCH        = 0x20,
+  GCAB_FILE_ATTRIBUTE_EXEC        = 0x40,
+  GCAB_FILE_ATTRIBUTE_NAME_IS_UTF = 0x80
+} GCabFileAttribute;
+
+/**
  * GCabFile:
  *
  * An opaque object, referencing a file in a Cabinet.

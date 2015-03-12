@@ -31,13 +31,6 @@ typedef struct cdata cdata_t;
 
 #define DATABLOCKSIZE           32768
 
-#define  CABINET_RDONLY         0x01  /* file is read-only */
-#define  CABINET_HIDDEN         0x02  /* file is hidden */
-#define  CABINET_SYSTEM         0x04  /* file is a system file */
-#define  CABINET_ARCH           0x20  /* file modified since last backup */
-#define  CABINET_EXEC           0x40  /* run after extraction */
-#define  CABINET_NAME_IS_UTF    0x80  /* szName[] contains UTF */
-
 #define CFO_START               0x24		/* folder offset */
 #define CFI_START               0x2C  	/* file offset */
 
