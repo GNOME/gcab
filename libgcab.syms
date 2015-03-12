@@ -37,4 +37,7 @@ LIBGCAB1_0.5 {
 
 LIBGCAB1_0.6 {
         gcab_file_attribute_get_type;
+        gcab_file_get_attributes;
+        gcab_file_get_date;
+        gcab_file_get_size;
 } LIBGCAB1_0.5;

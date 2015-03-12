@@ -159,6 +159,75 @@ gcab_file_set_uoffset (GCabFile *self, u4 uoffset)
 }
 
 /**
+ * gcab_file_get_size:
+ * @file: a #GCabFile
+ *
+ * Get the file size.
+ *
+ * Returns: the cabinet file size
+ * Since: 0.6
+ **/
+guint32
+gcab_file_get_size (GCabFile *self)
+{
+    g_return_val_if_fail (GCAB_IS_FILE (self), 0);
+
+    return self->cfile.usize;
+}
+
+/**
+ * gcab_file_get_date:
+ * @file: a #GCabFile
+ * @result: a #GTimeVal to return date
+ *
+ * Get the file date.
+ *
+ * Returns: the cabinet file date in @result
+ * Since: 0.6
+ **/
+void
+gcab_file_get_date (GCabFile *self, GTimeVal *tv)
+{
+    struct tm tm;
+    guint16 date, time;
+
+    g_return_if_fail (GCAB_IS_FILE (self));
+    g_return_if_fail (tv != NULL);
+
+    date = self->cfile.date;
+    time = self->cfile.time;
+
+    tm.tm_isdst = -1;
+    tm.tm_year  = ((date >> 9) + 1980) - 1900;
+    tm.tm_mon   = ((date >> 5) & 0xf) - 1;
+    tm.tm_mday  = (date & 0x1f) - 1;
+
+    tm.tm_hour  = (time >> 11);
+    tm.tm_min   = ((time >> 5) & 0x3f);
+    tm.tm_sec   = (time & 0x1f) * 2;
+
+    tv->tv_sec  = mktime(&tm);
+    tv->tv_usec = 0;
+}
+
+/**
+ * gcab_file_get_attributes:
+ * @file: a #GCabFile
+ *
+ * Get the file attributes.
+ *
+ * Returns: the cabinet file attributes
+ * Since: 0.6
+ **/
+guint32
+gcab_file_get_attributes (GCabFile *self)
+{
+    g_return_val_if_fail (GCAB_IS_FILE (self), 0);
+
+    return self->cfile.fattr;
+}
+
+/**
  * gcab_file_get_name:
  * @file: a #GCabFile
  *

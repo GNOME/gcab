@@ -75,6 +75,9 @@ GType gcab_file_get_type (void) G_GNUC_CONST;
 GCabFile *      gcab_file_new_with_file             (const gchar *name, GFile *file);
 GFile *         gcab_file_get_file                  (GCabFile *file);
 const gchar *   gcab_file_get_name                  (GCabFile *file);
+guint32         gcab_file_get_size                  (GCabFile *file);
+guint32         gcab_file_get_attributes            (GCabFile *file);
+void            gcab_file_get_date                  (GCabFile *file, GTimeVal *result);
 const gchar *   gcab_file_get_extract_name          (GCabFile *file);
 void            gcab_file_set_extract_name          (GCabFile *file, const gchar *name);
 
