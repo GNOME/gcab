@@ -42,6 +42,8 @@ GCAB_IS_FILE
 GCAB_IS_FILE_CLASS
 GCAB_TYPE_FILE
 gcab_file_get_type
+GCAB_TYPE_FILE_ATTRIBUTE
+gcab_file_attribute_get_type
 <SUBSECTION Private>
 GCabFileClass
 </SECTION>

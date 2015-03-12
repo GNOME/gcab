@@ -82,6 +82,7 @@ BUILT_SOURCES += $(GCAB_ENUMS)
 
 ENUMS_FILES =					\
 	libgcab/gcab-folder.h			\
+	libgcab/gcab-file.h			\
 	$(NULL)
 
 $(GCAB_ENUMS): %: %.etemplate $(ENUMS_FILES)
