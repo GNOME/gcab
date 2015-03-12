@@ -101,6 +101,7 @@ main (int argc, char *argv[])
     int space = 0;
     int compress = 0;
     int list = 0;
+    int list_details = 0;
     int create = 0;
     int extract = 0;
     int dump_reserved = 0;
@@ -111,6 +112,7 @@ main (int argc, char *argv[])
         { "extract", 'x', 0, G_OPTION_ARG_NONE, &extract, N_("Extract all files"), NULL },
         { "dump-reserved", 'D', 0, G_OPTION_ARG_NONE, &dump_reserved, N_("Dump reserved and extra data"), NULL },
         { "list", 't', 0, G_OPTION_ARG_NONE, &list, N_("List content"), NULL },
+        { "list-details", 'l', 0, G_OPTION_ARG_NONE, &list_details, N_("List content with file details"), NULL },
         { "directory", 'C', 0, G_OPTION_ARG_FILENAME, &change, N_("Change to directory DIR"), N_("DIR") },
         { "zip", 'z', 0, G_OPTION_ARG_NONE, &compress, N_("Use zip compression"), NULL },
         { "nopath", 'n', 0, G_OPTION_ARG_NONE, &nopath, N_("Do not include path"), NULL },
@@ -148,7 +150,7 @@ individual files from the archive.\
         return 0;
     }
 
-    if ((list + extract + create + dump_reserved) != 1)
+    if ((list + extract + create + dump_reserved + list_details) != 1)
         gcab_error (_("Please specify a single operation."));
 
     if (!args || args[0] == NULL)
@@ -161,7 +163,7 @@ individual files from the archive.\
     GOutputStream *output;
     GFile *cwd;
 
-    if (list || extract || dump_reserved) {
+    if (list || list_details || extract || dump_reserved) {
         GFile *file = g_file_new_for_commandline_arg (args[0]);
         GInputStream *in = G_INPUT_STREAM (g_file_read (file, cancellable, &error));
 
@@ -170,12 +172,30 @@ individual files from the archive.\
         if (!gcab_cabinet_load (cabinet, in, cancellable, &error))
             gcab_error (_("error reading %s: %s\n"), args[0], (error && error->message) ? error->message : "unknown error");
 
-        if (list) {
+        if (list || list_details) {
             GPtrArray *folders = gcab_cabinet_get_folders (cabinet);
             for (i = 0; i < folders->len; i++) {
                 GSList *l, *files = gcab_folder_get_files (g_ptr_array_index (folders, i));
-                for (l = files; l != NULL; l = l->next)
-                    g_print ("%s\n", gcab_file_get_name (GCAB_FILE (l->data)));
+
+                for (l = files; l != NULL; l = l->next) {
+                    if (list_details) {
+                        gchar date[32];
+                        struct tm *tm;
+                        GTimeVal tv;
+
+                        gcab_file_get_date (GCAB_FILE (l->data), &tv);
+                        tm = localtime (&tv.tv_sec);
+                        strftime (date, sizeof (date), "%Y-%m-%d %H:%M:%S", tm);
+
+                        g_print ("%s %u %s 0x%X\n",
+                                 gcab_file_get_name (GCAB_FILE (l->data)),
+                                 gcab_file_get_size (GCAB_FILE (l->data)),
+                                 date,
+                                 gcab_file_get_attributes (GCAB_FILE (l->data)));
+                    } else {
+                        g_print ("%s\n", gcab_file_get_name (GCAB_FILE (l->data)));
+                    }
+                }
                 g_slist_free (files);
             }
         } else if (extract) {
