@@ -142,7 +142,7 @@ gcab_file_update_info (GCabFile *self, GFileInfo *info)
     self->cfile.usize = g_file_info_get_size (info);
     self->cfile.fattr = GCAB_FILE_ATTRIBUTE_ARCH;
     self->cfile.date = ((m->tm_year + 1900 - 1980 ) << 9 ) +
-        ((m->tm_mon+1) << 5 ) + (m->tm_mday);
+        ((m->tm_mon+1) << 5 ) + (m->tm_mday+1);
     self->cfile.time = (m->tm_hour << 11) + (m->tm_min << 5) + (m->tm_sec / 2);
 
     return TRUE;
