@@ -42,6 +42,8 @@ typedef struct _GCabFileClass GCabFileClass;
  * @GCAB_FILE_ATTRIBUTE_ARCH: file modified since last backup
  * @GCAB_FILE_ATTRIBUTE_EXEC: run after extraction
  * @GCAB_FILE_ATTRIBUTE_NAME_IS_UTF: name contains UTF
+ *
+ * Attributes associated with the #GCabFile.
  **/
 typedef enum
 {
