@@ -143,10 +143,13 @@ gcab_folder_get_ndatablocks (GCabFolder *self)
 }
 
 static gboolean
-add_file (GCabFolder *self, GCabFile *file)
+add_file (GCabFolder *self, GCabFile *file, GError **error)
 {
-    if (g_hash_table_lookup (self->hash, (gpointer)gcab_file_get_name (file)))
+    if (g_hash_table_lookup (self->hash, (gpointer)gcab_file_get_name (file))) {
+        g_set_error (error, GCAB_ERROR, GCAB_ERROR_FORMAT,
+                     "File '%s' has already been added", gcab_file_get_name (file));
         return FALSE;
+    }
 
     g_hash_table_insert (self->hash,
                          (gpointer)gcab_file_get_name (file), g_object_ref (file));
@@ -196,7 +199,7 @@ add_file_info (GCabFolder *self, GCabFile *file, GFileInfo *info,
 
     } else if (file_type == G_FILE_TYPE_REGULAR) {
         gcab_file_update_info (file, info);
-        if (!add_file (self, file))
+        if (!add_file (self, file, error))
             return FALSE;
 
     } else {
@@ -244,7 +247,7 @@ gcab_folder_add_file (GCabFolder *self, GCabFile *file,
                                  gcab_file_get_name (file), recurse, error);
         g_object_unref (info);
     } else {
-        success = add_file (self, file);
+        success = add_file (self, file, error);
     }
 
     return success;

@@ -96,14 +96,29 @@ _data_input_stream_read_until (GDataInputStream  *stream,
 #define RS(val) G_STMT_START{                                   \
     val = _data_input_stream_read_until (in, "\0", 1,           \
                                          cancellable, error);   \
-    if (!val || (error && *error))                              \
+    if (error && *error)                                        \
         goto end;                                               \
+    if (!val) {                                                 \
+        g_set_error(error, GCAB_ERROR, GCAB_ERROR_FORMAT,       \
+                    "Invalid contents");                        \
+        goto end;                                               \
+    }                                                           \
 }G_STMT_END
 #define RN(buff, size) G_STMT_START{                                    \
     if (size) {                                                         \
         gint _val = g_input_stream_read (G_INPUT_STREAM (in), buff, size, cancellable, error); \
-        if (_val == -1 || (error && *error))                            \
+        if (error && *error)                                            \
             goto end;                                                   \
+        if (_val >= 0 && _val < size) {                                 \
+            g_set_error(error, GCAB_ERROR, GCAB_ERROR_FORMAT,           \
+                        "Expected %d bytes, got %d", size, _val);       \
+            goto end;                                                   \
+        }                                                               \
+        if (_val == -1) {                                               \
+            g_set_error(error, GCAB_ERROR, GCAB_ERROR_FORMAT,           \
+                        "Invalid contents");                            \
+            goto end;                                                   \
+        }                                                               \
     }                                                                   \
 }G_STMT_END
 

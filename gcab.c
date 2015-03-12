@@ -140,7 +140,7 @@ individual files from the archive.\
     g_option_context_add_main_entries (context, entries, GETTEXT_PACKAGE);
     g_option_context_set_translation_domain (context, GETTEXT_PACKAGE);
     if (!g_option_context_parse (context, &argc, &argv, &error))
-        gcab_error (_("option parsing failed: %s\n"), error->message);
+        gcab_error (_("option parsing failed: %s\n"), (error && error->message) ? error->message : "unknown error");
     g_option_context_free(context);
 
     if (version) {
@@ -166,9 +166,9 @@ individual files from the archive.\
         GInputStream *in = G_INPUT_STREAM (g_file_read (file, cancellable, &error));
 
         if (!in)
-            gcab_error (_("can't open %s for reading: %s\n"), args[0], error->message);
+            gcab_error (_("can't open %s for reading: %s\n"), args[0], (error && error->message) ? error->message : "unknown error");
         if (!gcab_cabinet_load (cabinet, in, cancellable, &error))
-            gcab_error (_("error reading %s: %s\n"), args[0], error->message);
+            gcab_error (_("error reading %s: %s\n"), args[0], (error && error->message) ? error->message : "unknown error");
 
         if (list) {
             GPtrArray *folders = gcab_cabinet_get_folders (cabinet);
@@ -185,7 +185,7 @@ individual files from the archive.\
             file = g_file_new_for_path (change);
 
             if (!gcab_cabinet_extract (cabinet, file, file_callback, NULL, NULL, cancellable, &error))
-                gcab_error (_("error during extraction: %s"), error->message);
+                gcab_error (_("error during extraction: %s"), (error && error->message) ? error->message : "unknown error");
         } else if (dump_reserved) {
             GByteArray *reserved;
 
@@ -197,7 +197,7 @@ individual files from the archive.\
 
             reserved = (GByteArray *)gcab_cabinet_get_signature (cabinet, cancellable, &error);
             if (error)
-                gcab_error (_("error while reading signature: %s"), error->message);
+                gcab_error (_("error while reading signature: %s"), (error && error->message) ? error->message : "unknown error");
             if (reserved != NULL)
                 save_array_to_file (reserved, args[0], "signature");
         }
@@ -226,7 +226,7 @@ individual files from the archive.\
                                  remove_leading_path (name), file);
 
         if (!gcab_folder_add_file (folder, cabfile, TRUE, NULL, &error)) {
-            g_warning (_("Can't add file %s: %s"), args[i], error->message);
+            g_warning (_("Can't add file %s: %s"), args[i], (error && error->message) ? error->message : "unknown error");
             g_clear_error (&error);
         }
 
@@ -242,11 +242,11 @@ individual files from the archive.\
     output = G_OUTPUT_STREAM (g_file_replace (outputfile, NULL, FALSE,
                                               0, NULL, &error));
     if (error)
-        gcab_error (_("can't create cab file %s: %s"), args[0], error->message);
+        gcab_error (_("can't create cab file %s: %s"), args[0], (error && error->message) ? error->message : "unknown error");
 
     cwd = g_file_new_for_commandline_arg (".");
     if (!gcab_cabinet_add_folder (cabinet, folder, &error))
-        gcab_error (_("can't add folder to cab file %s: %s"), args[0], error->message);
+        gcab_error (_("can't add folder to cab file %s: %s"), args[0], (error && error->message) ? error->message : "unknown error");
 
     if (!gcab_cabinet_write (cabinet, output,
                              file_callback,
@@ -254,7 +254,7 @@ individual files from the archive.\
                              cwd,
                              NULL,
                              &error))
-        gcab_error (_("can't write cab file %s: %s"), args[0], error->message);
+        gcab_error (_("can't write cab file %s: %s"), args[0], (error && error->message) ? error->message : "unknown error");
 
     g_object_unref (cwd);
     g_object_unref (output);

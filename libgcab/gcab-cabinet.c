@@ -415,8 +415,20 @@ gcab_cabinet_load (GCabCabinet *self,
         if (!cfile_read (&cfile, in, cancellable, error))
             goto end;
 
-        GCabFile *file = gcab_file_new_with_cfile (&cfile);
+        if (cfile.index >= folders->len) {
+            g_set_error (error, GCAB_ERROR, GCAB_ERROR_FORMAT,
+                         "Invalid folder index");
+            goto end;
+        }
+
         GCabFolder *folder = g_ptr_array_index (folders, cfile.index);
+        if (folder == NULL) {
+            g_set_error (error, GCAB_ERROR, GCAB_ERROR_FORMAT,
+                         "Invalid folder pointer");
+            goto end;
+        }
+
+        GCabFile *file = gcab_file_new_with_cfile (&cfile);
         if (!gcab_folder_add_file (folder, file, FALSE, cancellable, error)) {
             g_object_unref (file);
             goto end;
