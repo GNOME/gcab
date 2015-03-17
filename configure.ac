@@ -12,7 +12,7 @@ AM_SILENT_RULES([yes])
 AC_PROG_CC
 AM_PROG_CC_C_O
 AC_PROG_INSTALL
-LT_INIT([win32-dll disable-fast-install])
+LT_INIT([win32-dll])
 GTK_DOC_CHECK([1.14],[--flavour no-tmpl])
 PKG_PROG_PKG_CONFIG
 GOBJECT_INTROSPECTION_CHECK([0.9.4])
