@@ -2,22 +2,23 @@
 # Copyright (C) 2013 gcab's COPYRIGHT HOLDER
 # This file is distributed under the same license as the gcab package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
-# Daniel Mustieles <daniel.mustieles@gmail.com>, 2013.
+# Daniel Mustieles <daniel.mustieles@gmail.com>, 2013, 2015.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: gcab master\n"
 "Report-Msgid-Bugs-To: http://bugzilla.gnome.org/enter_bug.cgi?"
 "product=gcab&keywords=I18N+L10N&component=general\n"
-"POT-Creation-Date: 2013-07-05 12:04+0000\n"
-"PO-Revision-Date: 2013-07-08 11:02+0200\n"
+"POT-Creation-Date: 2015-03-12 21:39+0000\n"
+"PO-Revision-Date: 2015-03-17 18:01+0100\n"
 "Last-Translator: Daniel Mustieles <daniel.mustieles@gmail.com>\n"
-"Language-Team: Español <gnome-es-list@gnome.org>\n"
+"Language-Team: Español; Castellano <gnome-es-list@gnome.org>\n"
 "Language: es\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=2; plural=(n!=1);\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Generator: Gtranslator 2.91.6\n"
 
 #: ../gcab.c:62
 #, c-format
@@ -34,66 +35,70 @@ msgstr "Volcando datos %s a: %s…\n"
 msgid "can't write file %s: %s"
 msgstr "no se puede escribir el archivo %s: %s"
 
-#: ../gcab.c:108
+#: ../gcab.c:109
 msgid "Print program version"
 msgstr "Mostrar la versión del programa"
 
-#: ../gcab.c:109
+#: ../gcab.c:110
 msgid "Be verbose"
 msgstr "Mostrar detalles"
 
-#: ../gcab.c:110
+#: ../gcab.c:111
 msgid "Create archive"
 msgstr "Crear archivador"
 
-#: ../gcab.c:111
+#: ../gcab.c:112
 msgid "Extract all files"
 msgstr "Extraer todos los archivos"
 
-#: ../gcab.c:112
+#: ../gcab.c:113
 msgid "Dump reserved and extra data"
 msgstr "Volcar datos reservados y adicionales"
 
-#: ../gcab.c:113
+#: ../gcab.c:114
 msgid "List content"
 msgstr "Listar contenido"
 
-#: ../gcab.c:114
+#: ../gcab.c:115
+msgid "List content with file details"
+msgstr "Listar el contenido con detalles de los archivos"
+
+#: ../gcab.c:116
 msgid "Change to directory DIR"
 msgstr "Cambiar a la carpeta CARPETA"
 
-#: ../gcab.c:114
+#: ../gcab.c:116
 msgid "DIR"
 msgstr "CARPETA"
 
-#: ../gcab.c:115
+#: ../gcab.c:117
 msgid "Use zip compression"
 msgstr "Usar compresión ZIP"
 
-#: ../gcab.c:116
+#: ../gcab.c:118
 msgid "Do not include path"
 msgstr "No incluir la ruta"
 
-#: ../gcab.c:117
+#: ../gcab.c:119
 msgid "Reserve space in cabinet for signing (e.g. -s 6144 reserves 6K bytes)"
 msgstr ""
 "Reservar espacio en el archivo cabinet para la firma (ej. -s 6144 reserva 6K "
 "bytes)"
 
-#: ../gcab.c:118
+#: ../gcab.c:120
 msgid "FILE INPUT_FILES..."
 msgstr "ARCHIVO ARCHIVOS_DE_ENTRADA…"
 
-#: ../gcab.c:132
+#: ../gcab.c:134
 msgid "- create a Cabinet file"
 msgstr "- crear un archivo Cabinet"
 
-#: ../gcab.c:133
+#: ../gcab.c:135
 #, c-format
 msgid "Report bugs to <%s>"
 msgstr "Informar de errores a <%s>"
 
-#: ../gcab.c:136
+#: ../gcab.c:138
 msgid ""
 "gcab saves many files together into a cabinet archive, and can restore\n"
 "individual files from the archive."
@@ -102,69 +107,68 @@ msgstr ""
 "restaurar\n"
 "archivos individuales del archivador."
 
-#: ../gcab.c:143
+#: ../gcab.c:145
 #, c-format
 msgid "option parsing failed: %s\n"
 msgstr "falló al analizar la opción: %s\n"
 
-#: ../gcab.c:152
+#: ../gcab.c:154
 msgid "Please specify a single operation."
 msgstr "Especifique una única operación."
 
-#: ../gcab.c:155
+#: ../gcab.c:157
 msgid "cabinet file must be specified."
 msgstr "se debe especificar un archivo cabinet."
 
-#: ../gcab.c:169
+#: ../gcab.c:171
 #, c-format
 msgid "can't open %s for reading: %s\n"
 msgstr "no se puede abrir %s para lectura: %s\n"
 
-#: ../gcab.c:171
+#: ../gcab.c:173
 #, c-format
 msgid "error reading %s: %s\n"
 msgstr "error al leer %s: %s\n"
 
-#: ../gcab.c:188
+#: ../gcab.c:208
 #, c-format
 msgid "error during extraction: %s"
 msgstr "error durante la extracción: %s"
 
-#: ../gcab.c:200
+#: ../gcab.c:220
 #, c-format
 msgid "error while reading signature: %s"
 msgstr "error al leer la firma %s"
 
-#: ../gcab.c:211
+#: ../gcab.c:231
 msgid "please specify input files."
 msgstr "especifique los archivos de entrada."
 
-#: ../gcab.c:229
+#: ../gcab.c:249
 #, c-format
 msgid "Can't add file %s: %s"
 msgstr "No se puede añadir el archivo %s: %s"
 
-#: ../gcab.c:239
+#: ../gcab.c:259
 msgid "no files to be archived."
 msgstr "no hay archivos que comprimir."
 
-#: ../gcab.c:245
+#: ../gcab.c:265
 #, c-format
 msgid "can't create cab file %s: %s"
 msgstr "no se puede crear el archivo cab %s: %s"
 
-#: ../gcab.c:249
+#: ../gcab.c:269
 #, c-format
-#| msgid "can't add folder to cabinet: %s"
 msgid "can't add folder to cab file %s: %s"
 msgstr "no se puede añadir una carpeta al archivo cabinet %s: %s"
 
-#: ../gcab.c:257
+#: ../gcab.c:277
 #, c-format
 msgid "can't write cab file %s: %s"
 msgstr "no se puede escribir el archivo cab %s: %s"
 
-#: ../libgcab/cabinet.c:20 ../libgcab/cabinet.c:453
+#: ../libgcab/cabinet.c:20 ../libgcab/cabinet.c:468
 #, c-format
 msgid "unsupported compression method %d"
 msgstr "método de compresión %d no soportado"
