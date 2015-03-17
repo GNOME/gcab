@@ -1,3 +1,12 @@
+v0.6
+====
+
+- fix for the AFL-detected crashes
+- add file information getters (get_attributes(), get_date(), get_size())
+- gcab learned --list-details to list files with those informations
+- fix the file date when creating cab
+- build-sys fixes
+
 v0.5
 ====
 
