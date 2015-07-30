@@ -42,6 +42,7 @@ nw="$nw -Wsign-conversion"      # Likewise.
 nw="$nw -Wunused-parameter"     # Likewise.
 nw="$nw -Wunused-local-typedefs" # Likewise.
 nw="$nw -Wunsafe-loop-optimizations" # Likewise.
+nw="$nw -Wbad-function-cast"    # Likewise.
 # Enable all GCC warnings not in this list.
 gl_MANYWARN_COMPLEMENT([warnings], [$warnings], [$nw])
 for w in $warnings; do
