@@ -1001,7 +1001,9 @@ int LZXfdi_decomp(int inlen, int outlen, fdi_decomp_state *decomp_state) {
             window_posn += match_length;
 
             /* copy match data - no worries about destination wraps */
-            while (match_length-- > 0) *rundest++ = *runsrc++;
+            memcpy(rundest, runsrc, match_length);
+            rundest += match_length;
+            runsrc += match_length;
           }
         }
         break;
@@ -1090,7 +1092,9 @@ int LZXfdi_decomp(int inlen, int outlen, fdi_decomp_state *decomp_state) {
             window_posn += match_length;
 
             /* copy match data - no worries about destination wraps */
-            while (match_length-- > 0) *rundest++ = *runsrc++;
+            memcpy(rundest, runsrc, match_length);
+            rundest += match_length;
+            runsrc += match_length;
           }
         }
         break;
