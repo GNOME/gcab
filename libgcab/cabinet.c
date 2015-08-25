@@ -477,7 +477,11 @@ cdata_read (cdata_t *cd, u1 res_data, gint comptype,
     RN (buf, cd->ncbytes);
 
     datacsum = compute_checksum(buf, cd->ncbytes, 0);
-    g_return_val_if_fail (cd->checksum == compute_checksum ((guint8*)&cd->ncbytes, 4, datacsum), FALSE);
+    if (cd->checksum != compute_checksum ((guint8*)&cd->ncbytes, 4, datacsum)) {
+        g_set_error_literal (error, GCAB_ERROR, GCAB_ERROR_FAILED,
+                             _("incorrect checksum detected"));
+        return FALSE;
+    }
 
     if (g_getenv ("GCAB_DEBUG")) {
         g_debug ("CDATA");
