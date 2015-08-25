@@ -299,6 +299,10 @@ gcab_cabinet_write (GCabCabinet *self,
         file->cfile.uoffset = prevf ? prevf->uoffset + prevf->usize : 0;
         prevf = &file->cfile;
 
+        /* automatically set flag if UTF-8 encoding */
+        if (!g_str_is_ascii (file->cfile.name))
+            file->cfile.fattr |= GCAB_FILE_ATTRIBUTE_NAME_IS_UTF;
+
         if (!cfile_write (&file->cfile, dstream, cancellable, error))
             goto end;
     }
