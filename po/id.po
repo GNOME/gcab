@@ -1,22 +1,22 @@
 # Indonesian translation for gcab.
 # Copyright (C) 2013 gcab's COPYRIGHT HOLDER
 # This file is distributed under the same license as the gcab package.
-# Andika Triwidada <andika@gmail.com>, 2013.
+# Andika Triwidada <andika@gmail.com>, 2013, 2015.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: gcab master\n"
 "Report-Msgid-Bugs-To: http://bugzilla.gnome.org/enter_bug.cgi?"
 "product=gcab&keywords=I18N+L10N&component=general\n"
-"POT-Creation-Date: 2015-03-12 21:39+0000\n"
-"PO-Revision-Date: 2015-03-18 18:14+0700\n"
+"POT-Creation-Date: 2015-08-25 20:08+0000\n"
+"PO-Revision-Date: 2015-08-28 20:45+0800\n"
 "Last-Translator: Andika Triwidada <andika@gmail.com>\n"
 "Language-Team: Indonesian <gnome-l10n-id@googlegroups.com>\n"
 "Language: id\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: Poedit 1.7.5\n"
+"X-Generator: Poedit 1.7.1\n"
 
 #: ../gcab.c:62
 #, c-format
@@ -169,3 +169,7 @@ msgstr "tak bisa tulisi berkas kab %s: %s"
 #, c-format
 msgid "unsupported compression method %d"
 msgstr "metoda kompresi tak didukung %d"
+
+#: ../libgcab/cabinet.c:482
+msgid "incorrect checksum detected"
+msgstr "﻿checksum yang salah terdeteksi"
