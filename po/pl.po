@@ -10,8 +10,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gcab\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-03-15 22:57+0100\n"
-"PO-Revision-Date: 2015-03-15 22:58+0100\n"
+"POT-Creation-Date: 2015-08-30 16:42+0200\n"
+"PO-Revision-Date: 2015-08-30 16:44+0100\n"
 "Last-Translator: Piotr Drąg <piotrdrag@gmail.com>\n"
 "Language-Team: Polish <gnomepl@aviary.pl>\n"
 "Language: pl\n"
@@ -26,12 +26,12 @@ msgstr ""
 #: ../gcab.c:62
 #, c-format
 msgid "Removing leading '%s' from member names"
-msgstr "Usuwanie kończącego \"%s\" z nazw elementów"
+msgstr "Usuwanie kończącego „%s” z nazw elementów"
 
 #: ../gcab.c:74
 #, c-format
 msgid "Dumping %s data to: %s ...\n"
-msgstr "Zrzucanie %s danych do: %s...\n"
+msgstr "Zrzucanie danych %s do: %s…\n"
 
 #: ../gcab.c:82
 #, c-format
@@ -90,11 +90,11 @@ msgstr ""
 
 #: ../gcab.c:120
 msgid "FILE INPUT_FILES..."
-msgstr "PLIK PLIKI_WEJŚCIOWE..."
+msgstr "PLIK PLIKI_WEJŚCIOWE…"
 
 #: ../gcab.c:134
 msgid "- create a Cabinet file"
-msgstr "- tworzy plik Cabinet"
+msgstr "— tworzy plik Cabinet"
 
 #: ../gcab.c:135
 #, c-format
@@ -116,7 +116,7 @@ msgstr "przetworzenie opcji się nie powiodło: %s\n"
 
 #: ../gcab.c:154
 msgid "Please specify a single operation."
-msgstr "Proszę podać pojedyncze działanie."
+msgstr "Proszę podać jedno działanie."
 
 #: ../gcab.c:157
 msgid "cabinet file must be specified."
@@ -174,3 +174,7 @@ msgstr "nie można zapisać pliku Cabinet %s: %s"
 #, c-format
 msgid "unsupported compression method %d"
 msgstr "nieobsługiwana metoda kompresji %d"
+
+#: ../libgcab/cabinet.c:482
+msgid "incorrect checksum detected"
+msgstr "wykryto niepoprawną sumę kontrolną"
