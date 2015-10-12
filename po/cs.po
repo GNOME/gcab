@@ -8,8 +8,8 @@ msgstr ""
 "Project-Id-Version: gcab master\n"
 "Report-Msgid-Bugs-To: http://bugzilla.gnome.org/enter_bug.cgi?"
 "product=gcab&keywords=I18N+L10N&component=general\n"
-"POT-Creation-Date: 2015-03-12 21:39+0000\n"
-"PO-Revision-Date: 2015-03-13 23:59+0100\n"
+"POT-Creation-Date: 2015-08-25 20:08+0000\n"
+"PO-Revision-Date: 2015-10-12 16:01+0200\n"
 "Last-Translator: Marek Černocký <marek@manet.cz>\n"
 "Language-Team: Czech <gnome-cs-list@gnome.org>\n"
 "Language: cs\n"
@@ -170,3 +170,7 @@ msgstr "nelze zapsat soubor CAB %s: %s"
 #, c-format
 msgid "unsupported compression method %d"
 msgstr "nepodporovaná metoda komprimace %d"
+
+#: ../libgcab/cabinet.c:482
+msgid "incorrect checksum detected"
+msgstr "zjištěn nesprávný kontrolní součet"
