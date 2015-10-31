@@ -9,15 +9,15 @@ msgstr ""
 "Project-Id-Version: gcab.master-sv\n"
 "Report-Msgid-Bugs-To: http://bugzilla.gnome.org/enter_bug.cgi?"
 "product=gcab&keywords=I18N+L10N&component=general\n"
-"POT-Creation-Date: 2015-03-12 21:39+0000\n"
-"PO-Revision-Date: 2015-03-15 17:35+0100\n"
+"POT-Creation-Date: 2015-08-25 20:08+0000\n"
+"PO-Revision-Date: 2015-08-27 23:09+0200\n"
 "Last-Translator: Anders Jonsson <anders.jonsson@norsjovallen.se>\n"
 "Language-Team: Swedish <tp-sv@listor.tp-sv.se>\n"
 "Language: sv\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: Poedit 1.7.3\n"
+"X-Generator: Poedit 1.8.3\n"
 
 #: ../gcab.c:62
 #, c-format
@@ -171,3 +171,7 @@ msgstr "kan inte skriva cab-fil %s: %s"
 #, c-format
 msgid "unsupported compression method %d"
 msgstr "komprimeringsmetoden %d stöds inte"
+
+#: ../libgcab/cabinet.c:482
+msgid "incorrect checksum detected"
+msgstr "felaktig kontrollsumma upptäckt"
