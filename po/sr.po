@@ -1,16 +1,16 @@
 # Serbian translation for gcab.
 # Copyright (C) 2013 gcab's COPYRIGHT HOLDER
 # This file is distributed under the same license as the gcab package.
-# Мирослав Николић <miroslavnikolic@rocketmail.com>, 2013.
+# Мирослав Николић <miroslavnikolic@rocketmail.com>, 2013—2015.
 msgid ""
 msgstr ""
 "Project-Id-Version: gcab master\n"
-"Report-Msgid-Bugs-To: http://bugzilla.gnome.org/enter_bug.cgi?product=gcab&k"
-"eywords=I18N+L10N&component=general\n"
-"POT-Creation-Date: 2013-08-02 10:32+0000\n"
-"PO-Revision-Date: 2013-11-08 08:51+0200\n"
+"Report-Msgid-Bugs-To: http://bugzilla.gnome.org/enter_bug.cgi?product=gcab&ke"
+"ywords=I18N+L10N&component=general\n"
+"POT-Creation-Date: 2015-08-25 20:08+0000\n"
+"PO-Revision-Date: 2015-12-30 09:58+0200\n"
 "Last-Translator: Мирослав Николић <miroslavnikolic@rocketmail.com>\n"
-"Language-Team: Serbian <(nothing)>\n"
+"Language-Team: Serbian <gnom@prevod.org>\n"
 "Language: sr\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -34,65 +34,69 @@ msgstr "Избацујем %s податке до: %s ...\n"
 msgid "can't write file %s: %s"
 msgstr "не могу да запишем датотеку „%s“: %s"
 
-#: ../gcab.c:108
+#: ../gcab.c:109
 msgid "Print program version"
 msgstr "Исписује издање програма"
 
-#: ../gcab.c:109
+#: ../gcab.c:110
 msgid "Be verbose"
 msgstr "Опширнији испис"
 
-#: ../gcab.c:110
+#: ../gcab.c:111
 msgid "Create archive"
 msgstr "Прави архиву"
 
-#: ../gcab.c:111
+#: ../gcab.c:112
 msgid "Extract all files"
 msgstr "Извлачи све датотеке"
 
-#: ../gcab.c:112
+#: ../gcab.c:113
 msgid "Dump reserved and extra data"
 msgstr "Избацује резервисане и посебне податке"
 
-#: ../gcab.c:113
+#: ../gcab.c:114
 msgid "List content"
 msgstr "Исписује садржај"
 
-#: ../gcab.c:114
+#: ../gcab.c:115
+msgid "List content with file details"
+msgstr "Исписује садржај са појединостима датотеке"
+
+#: ../gcab.c:116
 msgid "Change to directory DIR"
 msgstr "Прелази у директоријум ДИР"
 
-#: ../gcab.c:114
+#: ../gcab.c:116
 msgid "DIR"
 msgstr "ДИР"
 
-#: ../gcab.c:115
+#: ../gcab.c:117
 msgid "Use zip compression"
 msgstr "Користи зип сажимање"
 
-#: ../gcab.c:116
+#: ../gcab.c:118
 msgid "Do not include path"
 msgstr "Не укључује путању"
 
-#: ../gcab.c:117
+#: ../gcab.c:119
 msgid "Reserve space in cabinet for signing (e.g. -s 6144 reserves 6K bytes)"
 msgstr ""
 "Обезбеђује простор у кабинету за потпис (нпр. „-s 6144“ обезбеђује 6K бајта)"
 
-#: ../gcab.c:118
+#: ../gcab.c:120
 msgid "FILE INPUT_FILES..."
 msgstr "УЛАЗНЕ_ДАТОТЕКЕ ДАТОТЕКЕ..."
 
-#: ../gcab.c:132
+#: ../gcab.c:134
 msgid "- create a Cabinet file"
 msgstr "— направите Кабинет датотеку"
 
-#: ../gcab.c:133
+#: ../gcab.c:135
 #, c-format
 msgid "Report bugs to <%s>"
 msgstr "Грешке пријавите на <%s>"
 
-#: ../gcab.c:136
+#: ../gcab.c:138
 msgid ""
 "gcab saves many files together into a cabinet archive, and can restore\n"
 "individual files from the archive."
@@ -100,69 +104,72 @@ msgstr ""
 "гкаб чува заједно много датотека у кабинет архиви, и може да врати\n"
 "појединачне датотеке из архиве."
 
-#: ../gcab.c:143
+#: ../gcab.c:145
 #, c-format
 msgid "option parsing failed: %s\n"
 msgstr "није успела обрада опције: %s\n"
 
-#: ../gcab.c:152
+#: ../gcab.c:154
 msgid "Please specify a single operation."
 msgstr "Молим наведите једну радњу."
 
-#: ../gcab.c:155
+#: ../gcab.c:157
 msgid "cabinet file must be specified."
 msgstr "мора бити наведена кабинет датотека."
 
-#: ../gcab.c:169
+#: ../gcab.c:171
 #, c-format
 msgid "can't open %s for reading: %s\n"
 msgstr "не могу да отворим „%s“ за читање: %s\n"
 
-#: ../gcab.c:171
+#: ../gcab.c:173
 #, c-format
 msgid "error reading %s: %s\n"
 msgstr "грешка читања „%s“: %s\n"
 
-#: ../gcab.c:188
+#: ../gcab.c:208
 #, c-format
 msgid "error during extraction: %s"
 msgstr "грешка приликом извлачења: %s"
 
-#: ../gcab.c:200
+#: ../gcab.c:220
 #, c-format
 msgid "error while reading signature: %s"
 msgstr "грешка приликом читања потписа: %s"
 
-#: ../gcab.c:211
+#: ../gcab.c:231
 msgid "please specify input files."
 msgstr "молим наведите улазне датотеке."
 
-#: ../gcab.c:229
+#: ../gcab.c:249
 #, c-format
 msgid "Can't add file %s: %s"
 msgstr "Не могу да додам датотеку „%s“: %s"
 
-#: ../gcab.c:239
+#: ../gcab.c:259
 msgid "no files to be archived."
 msgstr "нема датотека за архивирање."
 
-#: ../gcab.c:245
+#: ../gcab.c:265
 #, c-format
 msgid "can't create cab file %s: %s"
 msgstr "не могу да направим каб датотеку „%s“: %s"
 
-#: ../gcab.c:249
+#: ../gcab.c:269
 #, c-format
-#| msgid "can't add folder to cabinet: %s"
 msgid "can't add folder to cab file %s: %s"
 msgstr "не могу да додам фасциклу у каб датотеку„%s“: %s"
 
-#: ../gcab.c:257
+#: ../gcab.c:277
 #, c-format
 msgid "can't write cab file %s: %s"
 msgstr "не могу да запишем каб датотеку „%s“: %s"
 
-#: ../libgcab/cabinet.c:20 ../libgcab/cabinet.c:453
+#: ../libgcab/cabinet.c:20 ../libgcab/cabinet.c:468
 #, c-format
 msgid "unsupported compression method %d"
 msgstr "неподржан режим паковања „%d“"
+
+#: ../libgcab/cabinet.c:482
+msgid "incorrect checksum detected"
+msgstr "откривена је неисправна сума провере"
