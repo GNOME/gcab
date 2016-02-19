@@ -13,7 +13,7 @@
  * a sub-container grouping GCabFiles together, sharing some common
  * settings like the compression method.
  *
- * You can retrieve the files withing a folder with
+ * You can retrieve the files within a folder with
  * gcab_folder_get_files().
  *
  * In order to add a file to a folder for creation, use
