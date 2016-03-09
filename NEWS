@@ -1,3 +1,15 @@
+v0.7
+====
+
+- learn to rewind if needed during extraction #763377
+- fix extraction of files without cdata #763376
+- do not abort with a critical warning if a file has an incorrect
+  checksum
+- set utf8 flag automatically #754091
+- fix wrong modification date #753040
+- build warning fixes
+- translation updates
+
 v0.6
 ====
 
