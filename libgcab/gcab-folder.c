@@ -404,6 +404,16 @@ gcab_folder_extract (GCabFolder *self,
 
         u4 usize = file->cfile.usize;
         u4 uoffset = file->cfile.uoffset;
+
+        /* let's rewind if need be */
+        if (uoffset < nubytes) {
+            if (!g_seekable_seek (G_SEEKABLE (data), self->cfolder.offsetdata,
+                                  G_SEEK_SET, cancellable, error))
+                goto end;
+            bzero(&cdata, sizeof(cdata));
+            nubytes = 0;
+        }
+
         while (usize > 0) {
             if ((nubytes + cdata.nubytes) <= uoffset) {
                 nubytes += cdata.nubytes;
