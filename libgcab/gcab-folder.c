@@ -404,7 +404,7 @@ gcab_folder_extract (GCabFolder *self,
 
         u4 usize = file->cfile.usize;
         u4 uoffset = file->cfile.uoffset;
-        do {
+        while (usize > 0) {
             if ((nubytes + cdata.nubytes) <= uoffset) {
                 nubytes += cdata.nubytes;
                 if (!cdata_read (&cdata, res_data, self->comptype,
@@ -422,7 +422,7 @@ gcab_folder_extract (GCabFolder *self,
                 usize -= count;
                 uoffset += count;
             }
-        } while (usize > 0);
+        }
     }
 
     success = TRUE;
