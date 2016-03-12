@@ -2,15 +2,15 @@
 # Copyright (C) 2013 gcab's COPYRIGHT HOLDER
 # This file is distributed under the same license as the gcab package.
 #
-# Matej Urbančič <mateju@svn.gnome.org>, 2013.2015.
+# Matej Urbančič <mateju@svn.gnome.org>, 2013-2016.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: gcab master\n"
 "Report-Msgid-Bugs-To: http://bugzilla.gnome.org/enter_bug.cgi?"
 "product=gcab&keywords=I18N+L10N&component=general\n"
-"POT-Creation-Date: 2015-03-15 05:42+0000\n"
-"PO-Revision-Date: 2015-03-15 13:14+0100\n"
+"POT-Creation-Date: 2016-03-12 21:28+0100\n"
+"PO-Revision-Date: 2016-03-12 21:28+0100\n"
 "Last-Translator: Matej Urbančič <mateju@svn.gnome.org>\n"
 "Language-Team: Slovenian GNOME Translation Team <gnome-si@googlegroups.com>\n"
 "Language: sl_SI\n"
@@ -20,7 +20,7 @@ msgstr ""
 "Plural-Forms: nplurals=4; plural=(n%100==1 ? 1 : n%100==2 ? 2 : n%100==3 || n"
 "%100==4 ? 3 : 0);\n"
 "X-Poedit-SourceCharset: utf-8\n"
-"X-Generator: Poedit 1.5.4\n"
+"X-Generator: Poedit 1.8.4\n"
 
 #: ../gcab.c:62
 #, c-format
@@ -173,3 +173,7 @@ msgstr "ni mogoče zapisati datoteke cab %s: %s"
 #, c-format
 msgid "unsupported compression method %d"
 msgstr "nepodprt način stiskanja %d"
+
+#: ../libgcab/cabinet.c:482
+msgid "incorrect checksum detected"
+msgstr "zaznana je nepravilna nadzorna vsota"
