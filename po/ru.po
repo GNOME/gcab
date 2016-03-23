@@ -8,9 +8,9 @@ msgstr ""
 "Project-Id-Version: gcab master\n"
 "Report-Msgid-Bugs-To: http://bugzilla.gnome.org/enter_bug.cgi?"
 "product=gcab&keywords=I18N+L10N&component=general\n"
-"POT-Creation-Date: 2013-10-14 17:12+0000\n"
-"PO-Revision-Date: 2013-10-16 15:27+0600\n"
-"Last-Translator: Dmitriy S. Seregin <dseregin@59.ru>\n"
+"POT-Creation-Date: 2015-08-25 20:08+0000\n"
+"PO-Revision-Date: 2015-12-10 13:52+0300\n"
+"Last-Translator: Aleksey Kabanov <ak099@mail.ru>\n"
 "Language-Team: Russian <gnome-cyr@gnome.org>\n"
 "Language: ru\n"
 "MIME-Version: 1.0\n"
@@ -18,7 +18,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n"
 "%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
-"X-Generator: Poedit 1.5.7\n"
+"X-Generator: Poedit 1.6.4\n"
 
 #: ../gcab.c:62
 #, c-format
@@ -35,66 +35,70 @@ msgstr "Создание дампа данных %s на: %s …\n"
 msgid "can't write file %s: %s"
 msgstr "не удалось записать файл %s: %s"
 
-#: ../gcab.c:108
+#: ../gcab.c:109
 msgid "Print program version"
 msgstr "Показать версию программы"
 
-#: ../gcab.c:109
+#: ../gcab.c:110
 msgid "Be verbose"
 msgstr "Выводить подробную информацию"
 
-#: ../gcab.c:110
+#: ../gcab.c:111
 msgid "Create archive"
 msgstr "Создать архив"
 
-#: ../gcab.c:111
+#: ../gcab.c:112
 msgid "Extract all files"
 msgstr "Извлечь все файлы"
 
-#: ../gcab.c:112
+#: ../gcab.c:113
 msgid "Dump reserved and extra data"
 msgstr "Включать в дамп резервные и дополнительные данные"
 
-#: ../gcab.c:113
+#: ../gcab.c:114
 msgid "List content"
 msgstr "Список содержимого"
 
-#: ../gcab.c:114
+#: ../gcab.c:115
+msgid "List content with file details"
+msgstr "Вывести список содержимого со сведениями о файлах"
+
+#: ../gcab.c:116
 msgid "Change to directory DIR"
 msgstr "Изменить на каталог КАТАЛОГ"
 
-#: ../gcab.c:114
+#: ../gcab.c:116
 msgid "DIR"
 msgstr "КАТАЛОГ"
 
-#: ../gcab.c:115
+#: ../gcab.c:117
 msgid "Use zip compression"
 msgstr "Использовать zip-сжатие"
 
-#: ../gcab.c:116
+#: ../gcab.c:118
 msgid "Do not include path"
 msgstr "Не включать путь"
 
-#: ../gcab.c:117
+#: ../gcab.c:119
 msgid "Reserve space in cabinet for signing (e.g. -s 6144 reserves 6K bytes)"
 msgstr ""
 "Зарезервировать место в архиве для подписи (например, -s 6144 зарезервирует "
 "6 Кб)"
 
-#: ../gcab.c:118
+#: ../gcab.c:120
 msgid "FILE INPUT_FILES..."
 msgstr "ФАЙЛ ВХОДНЫЕ_ФАЙЛЫ..."
 
-#: ../gcab.c:132
+#: ../gcab.c:134
 msgid "- create a Cabinet file"
 msgstr "- создать Cab-файл"
 
-#: ../gcab.c:133
+#: ../gcab.c:135
 #, c-format
 msgid "Report bugs to <%s>"
 msgstr "Отправить отчёт об ошибке на <%s>"
 
-#: ../gcab.c:136
+#: ../gcab.c:138
 msgid ""
 "gcab saves many files together into a cabinet archive, and can restore\n"
 "individual files from the archive."
@@ -102,68 +106,72 @@ msgstr ""
 "gcab упаковывает несколько файлов в cab-архив и может извлекать\n"
 "отдельные файлы из архива."
 
-#: ../gcab.c:143
+#: ../gcab.c:145
 #, c-format
 msgid "option parsing failed: %s\n"
 msgstr "ошибка разбора параметра: %s\n"
 
-#: ../gcab.c:152
+#: ../gcab.c:154
 msgid "Please specify a single operation."
 msgstr "Выберите одну операцию."
 
-#: ../gcab.c:155
+#: ../gcab.c:157
 msgid "cabinet file must be specified."
 msgstr "должен быть указан файл архива."
 
-#: ../gcab.c:169
+#: ../gcab.c:171
 #, c-format
 msgid "can't open %s for reading: %s\n"
 msgstr "не удалось открыть %s для чтения: %s\n"
 
-#: ../gcab.c:171
+#: ../gcab.c:173
 #, c-format
 msgid "error reading %s: %s\n"
 msgstr "ошибка чтения %s: %s\n"
 
-#: ../gcab.c:188
+#: ../gcab.c:208
 #, c-format
 msgid "error during extraction: %s"
 msgstr "ошибка во время извлечения: %s"
 
-#: ../gcab.c:200
+#: ../gcab.c:220
 #, c-format
 msgid "error while reading signature: %s"
 msgstr "ошибка чтения подписи: %s"
 
-#: ../gcab.c:211
+#: ../gcab.c:231
 msgid "please specify input files."
 msgstr "укажите входные файлы."
 
-#: ../gcab.c:229
+#: ../gcab.c:249
 #, c-format
 msgid "Can't add file %s: %s"
 msgstr "Не удалось добавить файл %s: %s"
 
-#: ../gcab.c:239
+#: ../gcab.c:259
 msgid "no files to be archived."
 msgstr "нет файлов для архивирования."
 
-#: ../gcab.c:245
+#: ../gcab.c:265
 #, c-format
 msgid "can't create cab file %s: %s"
 msgstr "не удалось создать cab-файл %s: %s"
 
-#: ../gcab.c:249
+#: ../gcab.c:269
 #, c-format
 msgid "can't add folder to cab file %s: %s"
 msgstr "не удалось добавить папку в cab-файл %s: %s"
 
-#: ../gcab.c:257
+#: ../gcab.c:277
 #, c-format
 msgid "can't write cab file %s: %s"
 msgstr "не удалось записать cab-файл %s: %s"
 
-#: ../libgcab/cabinet.c:20 ../libgcab/cabinet.c:453
+#: ../libgcab/cabinet.c:20 ../libgcab/cabinet.c:468
 #, c-format
 msgid "unsupported compression method %d"
 msgstr "метод сжатия %d не поддерживается"
+
+#: ../libgcab/cabinet.c:482
+msgid "incorrect checksum detected"
+msgstr "обнаружена неверная контрольная сумма"
