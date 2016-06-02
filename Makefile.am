@@ -14,6 +14,9 @@ SUBDIRS = . po libgcab docs
 AM_CFLAGS = $(WARN_CFLAGS)
 AM_CPPFLAGS =					\
         -I$(top_srcdir)				\
+        -I$(top_srcdir)/libgcab			\
+	-I$(top_builddir)			\
+	-I$(top_builddir)/libgcab		\
         -DG_LOG_DOMAIN=\"gcab\"			\
 	-DLOCALEDIR="\"$(datadir)/locale\""	\
 	$(GLIB_CFLAGS)				\
@@ -112,11 +115,11 @@ GCab_1_0_gir_LIBS = libgcab-1.0.la
 GCab_1_0_gir_FILES =				\
 	$(top_srcdir)/libgcab.h			\
 	$(top_srcdir)/libgcab/gcab-cabinet.h	\
-	$(top_srcdir)/libgcab/gcab-enums.h	\
+	$(top_builddir)/libgcab/gcab-enums.h	\
 	$(top_srcdir)/libgcab/gcab-file.h	\
 	$(top_srcdir)/libgcab/gcab-folder.h	\
 	$(top_srcdir)/libgcab/gcab-cabinet.c	\
-	$(top_srcdir)/libgcab/gcab-enums.c	\
+	$(top_builddir)/libgcab/gcab-enums.c	\
 	$(top_srcdir)/libgcab/gcab-file.c	\
 	$(top_srcdir)/libgcab/gcab-folder.c	\
 	$(NULL)
