@@ -1,32 +1,28 @@
-# -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-# Aviary.pl
-# Jeśli masz jakiekolwiek uwagi odnoszące się do tłumaczenia lub chcesz
-# pomóc w jego rozwijaniu i pielęgnowaniu, napisz do nas:
-# gnomepl@aviary.pl
-# -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-# Piotr Drąg <piotrdrag@gmail.com>, 2013-2015.
-# Aviary.pl <gnomepl@aviary.pl>, 2013-2015.
+# Polish translation for gcab.
+# Copyright © 2013-2016 the gcab authors.
+# This file is distributed under the same license as the gcab package.
+# Piotr Drąg <piotrdrag@gmail.com>, 2013-2016.
+# Aviary.pl <community-poland@mozilla.org>, 2013-2016.
+#
 msgid ""
 msgstr ""
 "Project-Id-Version: gcab\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-08-30 16:42+0200\n"
-"PO-Revision-Date: 2015-08-30 16:44+0100\n"
+"POT-Creation-Date: 2016-08-19 18:40+0200\n"
+"PO-Revision-Date: 2016-08-19 18:41+0200\n"
 "Last-Translator: Piotr Drąg <piotrdrag@gmail.com>\n"
-"Language-Team: Polish <gnomepl@aviary.pl>\n"
+"Language-Team: Polish <community-poland@mozilla.org>\n"
 "Language: pl\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=(n==1 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 "
 "|| n%100>=20) ? 1 : 2);\n"
-"X-Poedit-Language: Polish\n"
-"X-Poedit-Country: Poland\n"
 
 #: ../gcab.c:62
 #, c-format
 msgid "Removing leading '%s' from member names"
-msgstr "Usuwanie kończącego „%s” z nazw elementów"
+msgstr "Usuwanie kończącego „%s” z nazw elementów"
 
 #: ../gcab.c:74
 #, c-format
@@ -56,7 +52,7 @@ msgstr "Rozpakowuje wszystkie pliki"
 
 #: ../gcab.c:113
 msgid "Dump reserved and extra data"
-msgstr "Zrzuca zarezerwowane i dodatkowe dane"
+msgstr "Zrzuca zarezerwowane i dodatkowe dane"
 
 #: ../gcab.c:114
 msgid "List content"
@@ -64,7 +60,7 @@ msgstr "Wyświetla listę zawartości"
 
 #: ../gcab.c:115
 msgid "List content with file details"
-msgstr "Wyświetla listę zawartości z informacjami o plikach"
+msgstr "Wyświetla listę zawartości z informacjami o plikach"
 
 #: ../gcab.c:116
 msgid "Change to directory DIR"
@@ -85,7 +81,7 @@ msgstr "Bez dołączania ścieżki"
 #: ../gcab.c:119
 msgid "Reserve space in cabinet for signing (e.g. -s 6144 reserves 6K bytes)"
 msgstr ""
-"Rezerwuje miejsce w pliku Cabinet do podpisania (np. -s 6144 rezerwuje 6K "
+"Rezerwuje miejsce w pliku Cabinet do podpisania (np. -s 6144 rezerwuje 6K "
 "bajtów)"
 
 #: ../gcab.c:120
@@ -106,8 +102,8 @@ msgid ""
 "gcab saves many files together into a cabinet archive, and can restore\n"
 "individual files from the archive."
 msgstr ""
-"gcab zapisuje wiele plików w jednym archiwum Cabinet, a także przywraca\n"
-"pojedyncze pliki z archiwum."
+"gcab zapisuje wiele plików w jednym archiwum Cabinet, a także przywraca\n"
+"pojedyncze pliki z archiwum."
 
 #: ../gcab.c:145
 #, c-format
