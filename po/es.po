@@ -3,13 +3,13 @@
 # This file is distributed under the same license as the gcab package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 # Daniel Mustieles <daniel.mustieles@gmail.com>, 2013, 2015.
-#
+# 
 msgid ""
 msgstr ""
 "Project-Id-Version: gcab master\n"
 "Report-Msgid-Bugs-To: http://bugzilla.gnome.org/enter_bug.cgi?"
 "product=gcab&keywords=I18N+L10N&component=general\n"
-"POT-Creation-Date: 2015-08-25 20:08+0000\n"
+"POT-Creation-Date: 2015-08-31 09:04+0000\n"
 "PO-Revision-Date: 2015-08-31 \n"
 "Last-Translator: Daniel Mustieles <daniel.mustieles@gmail.com>\n"
 "Language-Team: Spanish <gnome-es-list@gnome.org>\n"
