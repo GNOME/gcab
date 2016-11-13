@@ -56,10 +56,13 @@ libgcab_1_0_la_CPPFLAGS =				\
 libgcab_1_0_la_LIBADD = -lz $(GLIB_LIBS)
 libgcab_1_0_la_LDFLAGS =				\
 	-version-info 0:0:0				\
-	-Wl,--version-script=${srcdir}/libgcab.syms	\
 	-no-undefined					\
 	$(NULL)
 libgcab_1_0_la_DEPENDENCIES = libgcab.syms
+
+if HAVE_VSCRIPT
+libgcab_1_0_la_LDFLAGS += $(VSCRIPT_LDFLAGS),${srcdir}/libgcab.syms
+endif
 
 pkgconfigdir = $(libdir)/pkgconfig
 pkgconfig_DATA = libgcab-1.0.pc
