@@ -59,6 +59,7 @@ libgcab_1_0_la_LDFLAGS =				\
 	-no-undefined					\
 	$(NULL)
 libgcab_1_0_la_DEPENDENCIES = libgcab.syms
+libgcab/gcab-priv.h: libgcab/gcab-enums.h
 
 if HAVE_VSCRIPT
 libgcab_1_0_la_LDFLAGS += $(VSCRIPT_LDFLAGS),${srcdir}/libgcab.syms
