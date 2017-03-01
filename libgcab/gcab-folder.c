@@ -240,7 +240,7 @@ gcab_folder_add_file (GCabFolder *self, GCabFile *file,
         g_return_val_if_fail (G_IS_FILE (gfile), FALSE);
 
         GFileInfo *info = g_file_query_info (gfile, FILE_ATTRS, 0, NULL, error);
-        if (*error)
+        if (info == NULL)
             return FALSE;
 
         success = add_file_info (self, file, info,

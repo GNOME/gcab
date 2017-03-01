@@ -562,7 +562,7 @@ end:
         g_set_error (error, GCAB_ERROR, GCAB_ERROR_FAILED,
                      "zlib failed: %s", zError (zret));
 
-    if (!*error && !success)
+    if (error != NULL && *error == NULL && !success)
         g_set_error (error, GCAB_ERROR, GCAB_ERROR_FAILED,
                      "Invalid cabinet chunk");
 

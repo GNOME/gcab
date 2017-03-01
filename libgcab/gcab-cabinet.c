@@ -257,7 +257,7 @@ gcab_cabinet_write (GCabCabinet *self,
 
         g_clear_object (&in);
         in = G_INPUT_STREAM (g_file_read (file->file, cancellable, error));
-        if (*error)
+        if (in == NULL)
             goto end;
 
         while ((len = g_input_stream_read (in,
