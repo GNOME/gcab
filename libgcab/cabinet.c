@@ -190,9 +190,10 @@ cheader_write (cheader_t *ch, GDataOutputStream *out,
         return FALSE;
 
     if (ch->flags & CABINET_HEADER_RESERVE) {
-        W2 (ch->res_header);
-        W1 (ch->res_folder);
-        W1 (ch->res_data);
+        if (!W2 (ch->res_header) ||
+            !W1 (ch->res_folder) ||
+            !W1 (ch->res_data))
+                return FALSE;
         if (g_output_stream_write (stream, ch->reserved, ch->res_header,
                                    cancellable, error) == -1)
             return FALSE;
