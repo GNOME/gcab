@@ -190,7 +190,9 @@ struct Ziphuft **t, cab_LONG *m, fdi_decomp_state *decomp_state)
           xp = ZIP(c) + k;
           while (++j < z)       /* try smaller tables up to z bits */
           {
-            if ((f <<= 1) <= *++xp)
+            if (*++xp > ZIPBMAX)
+              return 2;         /* corrupt */
+            if ((f <<= 1) <= *xp)
               break;            /* enough codes to use up j bits */
             f -= *xp;           /* else deduct codes from patterns */
           }
