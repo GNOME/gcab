@@ -180,9 +180,8 @@ gcab_file_get_size (GCabFile *self)
  * @file: a #GCabFile
  * @result: a #GTimeVal to return date
  *
- * Get the file date.
+ * Get the file date, in @result.
  *
- * Returns: the cabinet file date in @result
  * Since: 0.6
  **/
 void
