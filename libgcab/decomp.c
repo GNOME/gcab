@@ -248,6 +248,10 @@ struct Ziphuft **t, cab_LONG *m, fdi_decomp_state *decomp_state)
         i ^= j;
       i ^= j;
 
+      /* no tables */
+      if (h < 0)
+        return 2;               /* corrupt */
+
       /* backup over finished tables */
       while ((i & ((1 << w) - 1)) != ZIP(x)[h])
         w -= l[--h];            /* don't need to update q */
