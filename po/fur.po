@@ -1,0 +1,176 @@
+# Friulian translation for gcab.
+# Copyright (C) 2017 gcab's COPYRIGHT HOLDER
+# This file is distributed under the same license as the gcab package.
+# Fabio Tomat <f.t.public@gmail.com>, 2017.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: gcab master\n"
+"Report-Msgid-Bugs-To: https://bugzilla.gnome.org/enter_bug.cgi?"
+"product=msitools&keywords=I18N+L10N&component=gcab\n"
+"POT-Creation-Date: 2017-03-03 08:39+0000\n"
+"PO-Revision-Date: 2017-04-08 15:07+0200\n"
+"Language-Team: Friulian <fur@li.org>\n"
+"Language: fur\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Last-Translator: Fabio Tomat <f.t.public@gmail.com>\n"
+"X-Generator: Poedit 1.8.12\n"
+
+#: ../gcab.c:62
+#, c-format
+msgid "Removing leading '%s' from member names"
+msgstr "Daûr a gjavâ “%s” principâl dai nons dai membris"
+
+#: ../gcab.c:74
+#, c-format
+msgid "Dumping %s data to: %s ...\n"
+msgstr "Daûr a butâ i dâts di %s su: %s ...\n"
+
+#: ../gcab.c:82
+#, c-format
+msgid "can't write file %s: %s"
+msgstr "impussibil scrivi il file %s: %s"
+
+#: ../gcab.c:109
+msgid "Print program version"
+msgstr "Stampe la version dal program"
+
+#: ../gcab.c:110
+msgid "Be verbose"
+msgstr "Jessi prolìs"
+
+#: ../gcab.c:111
+msgid "Create archive"
+msgstr "Cree archivi"
+
+#: ../gcab.c:112
+msgid "Extract all files"
+msgstr "Tire fûr ducj i file"
+
+#: ../gcab.c:113
+msgid "Dump reserved and extra data"
+msgstr "Bute i dâts riservâts e adizionâi"
+
+#: ../gcab.c:114
+msgid "List content"
+msgstr "Liste il contignût"
+
+#: ../gcab.c:115
+msgid "List content with file details"
+msgstr "Liste il contignût cui detais dai file"
+
+#: ../gcab.c:116
+msgid "Change to directory DIR"
+msgstr "Va ae cartele CARTELE"
+
+#: ../gcab.c:116
+msgid "DIR"
+msgstr "CARTELE"
+
+#: ../gcab.c:117
+msgid "Use zip compression"
+msgstr "Dopre compression zip"
+
+#: ../gcab.c:118
+msgid "Do not include path"
+msgstr "No stâ includi il percors"
+
+#: ../gcab.c:119
+msgid "Reserve space in cabinet for signing (e.g. -s 6144 reserves 6K bytes)"
+msgstr ""
+"Riserve spazi tal archivi cabinet pe firme (p.e. -s 6144 al riserve 6K "
+"byte)"
+
+#: ../gcab.c:120
+msgid "FILE INPUT_FILES..."
+msgstr "FILE INPUT_FILES..."
+
+#: ../gcab.c:134
+msgid "- create a Cabinet file"
+msgstr "- cree un file Cabinet"
+
+#: ../gcab.c:135
+#, c-format
+msgid "Report bugs to <%s>"
+msgstr "Segnale erôrs a <%s>"
+
+#: ../gcab.c:138
+msgid ""
+"gcab saves many files together into a cabinet archive, and can restore\n"
+"individual files from the archive."
+msgstr ""
+"gcab al salve tancj file adun intun archivi cabinet e al puest "
+"ripristinâ,\n"
+"dal archivi, file individuâi ."
+
+#: ../gcab.c:145
+#, c-format
+msgid "option parsing failed: %s\n"
+msgstr "no si è rivâts a analizâ la opzion: %s\n"
+
+#: ../gcab.c:154
+msgid "Please specify a single operation."
+msgstr "Specifiche une uniche operazion."
+
+#: ../gcab.c:157
+msgid "cabinet file must be specified."
+msgstr "il file cabinet al à di jessi specificât."
+
+#: ../gcab.c:171
+#, c-format
+msgid "can't open %s for reading: %s\n"
+msgstr "impussibil vierzi %s pe leture: %s\n"
+
+#: ../gcab.c:173
+#, c-format
+msgid "error reading %s: %s\n"
+msgstr "erôr tal lei %s: %s\n"
+
+#: ../gcab.c:208
+#, c-format
+msgid "error during extraction: %s"
+msgstr "erôr dilunc la estrazion: %s"
+
+#: ../gcab.c:220
+#, c-format
+msgid "error while reading signature: %s"
+msgstr "erôr inte leture de firme: %s"
+
+#: ../gcab.c:231
+msgid "please specify input files."
+msgstr "specifiche i file di jentrade."
+
+#: ../gcab.c:249
+#, c-format
+msgid "Can't add file %s: %s"
+msgstr "Impussibil zontâ il file %s: %s"
+
+#: ../gcab.c:259
+msgid "no files to be archived."
+msgstr "nissun file di archiviâ."
+
+#: ../gcab.c:265
+#, c-format
+msgid "can't create cab file %s: %s"
+msgstr "impussibil creâ il file cab %s: %s"
+
+#: ../gcab.c:269
+#, c-format
+msgid "can't add folder to cab file %s: %s"
+msgstr "impussibil zontâ la cartele sul file cab %s: %s"
+
+#: ../gcab.c:277
+#, c-format
+msgid "can't write cab file %s: %s"
+msgstr "impussibil scrivi il file cab %s: %s"
+
+#: ../libgcab/cabinet.c:20 ../libgcab/cabinet.c:469
+#, c-format
+msgid "unsupported compression method %d"
+msgstr "metodi di compression %d no supuartât"
+
+#: ../libgcab/cabinet.c:483
+msgid "incorrect checksum detected"
+msgstr "rilevât checksum no just"
