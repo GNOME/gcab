@@ -25,7 +25,7 @@ AC_SUBST(GETTEXT_PACKAGE)
 AC_DEFINE_UNQUOTED([GETTEXT_PACKAGE],["$GETTEXT_PACKAGE"],[The name of the gettext domain])
 AM_GLIB_GNU_GETTEXT
 
-AM_PATH_GLIB_2_0([2.22.0], [], [AC_MSG_ERROR([glib required])], [gio])
+AM_PATH_GLIB_2_0([2.32.0], [], [AC_MSG_ERROR([glib required])], [gio])
 AM_PROG_VALAC([0.14])
 AC_PATH_PROG(VAPIGEN, vapigen, no)
 AC_SUBST(VAPIGEN)

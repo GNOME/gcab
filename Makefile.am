@@ -93,7 +93,7 @@ ENUMS_FILES =					\
 	$(NULL)
 
 $(GCAB_ENUMS): %: %.etemplate $(ENUMS_FILES)
-	$(AM_V_GEN)$(GLIB_MKENUMS) --template $^ | sed -e 's/g_cab/gcab/g' | sed -e 's/G_CAB/GCAB/g' | sed -e 's/_CAB//g' > $@
+	$(AM_V_GEN)$(GLIB_MKENUMS) --identifier-prefix GCab --symbol-prefix gcab --template $^ > $@
 
 EXTRA_DIST =					\
 	gcab.doap				\
