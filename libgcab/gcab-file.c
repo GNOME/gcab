@@ -136,7 +136,7 @@ gcab_file_update_info (GCabFile *self, GFileInfo *info)
 
     g_file_info_get_modification_time (info, &tv);
     time = tv.tv_sec;
-    m = localtime (&time);
+    m = gmtime (&time);
 
     self->cfile.name = self->name;
     self->cfile.usize = g_file_info_get_size (info);
