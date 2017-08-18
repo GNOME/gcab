@@ -887,6 +887,7 @@ int LZXfdi_decomp(int inlen, int outlen, fdi_decomp_state *decomp_state) {
         for (i = 0; i < 8; i++) { READ_BITS(j, 3); LENTABLE(ALIGNED)[i] = j; }
         BUILD_TABLE(ALIGNED);
         /* rest of aligned header is same as verbatim */
+        /* fall-thru */
 
       case LZX_BLOCKTYPE_VERBATIM:
         READ_LENGTHS(MAINTREE, 0, 256, fdi_lzx_read_lens);

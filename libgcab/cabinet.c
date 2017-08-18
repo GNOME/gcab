@@ -400,8 +400,11 @@ compute_checksum (guint8 *in, u2 ncbytes, CHECKSUM seed)
     temp = 0;
     switch (ncbytes % 4) {
     case 3: temp |= (((CHECKSUM) (*in++)) << 16);
+    /* fall-thru */
     case 2: temp |= (((CHECKSUM) (*in++)) << 8);
+    /* fall-thru */
     case 1: temp |= ((CHECKSUM) (*in++));
+    /* fall-thru */
     default: break;
     }
 
