@@ -6,9 +6,9 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: gcab master\n"
-"Report-Msgid-Bugs-To: http://bugzilla.gnome.org/enter_bug.cgi?"
+"Report-Msgid-Bugs-To: https://bugzilla.gnome.org/enter_bug.cgi?"
 "product=msitools&keywords=I18N+L10N&component=gcab\n"
-"POT-Creation-Date: 2016-11-29 02:32+0000\n"
+"POT-Creation-Date: 2017-02-22 19:27+0000\n"
 "PO-Revision-Date: 2017-02-22 19:10+0100\n"
 "Last-Translator: Joe Hansen <joedalton2@yahoo.dk>\n"
 "Language-Team: Danish <dansk@dansk-gruppen.dk>\n"
@@ -21,12 +21,12 @@ msgstr ""
 #: ../gcab.c:62
 #, c-format
 msgid "Removing leading '%s' from member names"
-msgstr "Fjerner foranstillet \"%s\" fra elementnavne"
+msgstr "Fjerner foranstillet “%s” fra elementnavne"
 
 #: ../gcab.c:74
 #, c-format
 msgid "Dumping %s data to: %s ...\n"
-msgstr "Dumper %s-data til: %s ...\n"
+msgstr "Dumper %s-data til: %s …\n"
 
 #: ../gcab.c:82
 #, c-format
@@ -79,11 +79,13 @@ msgstr "Inkluder ikke sti"
 
 #: ../gcab.c:119
 msgid "Reserve space in cabinet for signing (e.g. -s 6144 reserves 6K bytes)"
-msgstr "Reserver plads i cabinet for underskrivning (f.eks. -s 6144 reserverer 6K byte)"
+msgstr ""
+"Reserver plads i cabinet for underskrivning (f.eks. -s 6144 reserverer 6K "
+"byte)"
 
 #: ../gcab.c:120
 msgid "FILE INPUT_FILES..."
-msgstr "FIL INDDATA_FILER ..."
+msgstr "FIL INDDATA_FILER …"
 
 #: ../gcab.c:134
 msgid "- create a Cabinet file"
@@ -171,4 +173,3 @@ msgstr "komprimeringsmetoden %d understøttes ikke"
 #: ../libgcab/cabinet.c:482
 msgid "incorrect checksum detected"
 msgstr "en fejlagtig kontrolsum blev detekteret"
-
