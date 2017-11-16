@@ -11,8 +11,7 @@ zalloc (voidpf opaque, uInt items, uInt size)
 static void
 zfree (voidpf opaque, voidpf address)
 {
-    if (address)
-        g_free (address);
+    g_free (address);
 }
 
 static gboolean

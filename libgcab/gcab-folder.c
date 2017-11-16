@@ -442,8 +442,7 @@ gcab_folder_extract (GCabFolder *self,
     success = TRUE;
 
 end:
-    if (files)
-        g_slist_free (files);
+    g_slist_free (files);
 
     g_clear_object (&data);
     g_clear_object (&out);
