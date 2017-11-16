@@ -1,3 +1,5 @@
+#include "config.h"
+
 #include "gcab-priv.h"
 #include <glib/gi18n-lib.h>
 

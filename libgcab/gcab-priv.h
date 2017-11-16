@@ -1,6 +1,8 @@
 #ifndef GCAB_PRIV_H
 #define GCAB_PRIV_H
 
+#include "config.h"
+
 #include <glib-object.h>
 #include "glib-compat.h"
 

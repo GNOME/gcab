@@ -1,3 +1,7 @@
+#include "config.h"
+
+#include <strings.h>
+
 #include "gcab-priv.h"
 
 /**
