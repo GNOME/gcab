@@ -1,4 +1,4 @@
-.TH GCAB "1" "December 2012" "@PACKAGE@ @VERSION@"
+.TH GCAB "1" "December 2012" "@PACKAGE_NAME@ @VERSION@"
 .SH NAME
 gcab \- Program to create Microsoft cabinet (.cab) archives
 .SH SYNOPSIS
