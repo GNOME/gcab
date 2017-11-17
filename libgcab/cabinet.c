@@ -303,7 +303,7 @@ cfolder_write (cfolder_t *cf, GDataOutputStream *out,
 }
 
 G_GNUC_INTERNAL gboolean
-cfolder_read (cfolder_t *cf, u1 res_size, GDataInputStream *in,
+cfolder_read (cfolder_t *cf, guint8 res_size, GDataInputStream *in,
               GCancellable *cancellable, GError **error)
 {
     gboolean success = FALSE;
@@ -377,34 +377,32 @@ end:
     return success;
 }
 
-typedef guint32 CHECKSUM;
-
-static CHECKSUM
-compute_checksum (guint8 *in, u2 ncbytes, CHECKSUM seed)
+static guint32
+compute_checksum (guint8 *in, guint16 ncbytes, guint32 seed)
 {
     int no_ulongs;
-    CHECKSUM csum=0;
-    CHECKSUM temp;
+    guint32 csum=0;
+    guint32 temp;
 
     no_ulongs = ncbytes / 4;
     csum = seed;
 
     while (no_ulongs-- > 0) {
-        temp = ((CHECKSUM) (*in++));
-        temp |= (((CHECKSUM) (*in++)) << 8);
-        temp |= (((CHECKSUM) (*in++)) << 16);
-        temp |= (((CHECKSUM) (*in++)) << 24);
+        temp = ((guint32) (*in++));
+        temp |= (((guint32) (*in++)) << 8);
+        temp |= (((guint32) (*in++)) << 16);
+        temp |= (((guint32) (*in++)) << 24);
 
         csum ^= temp;
     }
 
     temp = 0;
     switch (ncbytes % 4) {
-    case 3: temp |= (((CHECKSUM) (*in++)) << 16);
+    case 3: temp |= (((guint32) (*in++)) << 16);
     /* fall-thru */
-    case 2: temp |= (((CHECKSUM) (*in++)) << 8);
+    case 2: temp |= (((guint32) (*in++)) << 8);
     /* fall-thru */
-    case 1: temp |= ((CHECKSUM) (*in++));
+    case 1: temp |= ((guint32) (*in++));
     /* fall-thru */
     default: break;
     }
@@ -422,8 +420,8 @@ cdata_write (cdata_t *cd, GDataOutputStream *out, int type,
     if (!cdata_set(cd, type, data, size))
         return FALSE;
 
-    CHECKSUM datacsum = compute_checksum(cd->in, cd->ncbytes, 0);
-    CHECKSUM sizecsum = GUINT32_TO_LE(cd->ncbytes << 16 | cd->nubytes);
+    guint32 datacsum = compute_checksum(cd->in, cd->ncbytes, 0);
+    guint32 sizecsum = GUINT32_TO_LE(cd->ncbytes << 16 | cd->nubytes);
     cd->checksum = compute_checksum ((guint8*)&sizecsum, 4, datacsum);
     GOutputStream *stream = g_filter_output_stream_get_base_stream (G_FILTER_OUTPUT_STREAM (out));
 
@@ -458,7 +456,7 @@ cdata_finish (cdata_t *cd, GError **error)
 }
 
 G_GNUC_INTERNAL gboolean
-cdata_read (cdata_t *cd, u1 res_data, gint comptype,
+cdata_read (cdata_t *cd, guint8 res_data, gint comptype,
             GDataInputStream *in, GCancellable *cancellable, GError **error)
 
 {
@@ -466,8 +464,8 @@ cdata_read (cdata_t *cd, u1 res_data, gint comptype,
     int ret, zret = Z_OK;
     gint compression = comptype & GCAB_COMPRESSION_MASK;
     guint8 *buf = compression == GCAB_COMPRESSION_NONE ? cd->out : cd->in;
-    CHECKSUM datacsum;
-    CHECKSUM sizecsum;
+    guint32 datacsum;
+    guint32 sizecsum;
 
     if (compression > GCAB_COMPRESSION_MSZIP &&
         compression != GCAB_COMPRESSION_LZX) {

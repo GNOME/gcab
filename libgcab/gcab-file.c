@@ -151,7 +151,7 @@ gcab_file_update_info (GCabFile *self, GFileInfo *info)
 }
 
 G_GNUC_INTERNAL gboolean
-gcab_file_set_uoffset (GCabFile *self, u4 uoffset)
+gcab_file_set_uoffset (GCabFile *self, guint32 uoffset)
 {
     g_return_val_if_fail (GCAB_IS_FILE (self), FALSE);
 

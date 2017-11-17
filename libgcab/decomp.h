@@ -125,7 +125,7 @@
 #define CAB_BLOCKMAX (32768)
 #define CAB_INPUTMAX (CAB_BLOCKMAX+6144)
 
-typedef unsigned char cab_UBYTE; /* 8 bits  */
+typedef guint8        cab_UBYTE; /* 8 bits  */
 typedef guint16       cab_UWORD; /* 16 bits */
 typedef guint32       cab_ULONG; /* 32 bits */
 typedef gint32        cab_LONG;  /* 32 bits */

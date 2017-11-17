@@ -332,7 +332,7 @@ sort_by_offset (GCabFile *a, GCabFile *b)
 G_GNUC_INTERNAL gboolean
 gcab_folder_extract (GCabFolder *self,
                      GFile *path,
-                     u1 res_data,
+                     guint8 res_data,
                      GCabFileCallback file_callback,
                      GFileProgressCallback progress_callback,
                      gpointer callback_data,
@@ -345,7 +345,7 @@ gcab_folder_extract (GCabFolder *self,
     GFileOutputStream *out = NULL;
     GSList *f, *files = NULL;
     cdata_t cdata = { 0, };
-    u4 nubytes = 0;
+    guint32 nubytes = 0;
 
     data = g_data_input_stream_new (self->stream);
     g_data_input_stream_set_byte_order (data, G_DATA_STREAM_BYTE_ORDER_LITTLE_ENDIAN);
@@ -406,8 +406,8 @@ gcab_folder_extract (GCabFolder *self,
         if (!out)
             goto end;
 
-        u4 usize = file->cfile.usize;
-        u4 uoffset = file->cfile.uoffset;
+        guint32 usize = file->cfile.usize;
+        guint32 uoffset = file->cfile.uoffset;
 
         /* let's rewind if need be */
         if (uoffset < nubytes) {

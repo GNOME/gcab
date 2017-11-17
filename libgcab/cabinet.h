@@ -20,10 +20,6 @@
 /* based on the spec
    http://msdn.microsoft.com/en-us/library/bb417343.aspx */
 
-typedef unsigned char u1;
-typedef unsigned short int u2;
-typedef unsigned long int u4;
-
 typedef struct cheader cheader_t;
 typedef struct cfolder cfolder_t;
 typedef struct cfile cfile_t;
@@ -36,21 +32,21 @@ typedef struct cdata cdata_t;
 
 struct cheader
 {
-    u4 res1;
-    u4 size;
-    u4 res2;
-    u4 offsetfiles;
-    u4 res3;
-    u1 versionMIN;
-    u1 versionMAJ;
-    u2 nfolders;
-    u2 nfiles;
-    u2 flags;
-    u2 setID;
-    u2 cabID;
-    u2 res_header;
-    u1 res_folder;
-    u1 res_data;
+    guint32 res1;
+    guint32 size;
+    guint32 res2;
+    guint32 offsetfiles;
+    guint32 res3;
+    guint8 versionMIN;
+    guint8 versionMAJ;
+    guint16 nfolders;
+    guint16 nfiles;
+    guint16 flags;
+    guint16 setID;
+    guint16 cabID;
+    guint16 res_header;
+    guint8 res_folder;
+    guint8 res_data;
     guint8 *reserved;
     gchar *cab_prev;
     gchar *disk_prev;
@@ -66,28 +62,28 @@ typedef enum {
 
 struct cfolder
 {
-    u4 offsetdata;
-    u2 ndatab;
-    u2 typecomp;
+    guint32 offsetdata;
+    guint16 ndatab;
+    guint16 typecomp;
     guint8 *reserved;
 };
 
 struct cfile
 {
-    u4 usize;
-    u4 uoffset;
-    u2 index;
-    u2 date;
-    u2 time;
-    u2 fattr;
+    guint32 usize;
+    guint32 uoffset;
+    guint16 index;
+    guint16 date;
+    guint16 time;
+    guint16 fattr;
     gchar *name;
 };
 
 struct cdata
 {
-    u4 checksum;
-    u2 ncbytes;
-    u2 nubytes;
+    guint32 checksum;
+    guint16 ncbytes;
+    guint16 nubytes;
     guint8 *reserved;
     guint8 in[CAB_INPUTMAX+2];
     guint8 out[CAB_BLOCKMAX];
@@ -111,7 +107,7 @@ gboolean     cfolder_write                      (cfolder_t *cf,
                                                  GCancellable *cancellable,
                                                  GError **error);
 gboolean     cfolder_read                       (cfolder_t *cf,
-                                                 u1 res_folder,
+                                                 guint8 res_folder,
                                                  GDataInputStream *in,
                                                  GCancellable *cancellable,
                                                  GError **error);
@@ -132,7 +128,7 @@ gboolean     cdata_write                        (cdata_t *cd,
                                                  GCancellable *cancellable,
                                                  GError **error);
 gboolean     cdata_read                         (cdata_t *cd,
-                                                 u1 res_data,
+                                                 guint8 res_data,
                                                  gint comptype,
                                                  GDataInputStream *in,
                                                  GCancellable *cancellable,
