@@ -208,7 +208,7 @@ add_file_info (GCabFolder *self, GCabFile *file, GFileInfo *info,
 
     } else {
         g_set_error (error, G_FILE_ERROR, G_FILE_ERROR_FAILED,
-                     "Unhandled file type: %d", file_type);
+                     "Unhandled file type: %u", file_type);
         return FALSE;
     }
 
