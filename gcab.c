@@ -92,7 +92,6 @@ main (int argc, char *argv[])
 {
     GError *error = NULL;
     GOptionContext *context;
-    int i;
 
     gchar **args = NULL;
     gchar *change = NULL;
@@ -174,7 +173,7 @@ individual files from the archive.\
 
         if (list || list_details) {
             GPtrArray *folders = gcab_cabinet_get_folders (cabinet);
-            for (i = 0; i < folders->len; i++) {
+            for (guint i = 0; i < folders->len; i++) {
                 GSList *l, *files = gcab_folder_get_files (g_ptr_array_index (folders, i));
 
                 for (l = files; l != NULL; l = l->next) {
@@ -239,7 +238,7 @@ individual files from the archive.\
 
     folder = gcab_folder_new (compress ? GCAB_COMPRESSION_MSZIP : 0);
 
-    for (i = 1; args[i]; i++) {
+    for (gint i = 1; args[i]; i++) {
         GFile *file = g_file_new_for_commandline_arg (args[i]);
         gchar *name = nopath ? g_path_get_basename (args[i]) : g_strdup (args[i]);
         GCabFile *cabfile = gcab_file_new_with_file (

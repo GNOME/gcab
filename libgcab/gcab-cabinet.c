@@ -225,7 +225,6 @@ gcab_cabinet_write (GCabCabinet *self,
     size_t sumstr = 0;
     GSList *l, *files;
     cfile_t *prevf = NULL;
-    int i;
 
     dstream = g_data_output_stream_new (out);
     g_data_output_stream_set_byte_order (dstream, G_DATA_STREAM_BYTE_ORDER_LITTLE_ENDIAN);
@@ -248,7 +247,7 @@ gcab_cabinet_write (GCabCabinet *self,
     folder.ndatab = gcab_folder_get_ndatablocks (cabfolder);
 
     /* avoid seeking to allow growing output streams */
-    for (i = 0; i < folder.offsetdata; i++)
+    for (guint i = 0; i < folder.offsetdata; i++)
         if (!g_data_output_stream_put_byte (dstream, 0, cancellable, error))
             goto end;
 
@@ -387,7 +386,6 @@ gcab_cabinet_load (GCabCabinet *self,
 
     gboolean success = FALSE;
     cheader_t cheader;
-    int i;
     GDataInputStream *in = g_data_input_stream_new (stream);
     g_filter_input_stream_set_close_base_stream (G_FILTER_INPUT_STREAM (in), FALSE);
     g_data_input_stream_set_byte_order (in, G_DATA_STREAM_BYTE_ORDER_LITTLE_ENDIAN);
@@ -402,7 +400,7 @@ gcab_cabinet_load (GCabCabinet *self,
                       g_byte_array_new_take (cheader.reserved, cheader.res_header),
                       NULL);
 
-    for (i = 0; i < cheader.nfolders; i++) {
+    for (guint i = 0; i < cheader.nfolders; i++) {
         cfolder_t cfolder = { 0, };
         if (!cfolder_read (&cfolder, cheader.res_folder, in, cancellable, error))
             goto end;
@@ -416,7 +414,7 @@ gcab_cabinet_load (GCabCabinet *self,
         cfolder.reserved = NULL;
     }
 
-    for (i = 0; i < cheader.nfiles; i++) {
+    for (guint i = 0; i < cheader.nfiles; i++) {
         cfile_t cfile = { 0, };
         if (!cfile_read (&cfile, in, cancellable, error))
             goto end;
@@ -475,14 +473,13 @@ gcab_cabinet_extract (GCabCabinet *self,
                       GError **error)
 {
     gboolean success = TRUE;
-    int i;
 
     g_return_val_if_fail (GCAB_IS_CABINET (self), FALSE);
     g_return_val_if_fail (G_IS_FILE (path), FALSE);
     g_return_val_if_fail (!cancellable || G_IS_CANCELLABLE (cancellable), FALSE);
     g_return_val_if_fail (!error || *error == NULL, FALSE);
 
-    for (i = 0; i < self->folders->len; ++i) {
+    for (guint i = 0; i < self->folders->len; ++i) {
         GCabFolder *folder = g_ptr_array_index (self->folders, i);
         if (!gcab_folder_extract (folder, path, self->cheader.res_data,
                                   file_callback, progress_callback, user_data,
