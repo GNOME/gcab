@@ -78,12 +78,12 @@ gcab_cabinet_set_property (GObject *object, guint prop_id, const GValue *value, 
         if (self->reserved)
             g_byte_array_unref (self->reserved);
         self->reserved = g_value_dup_boxed (value);
-	break;
+        break;
     case PROP_SIGNATURE:
         if (self->signature)
             g_byte_array_unref (self->signature);
         self->signature = g_value_dup_boxed (value);
-	break;
+        break;
     default:
         G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
         break;
@@ -99,7 +99,7 @@ gcab_cabinet_get_property (GObject *object, guint prop_id, GValue *value, GParam
     switch (prop_id) {
     case PROP_RESERVED:
         g_value_set_boxed (value, self->reserved);
-	break;
+        break;
     case PROP_SIGNATURE:
         g_value_set_boxed (value, gcab_cabinet_get_signature (self, NULL, NULL));
         break;

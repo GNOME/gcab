@@ -75,7 +75,7 @@ gcab_folder_set_property (GObject *object, guint prop_id, const GValue *value, G
         if (self->reserved)
             g_byte_array_unref (self->reserved);
         self->reserved = g_value_dup_boxed (value);
-	break;
+        break;
     default:
         G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
         break;
@@ -97,7 +97,7 @@ gcab_folder_get_property (GObject *object, guint prop_id, GValue *value, GParamS
         break;
     case PROP_RESERVED:
         g_value_set_boxed (value, self->reserved);
-	break;
+        break;
     default:
         G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
         break;
