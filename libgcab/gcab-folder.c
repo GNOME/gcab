@@ -330,7 +330,7 @@ gcab_folder_new_with_cfolder (const cfolder_t *folder, GInputStream *stream)
  *
  * Get the list of #GCabFile files contained in the @cabfolder.
  *
- * Returns: (element-type GCabFile) (transfer full): list of files
+ * Returns: (element-type GCabFile) (transfer container): list of files
  **/
 GSList *
 gcab_folder_get_files (GCabFolder *self)
