@@ -156,6 +156,25 @@ CLEANFILES += libgcab-1.0.vapi
 endif # VAPI
 endif # GIR
 
+check_PROGRAMS =				\
+	gcab-self-test
+
+gcab_self_test_SOURCES =			\
+	tests/gcab-self-test.c
+
+gcab_self_test_LDADD =				\
+	$(lib_LTLIBRARIES)			\
+	$(GLIB_LIBS)
+
+gcab_self_test_CPPFLAGS =			\
+	$(AM_CPPFLAGS)				\
+	-DTESTDATADIR=\""$(abs_top_srcdir)/tests"\"
+
+gcab_self_test_CFLAGS =				\
+	$(AM_CFLAGS)
+
+TESTS = gcab-self-test
+
 # Autotest support
 
 TESTSUITE = $(srcdir)/tests/testsuite

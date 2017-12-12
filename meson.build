@@ -97,6 +97,7 @@ conf.set_quoted('PACKAGE_STRING', meson.project_name())
 conf.set_quoted('VERSION', meson.project_version())
 conf.set_quoted('LOCALEDIR', get_option('localedir'))
 conf.set_quoted('PACKAGE_BUGREPORT', 'https://bugzilla.gnome.org/enter_bug.cgi?product=msitools')
+conf.set_quoted('TESTDATADIR', join_paths(meson.source_root(), 'tests'))
 configure_file(
   output : 'config.h',
   configuration : conf
@@ -108,4 +109,8 @@ subdir('src')
 
 if get_option('docs')
 subdir('docs')
+endif
+
+if get_option('tests')
+subdir('tests')
 endif
