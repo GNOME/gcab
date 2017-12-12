@@ -110,6 +110,8 @@ const GByteArray * gcab_cabinet_get_signature (GCabCabinet *cabinet,
                                                GCancellable *cancellable,
                                                GError **error);
 
+G_DEFINE_AUTOPTR_CLEANUP_FUNC(GCabCabinet, g_object_unref)
+
 G_END_DECLS
 
 #endif /* _GCAB_CABINET_H_ */

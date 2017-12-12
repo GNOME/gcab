@@ -84,7 +84,7 @@ add_global_link_arguments(
   language: 'c'
 )
 
-gio = dependency('gio-2.0', version : '>= 2.32.0')
+gio = dependency('gio-2.0', version : '>= 2.44.0')
 libz = dependency('zlib')
 
 gnome = import('gnome')

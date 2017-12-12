@@ -84,6 +84,8 @@ void            gcab_file_get_date                  (GCabFile *file, GTimeVal *r
 const gchar *   gcab_file_get_extract_name          (GCabFile *file);
 void            gcab_file_set_extract_name          (GCabFile *file, const gchar *name);
 
+G_DEFINE_AUTOPTR_CLEANUP_FUNC(GCabFile, g_object_unref)
+
 G_END_DECLS
 
 #endif /* _GCAB_FILE_H_ */

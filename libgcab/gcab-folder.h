@@ -74,6 +74,8 @@ gboolean        gcab_folder_add_file          (GCabFolder *cabfolder,
 guint           gcab_folder_get_nfiles        (GCabFolder *cabfolder);
 GSList *        gcab_folder_get_files         (GCabFolder *cabfolder);
 
+G_DEFINE_AUTOPTR_CLEANUP_FUNC(GCabFolder, g_object_unref)
+
 G_END_DECLS
 
 #endif /* _GCAB_FILE_H_ */
