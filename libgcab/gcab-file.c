@@ -43,7 +43,6 @@ struct _GCabFile
 {
     GObject parent_instance;
 
-    gchar *name;
     gchar *extract_name;
     GFile *file;
     cfile_t cfile;
@@ -70,7 +69,7 @@ gcab_file_finalize (GObject *object)
 
     if (self->file != NULL)
         g_object_unref (self->file);
-    g_free (self->name);
+    g_free (self->cfile.name);
     g_free (self->extract_name);
 
     G_OBJECT_CLASS (gcab_file_parent_class)->finalize (object);
@@ -91,8 +90,8 @@ gcab_file_set_name (GCabFile *self, const gchar *name)
     }
 #endif
 
-    g_free (self->name);
-    self->name = fname;
+    g_free (self->cfile.name);
+    self->cfile.name = fname;
 }
 
 static void
@@ -122,7 +121,7 @@ gcab_file_get_property (GObject *object, guint prop_id, GValue *value, GParamSpe
 
     switch (prop_id) {
     case PROP_NAME:
-        g_value_set_string (value, self->name);
+        g_value_set_string (value, self->cfile.name);
         break;
     case PROP_FILE:
         g_value_set_object (value, self->file);
@@ -167,7 +166,6 @@ gcab_file_update_info (GCabFile *self, GFileInfo *info)
     time = tv.tv_sec;
     m = gmtime (&time);
 
-    self->cfile.name = self->name;
     self->cfile.usize = g_file_info_get_size (info);
     self->cfile.fattr = GCAB_FILE_ATTRIBUTE_ARCH;
     self->cfile.date = ((m->tm_year + 1900 - 1980 ) << 9 ) +
@@ -303,7 +301,7 @@ gcab_file_get_name (GCabFile *self)
 {
     g_return_val_if_fail (GCAB_IS_FILE (self), NULL);
 
-    return self->name;
+    return self->cfile.name;
 }
 
 /**
@@ -354,9 +352,7 @@ gcab_file_new_with_cfile (const cfile_t *cfile)
 {
     g_return_val_if_fail (cfile != NULL, NULL);
 
-    GCabFile *file = g_object_new (GCAB_TYPE_FILE,
-                                   "name", cfile->name,
-                                   NULL);
+    GCabFile *file = g_object_new (GCAB_TYPE_FILE, NULL);
     file->cfile = *cfile;
 
     return file;
@@ -375,7 +371,7 @@ gcab_file_get_extract_name (GCabFile *self)
 {
     g_return_val_if_fail (GCAB_IS_FILE (self), NULL);
 
-    return self->extract_name ? self->extract_name : self->name;
+    return self->extract_name ? self->extract_name : self->cfile.name;
 }
 
 /**
