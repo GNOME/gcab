@@ -282,7 +282,14 @@ gcab_cabinet_write (GCabCabinet *self,
         if (file_callback)
             file_callback (file, user_data);
 
-        in = G_INPUT_STREAM (g_file_read (gcab_file_get_gfile (file), cancellable, error));
+        GFile *gfile = gcab_file_get_gfile (file);
+        if (gfile == NULL) {
+            g_set_error (error, GCAB_ERROR, GCAB_ERROR_FORMAT,
+                         "No GFile for %s", gcab_file_get_name (file));
+            return FALSE;
+        }
+
+        in = G_INPUT_STREAM (g_file_read (gfile, cancellable, error));
         if (in == NULL)
             return FALSE;
 
