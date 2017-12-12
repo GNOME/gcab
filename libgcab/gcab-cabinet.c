@@ -171,6 +171,15 @@ gcab_cabinet_add_folder (GCabCabinet *self,
     g_return_val_if_fail (GCAB_IS_FOLDER (folder), FALSE);
     g_return_val_if_fail (!error || *error == NULL, FALSE);
 
+    for (guint i = 0; i < self->folders->len; i++) {
+        GCabFolder *folder_tmp = g_ptr_array_index (self->folders, i);
+        if (folder_tmp == folder) {
+            g_set_error (error, GCAB_ERROR, GCAB_ERROR_FORMAT,
+                         "Folder has already been added");
+            return FALSE;
+        }
+    }
+
     g_ptr_array_add (self->folders, g_object_ref (folder));
 
     return TRUE;
