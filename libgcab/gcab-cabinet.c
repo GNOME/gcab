@@ -193,7 +193,7 @@ gcab_cabinet_add_folder (GCabCabinet *self,
  * Note that Cabinet folders are not like filesystem path, they are
  * group of files sharing some layout parameters.
  *
- * Returns: (element-type GCabFolder) (transfer full): an array of #GCabFolder
+ * Returns: (element-type GCabFolder) (transfer none): an array of #GCabFolder
  **/
 GPtrArray *
 gcab_cabinet_get_folders (GCabCabinet *self)
