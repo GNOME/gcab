@@ -221,9 +221,8 @@ add_file_info (GCabFolder *self, GCabFile *file, GFileInfo *info,
             g_autofree gchar *child_name = g_build_path ("\\", name, g_file_info_get_name (info), NULL);
             g_autoptr(GCabFile) child_file = gcab_file_new_with_file (child_name, child);
             if (!add_file_info (self, child_file, info, child_name, recurse, error)) {
-                g_warning ("Couldn't add file %s: %s",
-                           child_name, (*error)->message);
-                g_clear_error (error);
+                g_object_unref (info);
+                return FALSE;
             }
             g_object_unref (info);
         }
