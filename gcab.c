@@ -95,15 +95,15 @@ main (int argc, char *argv[])
 
     gchar **args = NULL;
     gchar *change = NULL;
-    int version = 0;
-    int nopath = 0;
-    int space = 0;
-    int compress = 0;
-    int list = 0;
-    int list_details = 0;
-    int create = 0;
-    int extract = 0;
-    int dump_reserved = 0;
+    gboolean version = FALSE;
+    gboolean nopath = FALSE;
+    gboolean space = FALSE;
+    gboolean compress = FALSE;
+    gboolean list = FALSE;
+    gboolean list_details = FALSE;
+    gboolean create = FALSE;
+    gboolean extract = FALSE;
+    gboolean dump_reserved = FALSE;
     GOptionEntry entries[] = {
         { "version", 0, 0, G_OPTION_ARG_NONE, &version, N_("Print program version"), NULL },
         { "verbose", 'v', 0, G_OPTION_ARG_NONE, &verbose, N_("Be verbose"), NULL },
