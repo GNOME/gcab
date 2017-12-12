@@ -421,8 +421,14 @@ cdata_write (cdata_t *cd, GDataOutputStream *out, int type,
         return FALSE;
 
     guint32 datacsum = compute_checksum(cd->in, cd->ncbytes, 0);
-    guint32 sizecsum = GUINT32_TO_LE(cd->ncbytes << 16 | cd->nubytes);
-    cd->checksum = compute_checksum ((guint8*)&sizecsum, 4, datacsum);
+    guint8 sizecsum[4];
+    guint16 nbytes_le;
+
+    nbytes_le = GUINT16_TO_LE (cd->ncbytes);
+    memcpy (&sizecsum[0], &nbytes_le, 2);
+    nbytes_le = GUINT16_TO_LE (cd->nubytes);
+    memcpy (&sizecsum[2], &nbytes_le, 2);
+    cd->checksum = compute_checksum (sizecsum, sizeof(sizecsum), datacsum);
     GOutputStream *stream = g_filter_output_stream_get_base_stream (G_FILTER_OUTPUT_STREAM (out));
 
     *bytes_written = 0;
@@ -465,7 +471,8 @@ cdata_read (cdata_t *cd, guint8 res_data, gint comptype,
     gint compression = comptype & GCAB_COMPRESSION_MASK;
     guint8 *buf = compression == GCAB_COMPRESSION_NONE ? cd->out : cd->in;
     guint32 datacsum;
-    guint32 sizecsum;
+    guint8 sizecsum[4];
+    guint16 nbytes_le;
 
     if (compression > GCAB_COMPRESSION_MSZIP &&
         compression != GCAB_COMPRESSION_LZX) {
@@ -482,8 +489,11 @@ cdata_read (cdata_t *cd, guint8 res_data, gint comptype,
     RN (buf, cd->ncbytes);
 
     datacsum = compute_checksum(buf, cd->ncbytes, 0);
-    sizecsum = GUINT32_TO_LE(cd->ncbytes << 16 | cd->nubytes);
-    if (cd->checksum != compute_checksum ((guint8*)&sizecsum, 4, datacsum)) {
+    nbytes_le = GUINT16_TO_LE (cd->ncbytes);
+    memcpy (&sizecsum[0], &nbytes_le, 2);
+    nbytes_le = GUINT16_TO_LE (cd->nubytes);
+    memcpy (&sizecsum[2], &nbytes_le, 2);
+    if (cd->checksum != compute_checksum (sizecsum, sizeof(sizecsum), datacsum)) {
         g_set_error_literal (error, GCAB_ERROR, GCAB_ERROR_FAILED,
                              _("incorrect checksum detected"));
         return FALSE;
