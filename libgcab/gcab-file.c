@@ -62,7 +62,8 @@ gcab_file_finalize (GObject *object)
 {
     GCabFile *self = GCAB_FILE (object);
 
-    g_object_unref (self->file);
+    if (self->file != NULL)
+        g_object_unref (self->file);
     g_free (self->name);
     g_free (self->extract_name);
 
