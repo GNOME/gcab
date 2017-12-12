@@ -41,3 +41,7 @@ LIBGCAB1_0.6 {
         gcab_file_get_date;
         gcab_file_get_size;
 } LIBGCAB1_0.5;
+
+LIBGCAB1_1.0 {
+        gcab_folder_get_comptype;
+} LIBGCAB1_0.6;

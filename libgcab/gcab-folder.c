@@ -175,7 +175,17 @@ gcab_folder_get_ndatablocks (GCabFolder *self)
     return total_size / DATABLOCKSIZE + 1 ;
 }
 
-G_GNUC_INTERNAL gint
+/**
+ * gcab_folder_get_comptype:
+ * @cabfolder: a #GCabFolder
+ *
+ * Returns the compression used in this folder.
+ *
+ * Returns: a #GCabCompression, e.g. %GCAB_COMPRESSION_MSZIP
+ *
+ * Since: 1.0
+ **/
+gint
 gcab_folder_get_comptype (GCabFolder *self)
 {
     return self->comptype;

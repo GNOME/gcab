@@ -60,6 +60,7 @@ gcab_folder_new
 gcab_folder_add_file
 gcab_folder_get_files
 gcab_folder_get_nfiles
+gcab_folder_get_comptype
 <SUBSECTION Standard>
 GCAB_FOLDER
 GCAB_FOLDER_CLASS
