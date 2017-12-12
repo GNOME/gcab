@@ -38,7 +38,6 @@ libgcab = shared_library(
     'gcab-file.c',
     'cabinet.c',
     'decomp.c',
-    'glib-compat.c',
   ],
   soversion : lt_current,
   version : lt_version,

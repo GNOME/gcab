@@ -20,7 +20,6 @@ IGNORE_HFILES =					\
 	cabinet.h				\
 	decomp.h				\
 	gcab-priv.h				\
-	glib-compat.h				\
 	$(NULL)
 
 GTKDOC_CFLAGS =

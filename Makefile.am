@@ -46,8 +46,6 @@ libgcab_1_0_la_SOURCES =			\
 	libgcab/cabinet.h			\
 	libgcab/decomp.c			\
 	libgcab/decomp.h			\
-	libgcab/glib-compat.c			\
-	libgcab/glib-compat.h			\
 	$(NULL)
 libgcab_1_0_la_CPPFLAGS =				\
 	$(AM_CPPFLAGS)					\

@@ -24,7 +24,6 @@
 #include "config.h"
 
 #include <glib-object.h>
-#include "glib-compat.h"
 
 #include "cabinet.h"
 #include "gcab-file.h"
