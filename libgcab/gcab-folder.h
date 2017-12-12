@@ -47,8 +47,8 @@ typedef struct _GCabFolder GCabFolder;
  * GCabCompression:
  * @GCAB_COMPRESSION_NONE: No compression.
  * @GCAB_COMPRESSION_MSZIP: MSZIP compression.
- * @GCAB_COMPRESSION_QUANTUM: QUANTUM compression.
- * @GCAB_COMPRESSION_LZX: LZX compression.
+ * @GCAB_COMPRESSION_QUANTUM: QUANTUM compression (unsupported).
+ * @GCAB_COMPRESSION_LZX: LZX compression (only decompression supported).
  * @GCAB_COMPRESSION_MASK: compression value mask.
  *
  * Compression used by the #GCabFolder.
