@@ -567,8 +567,8 @@ gcab_cabinet_extract_simple (GCabCabinet *cabinet,
  * Lookup the cabinet authenticode signature if any.
  *
  * Since: 0.5
- * Returns: the array containing the PKCS#7 signed data or %NULL if
- * none found or error.
+ *
+ * Returns: the array containing the PKCS#7 signed data or %NULL on error.
  **/
 const GByteArray *
 gcab_cabinet_get_signature (GCabCabinet *self,
@@ -576,6 +576,7 @@ gcab_cabinet_get_signature (GCabCabinet *self,
                             GError **error)
 {
     const guint8 magic[] = { 0x00, 0x00, 0x10, 0x00 };
+    gssize sz;
     guint8 *reserved;
     guint32 offset;
     guint32 size;
@@ -587,15 +588,24 @@ gcab_cabinet_get_signature (GCabCabinet *self,
     if (self->signature)
         return self->signature;
 
-    if (!G_IS_SEEKABLE (self->stream))
+    if (!G_IS_SEEKABLE (self->stream)) {
+        g_set_error (error, GCAB_ERROR, GCAB_ERROR_FAILED,
+                     "Cabinet stream is not seekable");
         return NULL;
+    }
 
-    if (!self->reserved || self->reserved->len != 20)
+    if (!self->reserved || self->reserved->len != 20) {
+        g_set_error (error, GCAB_ERROR, GCAB_ERROR_FAILED,
+                     "Cabinet has no reserved area");
         return NULL;
+    }
 
     reserved = self->reserved->data;
-    if (memcmp (reserved, magic, sizeof (magic)) != 0)
+    if (memcmp (reserved, magic, sizeof (magic)) != 0) {
+        g_set_error (error, GCAB_ERROR, GCAB_ERROR_FORMAT,
+                     "Cabinet reserved magic was not correct");
         return NULL;
+    }
 
     offset = GCAB_READ_UINT32_LE (reserved + 4);
     size = GCAB_READ_UINT32_LE (reserved + 8);
@@ -605,12 +615,24 @@ gcab_cabinet_get_signature (GCabCabinet *self,
     self->signature = g_byte_array_sized_new (size);
     g_byte_array_set_size (self->signature, size);
 
-    if (!g_seekable_seek (G_SEEKABLE (self->stream), offset, G_SEEK_SET, cancellable, error))
+    if (!g_seekable_seek (G_SEEKABLE (self->stream), offset, G_SEEK_SET, cancellable, error)) {
+        g_set_error (error, GCAB_ERROR, GCAB_ERROR_FAILED,
+                     "Cannot seek to reserved area");
         return NULL;
+    }
 
-    if (g_input_stream_read (self->stream, self->signature->data, self->signature->len,
-                             cancellable, error) != self->signature->len)
+    sz = g_input_stream_read (self->stream,
+                              self->signature->data, self->signature->len,
+                              cancellable, error);
+    if (sz < 0) {
+        g_prefix_error (error, "Failed to read signature from stream: ");
         return NULL;
+    }
+    if (sz != self->signature->len) {
+        g_set_error (error, GCAB_ERROR, GCAB_ERROR_FAILED,
+                     "Failed to read correct size signature from stream: ");
+        return NULL;
+    }
 
     return self->signature;
 }
