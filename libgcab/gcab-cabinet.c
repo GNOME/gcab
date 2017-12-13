@@ -235,8 +235,20 @@ gcab_cabinet_write (GCabCabinet *self,
     g_return_val_if_fail (G_IS_SEEKABLE (out), FALSE);
     g_return_val_if_fail (!cancellable || G_IS_CANCELLABLE (cancellable), FALSE);
     g_return_val_if_fail (!error || *error == NULL, FALSE);
-    /* FIXME: current limitation of 1 folder */
-    g_return_val_if_fail (self->folders->len == 1, FALSE);
+
+    /* nothing to do */
+    if (self->folders->len == 0) {
+        g_set_error_literal (error, GCAB_ERROR, GCAB_ERROR_FAILED,
+                             "Cabinet has no added folders");
+        return FALSE;
+    }
+
+    /* unsupported */
+    if (self->folders->len > 1) {
+        g_set_error_literal (error, GCAB_ERROR, GCAB_ERROR_FAILED,
+                             "Cabinet has more than one added folder");
+        return FALSE;
+    }
 
     GCabFolder *cabfolder = g_ptr_array_index (self->folders, 0);
     gsize nfiles = gcab_folder_get_nfiles (cabfolder);
