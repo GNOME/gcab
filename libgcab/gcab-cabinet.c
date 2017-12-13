@@ -41,7 +41,7 @@ struct _GCabCabinet {
 
     GPtrArray *folders;
     GByteArray *reserved;
-    cheader_t cheader;
+    cheader_t *cheader;
     GByteArray *signature;
     GInputStream *stream;
 };
@@ -72,6 +72,7 @@ gcab_cabinet_finalize (GObject *object)
 {
     GCabCabinet *self = GCAB_CABINET (object);
 
+    cheader_free (self->cheader);
     g_ptr_array_unref (self->folders);
     if (self->reserved)
         g_byte_array_unref (self->reserved);
@@ -407,57 +408,65 @@ gcab_cabinet_load (GCabCabinet *self,
     g_return_val_if_fail (self->folders->len == 0, FALSE);
     g_return_val_if_fail (self->stream == NULL, FALSE);
 
-    self->stream = g_object_ref (stream);
-
-    cheader_t cheader;
+    g_autoptr(cheader_t) cheader = NULL;
     g_autoptr(GDataInputStream) in = g_data_input_stream_new (stream);
     g_filter_input_stream_set_close_base_stream (G_FILTER_INPUT_STREAM (in), FALSE);
     g_data_input_stream_set_byte_order (in, G_DATA_STREAM_BYTE_ORDER_LITTLE_ENDIAN);
 
-    if (!cheader_read (&cheader, in, cancellable, error))
+    cheader = g_new0 (cheader_t, 1);
+    if (!cheader_read (cheader, in, cancellable, error))
         return FALSE;
 
-    if (cheader.reserved)
-        g_object_set (self, "reserved",
-                      g_byte_array_new_take (cheader.reserved, cheader.res_header),
-                      NULL);
-
-    for (guint i = 0; i < cheader.nfolders; i++) {
-        cfolder_t cfolder = { 0, };
-        if (!cfolder_read (&cfolder, cheader.res_folder, in, cancellable, error))
-            return FALSE;
-
-        GCabFolder *folder = gcab_folder_new_with_cfolder (&cfolder, stream);
-        if (cfolder.reserved)
-            g_object_set (folder, "reserved",
-                          g_byte_array_new_take (cfolder.reserved, cheader.res_folder),
-                          NULL);
-        g_ptr_array_add (self->folders, folder);
-        cfolder.reserved = NULL;
+    if (cheader->reserved != NULL) {
+        g_autoptr(GByteArray) blob = NULL;
+        blob = g_byte_array_new_take (cheader->reserved, cheader->res_header);
+        g_object_set (self, "reserved", blob, NULL);
+        cheader->reserved = NULL;
     }
 
-    for (guint i = 0; i < cheader.nfiles; i++) {
-        cfile_t cfile = { 0, };
-        if (!cfile_read (&cfile, in, cancellable, error))
+    for (guint i = 0; i < cheader->nfolders; i++) {
+        g_autoptr(cfolder_t) cfolder = g_new0 (cfolder_t, 1);
+        g_autoptr(GByteArray) blob = NULL;
+        if (!cfolder_read (cfolder, cheader->res_folder, in, cancellable, error))
             return FALSE;
 
-        if (cfile.index >= self->folders->len) {
+        /* steal this inelegantly */
+        if (cfolder->reserved != NULL) {
+            blob = g_byte_array_new_take (cfolder->reserved, cheader->res_folder);
+            cfolder->reserved = NULL;
+        }
+
+        GCabFolder *folder = gcab_folder_new_steal_cfolder (&cfolder, stream);
+        if (blob != NULL)
+            g_object_set (folder, "reserved", blob, NULL);
+        g_ptr_array_add (self->folders, folder);
+    }
+
+    for (guint i = 0; i < cheader->nfiles; i++) {
+        g_autoptr(cfile_t) cfile = g_new0 (cfile_t, 1);
+        if (!cfile_read (cfile, in, cancellable, error))
+            return FALSE;
+
+        if (cfile->index >= self->folders->len) {
             g_set_error (error, GCAB_ERROR, GCAB_ERROR_FORMAT,
                          "Invalid folder index");
             return FALSE;
         }
 
-        GCabFolder *folder = g_ptr_array_index (self->folders, cfile.index);
+        GCabFolder *folder = g_ptr_array_index (self->folders, cfile->index);
         if (folder == NULL) {
             g_set_error (error, GCAB_ERROR, GCAB_ERROR_FORMAT,
                          "Invalid folder pointer");
             return FALSE;
         }
 
-        g_autoptr(GCabFile) file = gcab_file_new_with_cfile (&cfile);
+        g_autoptr(GCabFile) file = gcab_file_new_steal_cfile (&cfile);
         if (!gcab_folder_add_file (folder, file, FALSE, cancellable, error))
             return FALSE;
     }
+
+    self->stream = g_object_ref (stream);
+    self->cheader = g_steal_pointer (&cheader);
     return TRUE;
 }
 
@@ -486,24 +495,28 @@ gcab_cabinet_extract (GCabCabinet *self,
                       GCancellable *cancellable,
                       GError **error)
 {
-    gboolean success = TRUE;
-
     g_return_val_if_fail (GCAB_IS_CABINET (self), FALSE);
     g_return_val_if_fail (G_IS_FILE (path), FALSE);
     g_return_val_if_fail (!cancellable || G_IS_CANCELLABLE (cancellable), FALSE);
     g_return_val_if_fail (!error || *error == NULL, FALSE);
 
+    /* never loaded from a stream */
+    if (self->cheader == NULL) {
+        g_set_error (error, GCAB_ERROR, GCAB_ERROR_FAILED,
+                     "Cabinet has not been loaded");
+        return FALSE;
+    }
+
     for (guint i = 0; i < self->folders->len; ++i) {
         GCabFolder *folder = g_ptr_array_index (self->folders, i);
-        if (!gcab_folder_extract (folder, path, self->cheader.res_data,
+        if (!gcab_folder_extract (folder, path, self->cheader->res_data,
                                   file_callback, progress_callback, user_data,
                                   cancellable, error)) {
-            success = FALSE;
-            break;
+            return FALSE;
         }
     }
 
-    return success;
+    return TRUE;
 }
 
 /**

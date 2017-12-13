@@ -45,7 +45,7 @@ struct _GCabFile
 
     gchar *extract_name;
     GFile *file;
-    cfile_t cfile;
+    cfile_t *cfile;
 };
 
 enum {
@@ -69,7 +69,7 @@ gcab_file_finalize (GObject *object)
 
     if (self->file != NULL)
         g_object_unref (self->file);
-    g_free (self->cfile.name);
+    cfile_free (self->cfile);
     g_free (self->extract_name);
 
     G_OBJECT_CLASS (gcab_file_parent_class)->finalize (object);
@@ -79,6 +79,8 @@ static void
 gcab_file_set_name (GCabFile *self, const gchar *name)
 {
     gchar *fname = g_strdup (name);
+
+    g_return_if_fail (self->cfile != NULL);
 
     /* assuming that on win32 we don't get unix paths */
 #ifndef G_OS_WIN32
@@ -90,8 +92,8 @@ gcab_file_set_name (GCabFile *self, const gchar *name)
     }
 #endif
 
-    g_free (self->cfile.name);
-    self->cfile.name = fname;
+    g_free (self->cfile->name);
+    self->cfile->name = fname;
 }
 
 static void
@@ -121,7 +123,7 @@ gcab_file_get_property (GObject *object, guint prop_id, GValue *value, GParamSpe
 
     switch (prop_id) {
     case PROP_NAME:
-        g_value_set_string (value, self->cfile.name);
+        g_value_set_string (value, self->cfile->name);
         break;
     case PROP_FILE:
         g_value_set_object (value, self->file);
@@ -143,12 +145,12 @@ gcab_file_class_init (GCabFileClass *klass)
 
     g_object_class_install_property (object_class, PROP_NAME,
         g_param_spec_string ("name", "name", "name", NULL,
-                             G_PARAM_CONSTRUCT_ONLY | G_PARAM_READWRITE |
+                             G_PARAM_READWRITE |
                              G_PARAM_STATIC_STRINGS));
 
     g_object_class_install_property (object_class, PROP_FILE,
         g_param_spec_object ("file", "file", "file", G_TYPE_FILE,
-                             G_PARAM_CONSTRUCT_ONLY | G_PARAM_READWRITE |
+                             G_PARAM_READWRITE |
                              G_PARAM_STATIC_STRINGS));
 }
 
@@ -166,11 +168,11 @@ gcab_file_update_info (GCabFile *self, GFileInfo *info)
     time = tv.tv_sec;
     m = gmtime (&time);
 
-    self->cfile.usize = g_file_info_get_size (info);
-    self->cfile.fattr = GCAB_FILE_ATTRIBUTE_ARCH;
-    self->cfile.date = ((m->tm_year + 1900 - 1980 ) << 9 ) +
+    self->cfile->usize = g_file_info_get_size (info);
+    self->cfile->fattr = GCAB_FILE_ATTRIBUTE_ARCH;
+    self->cfile->date = ((m->tm_year + 1900 - 1980 ) << 9 ) +
         ((m->tm_mon+1) << 5 ) + (m->tm_mday);
-    self->cfile.time = (m->tm_hour << 11) + (m->tm_min << 5) + (m->tm_sec / 2);
+    self->cfile->time = (m->tm_hour << 11) + (m->tm_min << 5) + (m->tm_sec / 2);
 
     return TRUE;
 }
@@ -180,7 +182,7 @@ gcab_file_set_uoffset (GCabFile *self, guint32 uoffset)
 {
     g_return_val_if_fail (GCAB_IS_FILE (self), FALSE);
 
-    self->cfile.uoffset = uoffset;
+    self->cfile->uoffset = uoffset;
 
     return TRUE;
 }
@@ -189,14 +191,14 @@ G_GNUC_INTERNAL guint32
 gcab_file_get_uoffset (GCabFile *self)
 {
     g_return_val_if_fail (GCAB_IS_FILE (self), 0);
-    return self->cfile.uoffset;
+    return self->cfile->uoffset;
 }
 
 G_GNUC_INTERNAL guint32
 gcab_file_get_usize (GCabFile *self)
 {
     g_return_val_if_fail (GCAB_IS_FILE (self), 0);
-    return self->cfile.usize;
+    return self->cfile->usize;
 }
 
 G_GNUC_INTERNAL GFile *
@@ -210,14 +212,14 @@ G_GNUC_INTERNAL void
 gcab_file_add_attribute (GCabFile *self, guint32 attribute)
 {
     g_return_if_fail (GCAB_IS_FILE (self));
-    self->cfile.fattr |= attribute;
+    self->cfile->fattr |= attribute;
 }
 
 G_GNUC_INTERNAL cfile_t *
 gcab_file_get_cfile (GCabFile *self)
 {
     g_return_val_if_fail (GCAB_IS_FILE (self), NULL);
-    return &self->cfile;
+    return self->cfile;
 }
 
 /**
@@ -234,7 +236,7 @@ gcab_file_get_size (GCabFile *self)
 {
     g_return_val_if_fail (GCAB_IS_FILE (self), 0);
 
-    return self->cfile.usize;
+    return self->cfile->usize;
 }
 
 /**
@@ -255,8 +257,8 @@ gcab_file_get_date (GCabFile *self, GTimeVal *tv)
     g_return_if_fail (GCAB_IS_FILE (self));
     g_return_if_fail (tv != NULL);
 
-    date = self->cfile.date;
-    time = self->cfile.time;
+    date = self->cfile->date;
+    time = self->cfile->time;
 
     tm.tm_isdst = -1;
     tm.tm_year  = ((date >> 9) + 1980) - 1900;
@@ -285,7 +287,7 @@ gcab_file_get_attributes (GCabFile *self)
 {
     g_return_val_if_fail (GCAB_IS_FILE (self), 0);
 
-    return self->cfile.fattr;
+    return self->cfile->fattr;
 }
 
 /**
@@ -301,7 +303,7 @@ gcab_file_get_name (GCabFile *self)
 {
     g_return_val_if_fail (GCAB_IS_FILE (self), NULL);
 
-    return self->cfile.name;
+    return self->cfile->name;
 }
 
 /**
@@ -341,19 +343,21 @@ gcab_file_new_with_file (const gchar *name, GFile *file)
     g_return_val_if_fail (name != NULL, NULL);
     g_return_val_if_fail (G_IS_FILE (file), NULL);
 
-    return g_object_new (GCAB_TYPE_FILE,
-                         "name", name,
-                         "file", file,
-                         NULL);
+    GCabFile *self = g_object_new (GCAB_TYPE_FILE,
+                                   "file", file,
+                                   NULL);
+    self->cfile = g_new0 (cfile_t, 1);
+    gcab_file_set_name (self, name);
+    return self;
 }
 
 G_GNUC_INTERNAL GCabFile *
-gcab_file_new_with_cfile (const cfile_t *cfile)
+gcab_file_new_steal_cfile (cfile_t **cfile)
 {
     g_return_val_if_fail (cfile != NULL, NULL);
 
     GCabFile *file = g_object_new (GCAB_TYPE_FILE, NULL);
-    file->cfile = *cfile;
+    file->cfile = g_steal_pointer (cfile);
 
     return file;
 }
@@ -371,7 +375,7 @@ gcab_file_get_extract_name (GCabFile *self)
 {
     g_return_val_if_fail (GCAB_IS_FILE (self), NULL);
 
-    return self->extract_name ? self->extract_name : self->cfile.name;
+    return self->extract_name ? self->extract_name : self->cfile->name;
 }
 
 /**

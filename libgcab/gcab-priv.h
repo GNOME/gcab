@@ -40,8 +40,8 @@
                                           _GCAB_GET (data, 1, 32,  8) |  \
                                           _GCAB_GET (data, 0, 32,  0))
 
-GCabFolder *     gcab_folder_new_with_cfolder        (const cfolder_t *folder, GInputStream *stream);
-GCabFile *       gcab_file_new_with_cfile            (const cfile_t *file);
+GCabFolder *     gcab_folder_new_steal_cfolder       (cfolder_t **cfolder, GInputStream *stream);
+GCabFile *       gcab_file_new_steal_cfile           (cfile_t   **cfile);
 
 gboolean         gcab_file_update_info               (GCabFile *file, GFileInfo *info);
 guint32          gcab_file_get_uoffset               (GCabFile *file);

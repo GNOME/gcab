@@ -311,6 +311,19 @@ end:
     return success;
 }
 
+void
+cheader_free (cheader_t *ch)
+{
+    if (ch == NULL)
+        return;
+    g_free (ch->reserved);
+    g_free (ch->cab_prev);
+    g_free (ch->disk_prev);
+    g_free (ch->cab_next);
+    g_free (ch->disk_next);
+    g_free (ch);
+}
+
 G_GNUC_INTERNAL gboolean
 cfolder_write (cfolder_t *cf, GDataOutputStream *out,
                GCancellable *cancellable, GError **error)
@@ -348,6 +361,15 @@ cfolder_read (cfolder_t *cf, guint8 res_size, GDataInputStream *in,
 
 end:
     return success;
+}
+
+void
+cfolder_free (cfolder_t *cf)
+{
+    if (cf == NULL)
+        return;
+    g_free (cf->reserved);
+    g_free (cf);
 }
 
 G_GNUC_INTERNAL gboolean
@@ -396,6 +418,15 @@ cfile_read (cfile_t *cf, GDataInputStream *in,
 
 end:
     return success;
+}
+
+void
+cfile_free (cfile_t *cf)
+{
+    if (cf == NULL)
+        return;
+    g_free (cf->name);
+    g_free (cf);
 }
 
 static guint32

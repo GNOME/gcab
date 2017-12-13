@@ -40,17 +40,12 @@
 /* based on the spec
    http://msdn.microsoft.com/en-us/library/bb417343.aspx */
 
-typedef struct cheader cheader_t;
-typedef struct cfolder cfolder_t;
-typedef struct cfile cfile_t;
-typedef struct cdata cdata_t;
-
 #define DATABLOCKSIZE           32768
 
 #define CFO_START               0x24    /* folder offset */
 #define CFI_START               0x2C    /* file offset */
 
-struct cheader
+typedef struct
 {
     guint32 res1;
     guint32 size;
@@ -72,7 +67,7 @@ struct cheader
     gchar *disk_prev;
     gchar *cab_next;
     gchar *disk_next;
-};
+} cheader_t;
 
 typedef enum {
     CABINET_HEADER_PREV = 0x0001,
@@ -80,15 +75,15 @@ typedef enum {
     CABINET_HEADER_RESERVE = 0x0004,
 } CabinetHeaderFlags;
 
-struct cfolder
+typedef struct
 {
     guint32 offsetdata;
     guint16 ndatab;
     guint16 typecomp;
     guint8 *reserved;
-};
+} cfolder_t;
 
-struct cfile
+typedef struct
 {
     guint32 usize;
     guint32 uoffset;
@@ -97,9 +92,9 @@ struct cfile
     guint16 time;
     guint16 fattr;
     gchar *name;
-};
+} cfile_t;
 
-struct cdata
+typedef struct
 {
     guint32 checksum;
     guint16 ncbytes;
@@ -112,7 +107,7 @@ struct cdata
     /* using wine decomp.h */
     FDI_Int fdi;
     fdi_decomp_state decomp;
-};
+} cdata_t;
 
 gboolean     cheader_write                      (cheader_t *ch,
                                                  GDataOutputStream *out,
@@ -122,6 +117,8 @@ gboolean     cheader_read                       (cheader_t *ch,
                                                  GDataInputStream *in,
                                                  GCancellable *cancellable,
                                                  GError **error);
+void         cheader_free                       (cheader_t *ch);
+
 gboolean     cfolder_write                      (cfolder_t *cf,
                                                  GDataOutputStream *out,
                                                  GCancellable *cancellable,
@@ -131,6 +128,8 @@ gboolean     cfolder_read                       (cfolder_t *cf,
                                                  GDataInputStream *in,
                                                  GCancellable *cancellable,
                                                  GError **error);
+void         cfolder_free                       (cfolder_t *cf);
+
 gboolean     cfile_write                        (cfile_t *cf,
                                                  GDataOutputStream *out,
                                                  GCancellable *cancellable,
@@ -139,6 +138,8 @@ gboolean     cfile_read                         (cfile_t *cf,
                                                  GDataInputStream *in,
                                                  GCancellable *cancellable,
                                                  GError **error);
+void         cfile_free                         (cfile_t *cf);
+
 gboolean     cdata_write                        (cdata_t *cd,
                                                  GDataOutputStream *out,
                                                  int type,
@@ -154,5 +155,9 @@ gboolean     cdata_read                         (cdata_t *cd,
                                                  GCancellable *cancellable,
                                                  GError **error);
 void         cdata_finish                       (cdata_t *cd, GError **error);
+
+G_DEFINE_AUTOPTR_CLEANUP_FUNC(cfolder_t, cfolder_free)
+G_DEFINE_AUTOPTR_CLEANUP_FUNC(cfile_t, cfile_free)
+G_DEFINE_AUTOPTR_CLEANUP_FUNC(cheader_t, cheader_free)
 
 #endif /* CABINET_H */
