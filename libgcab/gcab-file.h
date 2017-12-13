@@ -70,9 +70,10 @@ GFile *         gcab_file_get_file                  (GCabFile *file);
 const gchar *   gcab_file_get_name                  (GCabFile *file);
 guint32         gcab_file_get_size                  (GCabFile *file);
 guint32         gcab_file_get_attributes            (GCabFile *file);
-void            gcab_file_get_date                  (GCabFile *file, GTimeVal *result);
+gboolean        gcab_file_get_date                  (GCabFile *file, GTimeVal *result);
 const gchar *   gcab_file_get_extract_name          (GCabFile *file);
 void            gcab_file_set_extract_name          (GCabFile *file, const gchar *name);
+void            gcab_file_set_date                  (GCabFile *file, const GTimeVal *tv);
 
 G_END_DECLS
 

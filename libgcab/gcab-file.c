@@ -154,25 +154,40 @@ gcab_file_class_init (GCabFileClass *klass)
                              G_PARAM_STATIC_STRINGS));
 }
 
+/**
+ * gcab_file_set_date:
+ * @file: a #GCabFile
+ * @tv: a #GTimeVal
+ *
+ * Sets the file modification date, instead of the value provided by the GFile.
+ *
+ * Since: 1.0
+ **/
+void
+gcab_file_set_date (GCabFile *self, const GTimeVal *tv)
+{
+    g_autoptr(GDateTime) dt = g_date_time_new_from_timeval_utc (tv);
+    self->cfile->date = ((g_date_time_get_year (dt) - 1980 ) << 9 ) +
+        ((g_date_time_get_month (dt)) << 5) +
+         (g_date_time_get_day_of_month (dt));
+    self->cfile->time = ((g_date_time_get_hour (dt)) << 11) +
+        (g_date_time_get_minute (dt) << 5) +
+        (g_date_time_get_second (dt) / 2);
+}
+
 G_GNUC_INTERNAL gboolean
 gcab_file_update_info (GCabFile *self, GFileInfo *info)
 {
     GTimeVal tv;
-    time_t time;
-    struct tm *m; // Use GDateTime when 2.26 in RHEL6
 
     g_return_val_if_fail (GCAB_IS_FILE (self), FALSE);
     g_return_val_if_fail (G_IS_FILE_INFO (info), FALSE);
 
     g_file_info_get_modification_time (info, &tv);
-    time = tv.tv_sec;
-    m = gmtime (&time);
-
+    if (self->cfile->date == 0)
+        gcab_file_set_date (self, &tv);
     self->cfile->usize = g_file_info_get_size (info);
     self->cfile->fattr = GCAB_FILE_ATTRIBUTE_ARCH;
-    self->cfile->date = ((m->tm_year + 1900 - 1980 ) << 9 ) +
-        ((m->tm_mon+1) << 5 ) + (m->tm_mday);
-    self->cfile->time = (m->tm_hour << 11) + (m->tm_min << 5) + (m->tm_sec / 2);
 
     return TRUE;
 }
@@ -247,30 +262,29 @@ gcab_file_get_size (GCabFile *self)
  * Get the file date, in @result.
  *
  * Since: 0.6
+ *
+ * Returns: %TRUE if @tv was set
  **/
-void
+gboolean
 gcab_file_get_date (GCabFile *self, GTimeVal *tv)
 {
-    struct tm tm;
     guint16 date, time;
+    g_autoptr(GDateTime) dt = NULL;
 
-    g_return_if_fail (GCAB_IS_FILE (self));
-    g_return_if_fail (tv != NULL);
+    g_return_val_if_fail (GCAB_IS_FILE (self), FALSE);
+    g_return_val_if_fail (tv != NULL, FALSE);
 
     date = self->cfile->date;
     time = self->cfile->time;
-
-    tm.tm_isdst = -1;
-    tm.tm_year  = ((date >> 9) + 1980) - 1900;
-    tm.tm_mon   = ((date >> 5) & 0xf) - 1;
-    tm.tm_mday  = (date & 0x1f) - 1;
-
-    tm.tm_hour  = (time >> 11);
-    tm.tm_min   = ((time >> 5) & 0x3f);
-    tm.tm_sec   = (time & 0x1f) * 2;
-
-    tv->tv_sec  = mktime(&tm);
-    tv->tv_usec = 0;
+    dt = g_date_time_new_utc ((date >> 9) + 1980,
+                              (date >> 5) & 0xf,
+                              (date & 0x1f),
+                              (time >> 11),
+                              (time >> 5) & 0x3f,
+                              (time & 0x1f) * 2);
+    if (dt == NULL)
+        return FALSE;
+    return g_date_time_to_timeval (dt, tv);
 }
 
 /**

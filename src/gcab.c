@@ -195,7 +195,7 @@ individual files from the archive.\
                     if (list_details) {
                         gchar date[32];
                         struct tm *tm;
-                        GTimeVal tv;
+                        GTimeVal tv = {0};
 
                         gcab_file_get_date (GCAB_FILE (l->data), &tv);
                         tm = localtime (&tv.tv_sec);

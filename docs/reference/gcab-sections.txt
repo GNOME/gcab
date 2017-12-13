@@ -32,6 +32,7 @@ GCabFileCallback
 GCabFile
 gcab_file_get_attributes
 gcab_file_get_date
+gcab_file_set_date
 gcab_file_get_extract_name
 gcab_file_get_file
 gcab_file_get_name
