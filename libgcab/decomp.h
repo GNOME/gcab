@@ -241,10 +241,12 @@ typedef struct fdi_cds_fwd {
         struct ZIPstate zip;
         struct LZXstate lzx;
     } methods;
+    int comptype;
 } fdi_decomp_state;
 
 int ZIPfdi_decomp(int inlen, int outlen, fdi_decomp_state *decomp_state);
 int LZXfdi_decomp(int inlen, int outlen, fdi_decomp_state *decomp_state);
 int LZXfdi_init(int window, fdi_decomp_state *decomp_state);
+void LZXfdi_clear(fdi_decomp_state *decomp_state);
 
 #endif

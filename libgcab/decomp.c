@@ -836,6 +836,11 @@ int LZXfdi_init(int window, fdi_decomp_state *decomp_state) {
   return DECR_OK;
 }
 
+void LZXfdi_clear(fdi_decomp_state *decomp_state) {
+  cab_UBYTE *window = LZX(window);
+  CAB(fdi)->free(window);
+}
+
 /*******************************************************
  * LZXfdi_decomp(internal)
  */

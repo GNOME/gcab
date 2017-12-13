@@ -471,6 +471,11 @@ cdata_finish (cdata_t *cd, GError **error)
     z_stream *z = &cd->z;
     int zret;
 
+    if (cd->decomp.comptype == GCAB_COMPRESSION_LZX) {
+        LZXfdi_clear (&cd->decomp);
+        return;
+    }
+
     if (!z->opaque)
         return;
 
@@ -537,6 +542,7 @@ cdata_read (cdata_t *cd, guint8 res_data, gint comptype,
             cd->decomp.fdi = &cd->fdi;
             cd->decomp.inbuf = cd->in;
             cd->decomp.outbuf = cd->out;
+            cd->decomp.comptype = compression;
 
             ret = LZXfdi_init((comptype >> 8) & 0x1f, &cd->decomp);
             if (ret < 0)
@@ -552,6 +558,7 @@ cdata_read (cdata_t *cd, guint8 res_data, gint comptype,
         if (cd->in[0] != 'C' || cd->in[1] != 'K')
             goto end;
 
+        cd->decomp.comptype = compression;
         z_stream *z = &cd->z;
 
         z->avail_in = cd->ncbytes - 2;
