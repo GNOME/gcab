@@ -7,13 +7,6 @@
 <book id="index">
   <bookinfo>
     <title>GCab Reference Manual</title>
-    <releaseinfo>
-      This document is generated from the version @PACKAGE_STRING@.
-      <!-- <ulink role="online-location"
-                  url="http://fixme/gcab/index.html">
-             http://fixme/gcab/
-           </ulink>. -->
-    </releaseinfo>
   </bookinfo>
 
   <chapter>
@@ -23,10 +16,6 @@
     <xi:include href="xml/gcab-file.xml"/>
   </chapter>
 
-  <chapter id="object-tree">
-    <title>Object Hierarchy</title>
-     <xi:include href="xml/tree_index.sgml"/>
-  </chapter>
   <index id="api-index-full">
     <title>API Index</title>
     <xi:include href="xml/api-index-full.xml"><xi:fallback /></xi:include>

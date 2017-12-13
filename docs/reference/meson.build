@@ -1,9 +1,3 @@
-gcab_docs = configure_file(
-  input : 'gcab-docs.sgml.in',
-  output : 'gcab-docs.sgml',
-  configuration : conf,
-)
-
 gnome.gtkdoc(
   'gcab',
   src_dir : [

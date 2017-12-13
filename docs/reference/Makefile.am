@@ -28,7 +28,6 @@ GTKDOC_LIBS = $(top_builddir)/libgcab-1.0.la
 
 include $(top_srcdir)/gtk-doc.make
 
-EXTRA_DIST += gcab-docs.sgml.in
 DISTCLEANFILES = $(DOC_MODULE).types
 
 if ENABLE_GTK_DOC

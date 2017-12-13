@@ -65,7 +65,6 @@ AC_OUTPUT([
   Makefile
   docs/Makefile
   docs/reference/Makefile
-  docs/reference/gcab-docs.sgml
   src/gcab.1
   libgcab/libgcab-1.0.pc
   libgcab/Makefile
