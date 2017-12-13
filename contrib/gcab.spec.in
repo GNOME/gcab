@@ -1,0 +1,76 @@
+Name:           gcab
+Version:        #VERSION#
+Release:        0.#BUILD#%{?alphatag}%{?dist}
+Summary:        Cabinet file library and tool
+
+License:        LGPLv2+
+#VCS:           git:git://git.gnome.org/gcab
+URL:            http://ftp.gnome.org/pub/GNOME/sources/gcab
+Source0:        http://ftp.gnome.org/pub/GNOME/sources/gcab/%{version}/%{name}-%{version}.tar.xz
+
+BuildRequires:  vala-tools
+BuildRequires:  glib2-devel
+BuildRequires:  gobject-introspection-devel
+BuildRequires:  zlib-devel
+BuildRequires: meson
+
+Requires:       libgcab1%{?_isa} = %{version}-%{release}
+
+%description
+gcab is a tool to manipulate Cabinet archive.
+
+%package -n libgcab1
+Summary:        Library to create Cabinet archives
+
+%description -n libgcab1
+libgcab is a library to manipulate Cabinet archive using GIO/GObject.
+
+%package -n libgcab1-devel
+Summary:        Development files to create Cabinet archives
+Requires:       libgcab1%{?_isa} = %{version}-%{release}
+Requires:       glib2-devel
+Requires:       pkgconfig
+
+%description -n libgcab1-devel
+libgcab is a library to manipulate Cabinet archive.
+
+Libraries, includes, etc. to compile with the gcab library.
+
+%prep
+%setup -q
+
+%build
+%meson
+%meson_build
+
+%install
+%meson_install
+
+%find_lang %{name}
+
+%post -n libgcab1 -p /sbin/ldconfig
+%postun -n libgcab1 -p /sbin/ldconfig
+
+%files
+%doc COPYING NEWS
+%{_bindir}/gcab
+%{_mandir}/man1/gcab.1*
+
+%files -n libgcab1 -f %{name}.lang
+%doc COPYING NEWS
+%{_libdir}/girepository-1.0/GCab-1.0.typelib
+%{_libdir}/libgcab-1.0.so.*
+
+%files -n libgcab1-devel
+%{_datadir}/gir-1.0/GCab-1.0.gir
+%{_datadir}/gtk-doc/html/gcab/*
+%{_datadir}/vala/vapi/libgcab-1.0.vapi
+%{_datadir}/vala/vapi/libgcab-1.0.deps
+%{_includedir}/libgcab-1.0/*
+%{_libdir}/libgcab-1.0.so
+%{_libdir}/pkgconfig/libgcab-1.0.pc
+
+%changelog
+* #LONGDATE# Richard Hughes <richard@hughsie.com> #VERSION#-0.#BUILD##ALPHATAG#
+- Update from GIT
+
