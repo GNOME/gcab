@@ -210,6 +210,14 @@ add_file (GCabFolder *self, GCabFile *file, GError **error)
 
 #define FILE_ATTRS "standard::*,time::modified"
 
+static gint
+_sort_cfiles (gconstpointer a, gconstpointer b)
+{
+    GCabFile *file_a = GCAB_FILE (a);
+    GCabFile *file_b = GCAB_FILE (b);
+    return g_strcmp0 (gcab_file_get_name (file_a), gcab_file_get_name (file_b));
+}
+
 static gboolean
 add_file_info (GCabFolder *self, GCabFile *file, GFileInfo *info,
                const gchar *name, gboolean recurse, GError **error)
@@ -235,6 +243,10 @@ add_file_info (GCabFolder *self, GCabFile *file, GFileInfo *info,
                 g_object_unref (info);
                 return FALSE;
             }
+
+            /* sort the files to avoid depending on filesystem order */
+            self->files = g_slist_sort (self->files, _sort_cfiles);
+
             g_object_unref (info);
         }
 
