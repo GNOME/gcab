@@ -518,6 +518,15 @@ cdata_finish (cdata_t *cd, GError **error)
                      "zlib failed: %s", zError (zret));
 }
 
+static gint
+_enforce_checksum (void)
+{
+    static gint enforce = -1;
+    if (enforce == -1)
+        enforce = g_getenv ("GCAB_SKIP_CHECKSUM") == NULL ? 1 : 0;
+    return enforce;
+}
+
 G_GNUC_INTERNAL gboolean
 cdata_read (cdata_t *cd, guint8 res_data, gint comptype,
             GDataInputStream *in, GCancellable *cancellable, GError **error)
@@ -550,7 +559,7 @@ cdata_read (cdata_t *cd, guint8 res_data, gint comptype,
     memcpy (&sizecsum[0], &nbytes_le, 2);
     nbytes_le = GUINT16_TO_LE (cd->nubytes);
     memcpy (&sizecsum[2], &nbytes_le, 2);
-    if (cd->checksum != compute_checksum (sizecsum, sizeof(sizecsum), datacsum)) {
+    if (_enforce_checksum () && cd->checksum != compute_checksum (sizecsum, sizeof(sizecsum), datacsum)) {
         g_set_error_literal (error, GCAB_ERROR, GCAB_ERROR_FAILED,
                              _("incorrect checksum detected"));
         return FALSE;
