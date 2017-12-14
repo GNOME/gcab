@@ -8,11 +8,13 @@ License:        LGPLv2+
 URL:            http://ftp.gnome.org/pub/GNOME/sources/gcab
 Source0:        http://ftp.gnome.org/pub/GNOME/sources/gcab/%{version}/%{name}-%{version}.tar.xz
 
+BuildRequires:  gettext
+BuildRequires:  gtk-doc
 BuildRequires:  vala-tools
 BuildRequires:  glib2-devel
 BuildRequires:  gobject-introspection-devel
 BuildRequires:  zlib-devel
-BuildRequires: meson
+BuildRequires:  meson
 
 Requires:       libgcab1%{?_isa} = %{version}-%{release}
 
@@ -42,6 +44,9 @@ Libraries, includes, etc. to compile with the gcab library.
 %build
 %meson
 %meson_build
+
+%check
+%meson_test
 
 %install
 %meson_install
