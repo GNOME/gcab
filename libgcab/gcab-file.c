@@ -275,7 +275,7 @@ gcab_file_get_name (GCabFile *self)
  * If @file is from an existing cabinet, the fuction will return
  * %NULL.
  *
- * Returns: (transfer full): the associated #GFile or %NULL
+ * Returns: (transfer none): the associated #GFile or %NULL
  **/
 GFile *
 gcab_file_get_file (GCabFile *self)
