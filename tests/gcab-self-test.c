@@ -229,7 +229,7 @@ gcab_test_cabinet_error_not_seekable_func (void)
     /* verify it has no signature */
     cabinet = gcab_cabinet_new ();
     signature = gcab_cabinet_get_signature (cabinet, NULL, &error);
-    g_assert_error (error, GCAB_ERROR, GCAB_ERROR_FAILED);
+    g_assert_error (error, GCAB_ERROR, GCAB_ERROR_NOT_SUPPORTED);
     g_assert (signature == NULL);
 }
 
@@ -348,7 +348,7 @@ gcab_test_cabinet_error_cves_func (void)
         g_assert (ret);
         file_tmpdir = g_file_new_for_path ("/tmp");
         ret = gcab_cabinet_extract_simple (cabinet, file_tmpdir, NULL, NULL, NULL, &error);
-        g_assert_error (error, GCAB_ERROR, GCAB_ERROR_FAILED);
+        g_assert (error != NULL);
         g_assert (!ret);
     }
     g_unsetenv ("GCAB_SKIP_CHECKSUM");

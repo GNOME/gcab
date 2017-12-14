@@ -48,8 +48,10 @@ GQuark gcab_error_quark (void);
 
 /**
  * GCabError:
- * @GCAB_ERROR_FORMAT: The given file is not of Cabinet format.
- * @GCAB_ERROR_FAILED: General function failure.
+ * @GCAB_ERROR_FORMAT:          The given file is not of Cabinet format.
+ * @GCAB_ERROR_FAILED:          General function failure.
+ * @GCAB_ERROR_NOT_SUPPORTED:   Action or format is not supported
+ * @GCAB_ERROR_INVALID_DATA:    Data stream was invalid
  *
  * The various errors triggered by the GCab functions.
  **/
@@ -57,6 +59,8 @@ typedef enum GCabError
 {
     GCAB_ERROR_FORMAT,
     GCAB_ERROR_FAILED,
+    GCAB_ERROR_NOT_SUPPORTED,   /* Since: 1.0 */
+    GCAB_ERROR_INVALID_DATA,    /* Since: 1.0 */
 } GCabError;
 
 GCabCabinet *      gcab_cabinet_new           (void);

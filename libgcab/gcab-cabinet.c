@@ -245,7 +245,7 @@ gcab_cabinet_write (GCabCabinet *self,
 
     /* unsupported */
     if (self->folders->len > 1) {
-        g_set_error_literal (error, GCAB_ERROR, GCAB_ERROR_FAILED,
+        g_set_error_literal (error, GCAB_ERROR, GCAB_ERROR_NOT_SUPPORTED,
                              "Cabinet has more than one added folder");
         return FALSE;
     }
@@ -589,7 +589,7 @@ gcab_cabinet_get_signature (GCabCabinet *self,
         return self->signature;
 
     if (!G_IS_SEEKABLE (self->stream)) {
-        g_set_error (error, GCAB_ERROR, GCAB_ERROR_FAILED,
+        g_set_error (error, GCAB_ERROR, GCAB_ERROR_NOT_SUPPORTED,
                      "Cabinet stream is not seekable");
         return NULL;
     }
@@ -616,7 +616,7 @@ gcab_cabinet_get_signature (GCabCabinet *self,
     g_byte_array_set_size (self->signature, size);
 
     if (!g_seekable_seek (G_SEEKABLE (self->stream), offset, G_SEEK_SET, cancellable, error)) {
-        g_set_error (error, GCAB_ERROR, GCAB_ERROR_FAILED,
+        g_set_error (error, GCAB_ERROR, GCAB_ERROR_INVALID_DATA,
                      "Cannot seek to reserved area");
         return NULL;
     }

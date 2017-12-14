@@ -22,7 +22,6 @@
 #include "config.h"
 
 #include "gcab-priv.h"
-#include <glib/gi18n-lib.h>
 
 static voidpf
 zalloc (voidpf opaque, uInt items, uInt size)
@@ -39,7 +38,7 @@ static gboolean
 cdata_set (cdata_t *cd, int type, guint8 *data, size_t size)
 {
     if (type > GCAB_COMPRESSION_MSZIP) {
-        g_critical (_("unsupported compression method %d"), type);
+        g_critical ("unsupported compression method %d", type);
         return FALSE;
     }
 
@@ -542,8 +541,8 @@ cdata_read (cdata_t *cd, guint8 res_data, gint comptype,
 
     if (compression > GCAB_COMPRESSION_MSZIP &&
         compression != GCAB_COMPRESSION_LZX) {
-        g_set_error (error, GCAB_ERROR, GCAB_ERROR_FAILED,
-                     _("unsupported compression method %d"), compression);
+        g_set_error (error, GCAB_ERROR, GCAB_ERROR_NOT_SUPPORTED,
+                     "unsupported compression method %d", compression);
         return FALSE;
     }
 
@@ -560,8 +559,8 @@ cdata_read (cdata_t *cd, guint8 res_data, gint comptype,
     nbytes_le = GUINT16_TO_LE (cd->nubytes);
     memcpy (&sizecsum[2], &nbytes_le, 2);
     if (_enforce_checksum () && cd->checksum != compute_checksum (sizecsum, sizeof(sizecsum), datacsum)) {
-        g_set_error_literal (error, GCAB_ERROR, GCAB_ERROR_FAILED,
-                             _("incorrect checksum detected"));
+        g_set_error_literal (error, GCAB_ERROR, GCAB_ERROR_INVALID_DATA,
+                             "incorrect checksum detected");
         return FALSE;
     }
 
