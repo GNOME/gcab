@@ -65,7 +65,7 @@ remove_leading_path (gchar *name)
         gchar c = name[i];
 
         name[i] = '\0';
-        g_warning (_("Removing leading '%s' from member names"), name);
+        g_debug ("removing leading '%s' from member names", name);
         name[i] = c;
     }
 
