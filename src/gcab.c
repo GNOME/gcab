@@ -137,7 +137,7 @@ main (int argc, char *argv[])
     g_set_prgname (PACKAGE_NAME);
 
     context = g_option_context_new (_("- create a Cabinet file"));
-    g_autofree gchar *s = g_strdup_printf ("%s: %s", _("Report bugs to:"), PACKAGE_BUGREPORT);
+    g_autofree gchar *s = g_strdup_printf ("%s %s", _("Report bugs to:"), PACKAGE_BUGREPORT);
     g_option_context_set_description (context, s);
     g_option_context_set_summary (context, _("\
 gcab saves many files together into a cabinet archive, and can restore\n\
