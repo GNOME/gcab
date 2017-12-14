@@ -68,12 +68,12 @@ endif
 pkgconfigdir = $(libdir)/pkgconfig
 pkgconfig_DATA = libgcab/libgcab-1.0.pc
 
-man1_MANS = gcab.1
+man1_MANS = src/gcab.1
 
 bin_PROGRAMS = gcab
 
 gcab_SOURCES =					\
-	gcab.c					\
+	src/gcab.c				\
 	$(NULL)
 gcab_LDADD =                                    \
 	$(GLIB_LIBS)                            \

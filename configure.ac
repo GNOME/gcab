@@ -1,7 +1,7 @@
 AC_PREREQ(2.57)
 AC_INIT([gcab], [1.0],
         [https://bugzilla.gnome.org/enter_bug.cgi?product=msitools&component=gcab])
-AC_CONFIG_SRCDIR([gcab.c])
+AC_CONFIG_SRCDIR([src])
 AC_CONFIG_AUX_DIR([build-aux])
 AC_CONFIG_MACRO_DIR([m4])
 
@@ -66,7 +66,7 @@ AC_OUTPUT([
   docs/Makefile
   docs/reference/Makefile
   docs/reference/gcab-docs.sgml
-  gcab.1
+  src/gcab.1
   libgcab/libgcab-1.0.pc
   libgcab/Makefile
   po/Makefile.in
