@@ -1,6 +1,7 @@
 /*
  * LibGCab
  * Copyright (c) 2012, Marc-André Lureau <marcandre.lureau@gmail.com>
+ * Copyright (c) 2017, Richard Hughes <richard@hughsie.com>
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -208,32 +209,24 @@ add_file_info (GCabFolder *self, GCabFile *file, GFileInfo *info,
         if (!recurse)
             return TRUE;
 
-        GFileEnumerator *dir = g_file_enumerate_children (gcab_file_get_gfile (file), FILE_ATTRS, 0, NULL, error);
-        if (*error) {
+        g_autoptr(GFileEnumerator) dir = g_file_enumerate_children (gcab_file_get_gfile (file), FILE_ATTRS, 0, NULL, error);
+        if (dir == NULL) {
             g_warning ("Couldn't enumerate directory %s: %s", name, (*error)->message);
             g_clear_error (error);
             return TRUE;
         }
 
         while ((info = g_file_enumerator_next_file (dir, NULL, error)) != NULL) {
-            GFile *child = g_file_get_child (gcab_file_get_gfile (file), g_file_info_get_name (info));
-            gchar *child_name = g_build_path ("\\", name, g_file_info_get_name (info), NULL);
-            GCabFile *child_file = gcab_file_new_with_file (child_name, child);
-
-            add_file_info (self, child_file, info, child_name, recurse, error);
-            if (*error) {
+            g_autoptr(GFile) child = g_file_get_child (gcab_file_get_gfile (file), g_file_info_get_name (info));
+            g_autofree gchar *child_name = g_build_path ("\\", name, g_file_info_get_name (info), NULL);
+            g_autoptr(GCabFile) child_file = gcab_file_new_with_file (child_name, child);
+            if (!add_file_info (self, child_file, info, child_name, recurse, error)) {
                 g_warning ("Couldn't add file %s: %s",
                            child_name, (*error)->message);
                 g_clear_error (error);
             }
-
-            g_object_unref (child_file);
-            g_free (child_name);
-            g_object_unref (child);
             g_object_unref (info);
         }
-
-        g_object_unref (dir);
 
     } else if (file_type == G_FILE_TYPE_REGULAR) {
         gcab_file_update_info (file, info);
@@ -277,13 +270,12 @@ gcab_folder_add_file (GCabFolder *self, GCabFile *file,
     if (gfile) {
         g_return_val_if_fail (G_IS_FILE (gfile), FALSE);
 
-        GFileInfo *info = g_file_query_info (gfile, FILE_ATTRS, 0, NULL, error);
+        g_autoptr(GFileInfo) info = g_file_query_info (gfile, FILE_ATTRS, 0, NULL, error);
         if (info == NULL)
             return FALSE;
 
         success = add_file_info (self, file, info,
                                  gcab_file_get_name (file), recurse, error);
-        g_object_unref (info);
     } else {
         success = add_file (self, file, error);
     }
@@ -375,9 +367,10 @@ gcab_folder_extract (GCabFolder *self,
 {
     GError *my_error = NULL;
     gboolean success = FALSE;
-    GDataInputStream *data = NULL;
-    GFileOutputStream *out = NULL;
-    GSList *f, *files = NULL;
+    g_autoptr(GDataInputStream) data = NULL;
+    g_autoptr(GFileOutputStream) out = NULL;
+    GSList *f = NULL;
+    g_autoptr(GSList) files = NULL;
     cdata_t cdata = { 0, };
     guint32 nubytes = 0;
 
@@ -396,48 +389,41 @@ gcab_folder_extract (GCabFolder *self,
         if (file_callback && !file_callback (file, callback_data))
             continue;
 
-        gchar *fname = g_strdup (gcab_file_get_extract_name (file));
+        g_autofree gchar *fname = g_strdup (gcab_file_get_extract_name (file));
         int i = 0, len = strlen (fname);
         for (i = 0; i < len; i++)
             if (fname[i] == '\\')
                 fname[i] = '/';
 
-        GFile *gfile = g_file_resolve_relative_path (path, fname);
-        g_free (fname);
+        g_autoptr(GFile) gfile = g_file_resolve_relative_path (path, fname);
 
         if (!g_file_has_prefix (gfile, path)) {
             // "Rebase" the file in the given path, to ensure we never escape it
-            char *rawpath = g_file_get_path (gfile);
+            g_autofree gchar *rawpath = g_file_get_path (gfile);
             if (rawpath != NULL) {
                 char *newpath = rawpath;
                 while (*newpath != 0 && *newpath == G_DIR_SEPARATOR) {
                     newpath++;
                 }
-                GFile *newgfile = g_file_resolve_relative_path (path, newpath);
-                g_free (rawpath);
-                g_object_unref (gfile);
-                gfile = newgfile;
+                g_autoptr(GFile) newgfile = g_file_resolve_relative_path (path, newpath);
+                g_set_object (&gfile, newgfile);
             }
         }
 
-        GFile *parent = g_file_get_parent (gfile);
+        g_autoptr(GFile) parent = g_file_get_parent (gfile);
 
         if (!g_file_make_directory_with_parents (parent, cancellable, &my_error)) {
             if (g_error_matches (my_error, G_IO_ERROR, G_IO_ERROR_EXISTS))
                 g_clear_error (&my_error);
             else {
-                g_object_unref (gfile);
-                g_object_unref (parent);
                 g_propagate_error (error, my_error);
                 goto end;
             }
         }
-        g_object_unref (parent);
 
-        g_clear_object (&out);
-        out = g_file_replace (gfile, NULL, FALSE, G_FILE_CREATE_REPLACE_DESTINATION, cancellable, error);
-        g_object_unref (gfile);
-        if (!out)
+        g_autoptr(GFileOutputStream) out2 = NULL;
+        out2 = g_file_replace (gfile, NULL, FALSE, G_FILE_CREATE_REPLACE_DESTINATION, cancellable, error);
+        if (!out2)
             goto end;
 
         guint32 usize = gcab_file_get_usize (file);
@@ -464,7 +450,7 @@ gcab_folder_extract (GCabFolder *self,
                     gcab_file_get_uoffset (file) - nubytes : 0;
                 const void *p = &cdata.out[offset];
                 gsize count = MIN (usize, cdata.nubytes - offset);
-                if (!g_output_stream_write_all (G_OUTPUT_STREAM (out), p, count,
+                if (!g_output_stream_write_all (G_OUTPUT_STREAM (out2), p, count,
                                                 NULL, cancellable, error))
                     goto end;
                 usize -= count;
@@ -476,10 +462,6 @@ gcab_folder_extract (GCabFolder *self,
     success = TRUE;
 
 end:
-    g_slist_free (files);
-
-    g_clear_object (&data);
-    g_clear_object (&out);
     cdata_finish (&cdata, NULL);
 
     return success;

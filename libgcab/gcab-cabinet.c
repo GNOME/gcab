@@ -1,6 +1,7 @@
 /*
  * LibGCab
  * Copyright (c) 2012, Marc-André Lureau <marcandre.lureau@gmail.com>
+ * Copyright (c) 2017, Richard Hughes <richard@hughsie.com>
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -76,7 +77,8 @@ gcab_cabinet_finalize (GObject *object)
         g_byte_array_unref (self->reserved);
     if (self->signature)
         g_byte_array_unref (self->signature);
-    g_clear_object (&self->stream);
+    if (self->stream)
+        g_object_unref (self->stream);
 
     G_OBJECT_CLASS (gcab_cabinet_parent_class)->finalize (object);
 }
@@ -237,15 +239,13 @@ gcab_cabinet_write (GCabCabinet *self,
 
     GCabFolder *cabfolder = g_ptr_array_index (self->folders, 0);
     gsize nfiles = gcab_folder_get_nfiles (cabfolder);
-    GInputStream *in = NULL;
-    GDataOutputStream *dstream = NULL;
-    gboolean success = FALSE;
+    g_autoptr(GDataOutputStream) dstream = NULL;
     gssize len, offset = 0;
     cdata_t block = { 0, };
     guint8 data[DATABLOCKSIZE];
     gsize written;
     size_t sumstr = 0;
-    GSList *files;
+    g_autoptr(GSList) files = NULL;
     GCabFile *prevf = NULL;
 
     dstream = g_data_output_stream_new (out);
@@ -273,51 +273,52 @@ gcab_cabinet_write (GCabCabinet *self,
     /* avoid seeking to allow growing output streams */
     for (guint i = 0; i < folder.offsetdata; i++)
         if (!g_data_output_stream_put_byte (dstream, 0, cancellable, error))
-            goto end;
+            return FALSE;
 
     for (GSList *l = files; l != NULL; l = l->next) {
+        g_autoptr(GInputStream) in = NULL;
+
         GCabFile *file = GCAB_FILE (l->data);
         if (file_callback)
             file_callback (file, user_data);
 
-        g_clear_object (&in);
         in = G_INPUT_STREAM (g_file_read (gcab_file_get_gfile (file), cancellable, error));
         if (in == NULL)
-            goto end;
+            return FALSE;
 
         while ((len = g_input_stream_read (in,
                                            &data[offset], DATABLOCKSIZE - offset,
                                            cancellable, error)) == (DATABLOCKSIZE - offset)) {
             if (!cdata_write (&block, dstream, folder.typecomp, data, DATABLOCKSIZE, &written, cancellable, error))
-                goto end;
+                return FALSE;
             header.size += written;
             offset = 0;
         }
 
         if (len == -1)
-            goto end;
+            return FALSE;
 
         offset += len;
     }
     if (offset != 0) {
         if (!cdata_write (&block, dstream, folder.typecomp, data, offset, &written, cancellable, error))
-            goto end;
+            return FALSE;
         header.size += written;
     }
 
     if (!g_seekable_seek (G_SEEKABLE (out), 0,
                           G_SEEK_SET, cancellable, error))
-        goto end;
+        return FALSE;
 
     header.nfiles = nfiles;
     header.size += header.offsetfiles + nfiles * 16; /* 1st part cfile struct = 16 bytes */
     header.size += sumstr;
 
     if (!cheader_write (&header, dstream, cancellable, error))
-        goto end;
+        return FALSE;
 
     if (!cfolder_write (&folder, dstream, cancellable, error))
-        goto end;
+        return FALSE;
 
     for (GSList *l = files; l != NULL; l = l->next) {
         GCabFile *file = GCAB_FILE (l->data);
@@ -329,17 +330,10 @@ gcab_cabinet_write (GCabCabinet *self,
             gcab_file_add_attribute (file, GCAB_FILE_ATTRIBUTE_NAME_IS_UTF);
 
         if (!cfile_write (gcab_file_get_cfile (file), dstream, cancellable, error))
-            goto end;
+            return FALSE;
     }
 
-    success = TRUE;
-
-end:
-    g_clear_object (&dstream);
-    g_clear_object (&in);
-    g_slist_free (files);
-
-    return success;
+    return TRUE;
 }
 
 /**
@@ -408,16 +402,13 @@ gcab_cabinet_load (GCabCabinet *self,
 
     self->stream = g_object_ref (stream);
 
-    gboolean success = FALSE;
     cheader_t cheader;
-    GDataInputStream *in = g_data_input_stream_new (stream);
+    g_autoptr(GDataInputStream) in = g_data_input_stream_new (stream);
     g_filter_input_stream_set_close_base_stream (G_FILTER_INPUT_STREAM (in), FALSE);
     g_data_input_stream_set_byte_order (in, G_DATA_STREAM_BYTE_ORDER_LITTLE_ENDIAN);
 
-    GPtrArray *folders = self->folders;
-
     if (!cheader_read (&cheader, in, cancellable, error))
-        goto end;
+        return FALSE;
 
     if (cheader.reserved)
         g_object_set (self, "reserved",
@@ -427,48 +418,40 @@ gcab_cabinet_load (GCabCabinet *self,
     for (guint i = 0; i < cheader.nfolders; i++) {
         cfolder_t cfolder = { 0, };
         if (!cfolder_read (&cfolder, cheader.res_folder, in, cancellable, error))
-            goto end;
+            return FALSE;
 
         GCabFolder *folder = gcab_folder_new_with_cfolder (&cfolder, stream);
         if (cfolder.reserved)
             g_object_set (folder, "reserved",
                           g_byte_array_new_take (cfolder.reserved, cheader.res_folder),
                           NULL);
-        g_ptr_array_add (folders, folder);
+        g_ptr_array_add (self->folders, folder);
         cfolder.reserved = NULL;
     }
 
     for (guint i = 0; i < cheader.nfiles; i++) {
         cfile_t cfile = { 0, };
         if (!cfile_read (&cfile, in, cancellable, error))
-            goto end;
+            return FALSE;
 
-        if (cfile.index >= folders->len) {
+        if (cfile.index >= self->folders->len) {
             g_set_error (error, GCAB_ERROR, GCAB_ERROR_FORMAT,
                          "Invalid folder index");
-            goto end;
+            return FALSE;
         }
 
-        GCabFolder *folder = g_ptr_array_index (folders, cfile.index);
+        GCabFolder *folder = g_ptr_array_index (self->folders, cfile.index);
         if (folder == NULL) {
             g_set_error (error, GCAB_ERROR, GCAB_ERROR_FORMAT,
                          "Invalid folder pointer");
-            goto end;
+            return FALSE;
         }
 
-        GCabFile *file = gcab_file_new_with_cfile (&cfile);
-        if (!gcab_folder_add_file (folder, file, FALSE, cancellable, error)) {
-            g_object_unref (file);
-            goto end;
-        }
+        g_autoptr(GCabFile) file = gcab_file_new_with_cfile (&cfile);
+        if (!gcab_folder_add_file (folder, file, FALSE, cancellable, error))
+            return FALSE;
     }
-
-    success = TRUE;
-
-end:
-    if (in)
-        g_object_unref (in);
-    return success;
+    return TRUE;
 }
 
 /**
