@@ -101,7 +101,6 @@ EXTRA_DIST =					\
 	$(BUILT_SOURCES)			\
 	libgcab/gcab-enums.c.etemplate		\
 	libgcab/gcab-enums.h.etemplate		\
-	build-aux/git-version-gen		\
 	$(NULL)
 
 if GIR

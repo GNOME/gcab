@@ -1,5 +1,5 @@
 AC_PREREQ(2.57)
-AC_INIT([gcab], m4_esyscmd([build-aux/git-version-gen .tarball-version]),
+AC_INIT([gcab], [1.0],
         [https://bugzilla.gnome.org/enter_bug.cgi?product=msitools&component=gcab])
 AC_CONFIG_SRCDIR([gcab.c])
 AC_CONFIG_AUX_DIR([build-aux])
