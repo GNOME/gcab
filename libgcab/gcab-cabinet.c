@@ -35,13 +35,7 @@
  * extracting and creation of archives.
  */
 
-struct _GCabCabinetClass
-{
-    GObjectClass parent_class;
-};
-
-struct _GCabCabinet
-{
+struct _GCabCabinet {
     GObject parent_instance;
 
     GPtrArray *folders;
@@ -242,7 +236,6 @@ gcab_cabinet_write (GCabCabinet *self,
     g_return_val_if_fail (self->folders->len == 1, FALSE);
 
     GCabFolder *cabfolder = g_ptr_array_index (self->folders, 0);
-    GCabFile *file;
     gsize nfiles = gcab_folder_get_nfiles (cabfolder);
     GInputStream *in = NULL;
     GDataOutputStream *dstream = NULL;
@@ -252,8 +245,8 @@ gcab_cabinet_write (GCabCabinet *self,
     guint8 data[DATABLOCKSIZE];
     gsize written;
     size_t sumstr = 0;
-    GSList *l, *files;
-    cfile_t *prevf = NULL;
+    GSList *files;
+    GCabFile *prevf = NULL;
 
     dstream = g_data_output_stream_new (out);
     g_data_output_stream_set_byte_order (dstream, G_DATA_STREAM_BYTE_ORDER_LITTLE_ENDIAN);
@@ -268,10 +261,12 @@ gcab_cabinet_write (GCabCabinet *self,
     }
 
     files = gcab_folder_get_files (cabfolder);
-    for (l = files; l != NULL; l = l->next)
-        sumstr += strlen (GCAB_FILE (l->data)->name) + 1;
+    for (GSList *l = files; l != NULL; l = l->next) {
+        GCabFile *cabfile = GCAB_FILE (l->data);
+        sumstr += strlen (gcab_file_get_name (cabfile)) + 1;
+    }
 
-    folder.typecomp = cabfolder->comptype;
+    folder.typecomp = gcab_folder_get_comptype (cabfolder);
     folder.offsetdata = header.offsetfiles + nfiles * 16 + sumstr;
     folder.ndatab = gcab_folder_get_ndatablocks (cabfolder);
 
@@ -280,13 +275,13 @@ gcab_cabinet_write (GCabCabinet *self,
         if (!g_data_output_stream_put_byte (dstream, 0, cancellable, error))
             goto end;
 
-    for (l = files; l != NULL; l = l->next) {
-        file = GCAB_FILE (l->data);
+    for (GSList *l = files; l != NULL; l = l->next) {
+        GCabFile *file = GCAB_FILE (l->data);
         if (file_callback)
             file_callback (file, user_data);
 
         g_clear_object (&in);
-        in = G_INPUT_STREAM (g_file_read (file->file, cancellable, error));
+        in = G_INPUT_STREAM (g_file_read (gcab_file_get_gfile (file), cancellable, error));
         if (in == NULL)
             goto end;
 
@@ -324,16 +319,16 @@ gcab_cabinet_write (GCabCabinet *self,
     if (!cfolder_write (&folder, dstream, cancellable, error))
         goto end;
 
-    for (l = files; l != NULL; l = l->next) {
-        file = GCAB_FILE (l->data);
-        file->cfile.uoffset = prevf ? prevf->uoffset + prevf->usize : 0;
-        prevf = &file->cfile;
+    for (GSList *l = files; l != NULL; l = l->next) {
+        GCabFile *file = GCAB_FILE (l->data);
+        gcab_file_set_uoffset (file, prevf ? gcab_file_get_uoffset (prevf) + gcab_file_get_usize (prevf) : 0);
+        prevf = file;
 
         /* automatically set flag if UTF-8 encoding */
-        if (!g_str_is_ascii (file->cfile.name))
-            file->cfile.fattr |= GCAB_FILE_ATTRIBUTE_NAME_IS_UTF;
+        if (!g_str_is_ascii (gcab_file_get_name (file)))
+            gcab_file_add_attribute (file, GCAB_FILE_ATTRIBUTE_NAME_IS_UTF);
 
-        if (!cfile_write (&file->cfile, dstream, cancellable, error))
+        if (!cfile_write (gcab_file_get_cfile (file), dstream, cancellable, error))
             goto end;
     }
 

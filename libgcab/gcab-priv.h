@@ -40,35 +40,18 @@
                                           _GCAB_GET (data, 1, 32,  8) |  \
                                           _GCAB_GET (data, 0, 32,  0))
 
-
-struct _GCabFile
-{
-    GObject parent_instance;
-
-    gchar *name;
-    gchar *extract_name;
-    GFile *file;
-    cfile_t cfile;
-};
-
-struct _GCabFolder
-{
-    GObject parent_instance;
-
-    GSList *files;
-    GHashTable *hash;
-    gint comptype;
-    GByteArray *reserved;
-    cfolder_t cfolder;
-    GInputStream *stream;
-};
-
 GCabFolder *     gcab_folder_new_with_cfolder        (const cfolder_t *folder, GInputStream *stream);
 GCabFile *       gcab_file_new_with_cfile            (const cfile_t *file);
 
 gboolean         gcab_file_update_info               (GCabFile *file, GFileInfo *info);
+guint32          gcab_file_get_uoffset               (GCabFile *file);
 gboolean         gcab_file_set_uoffset               (GCabFile *file, guint32 uoffset);
+guint32          gcab_file_get_usize                 (GCabFile *file);
+GFile           *gcab_file_get_gfile                 (GCabFile *file);
+cfile_t         *gcab_file_get_cfile                 (GCabFile *file);
+void             gcab_file_add_attribute             (GCabFile *file, guint32 attribute);
 
+gint             gcab_folder_get_comptype            (GCabFolder *folder);
 gsize            gcab_folder_get_ndatablocks         (GCabFolder *folder);
 gboolean         gcab_folder_extract                 (GCabFolder *self,
                                                       GFile *path,

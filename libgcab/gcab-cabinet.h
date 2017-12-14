@@ -29,12 +29,13 @@
 
 G_BEGIN_DECLS
 
+/**
+ * GCabCabinet:
+ *
+ * An opaque object holding a Cabinet file reference.
+ **/
 #define GCAB_TYPE_CABINET                (gcab_cabinet_get_type ())
-#define GCAB_CABINET(cabinet)            (G_TYPE_CHECK_INSTANCE_CAST ((cabinet), GCAB_TYPE_CABINET, GCabCabinet))
-#define GCAB_CABINET_CLASS(klass)        (G_TYPE_CHECK_CLASS_CAST ((klass), GCAB_TYPE_CABINET, GCabCabinetClass))
-#define GCAB_IS_CABINET(cabinet)         (G_TYPE_CHECK_INSTANCE_TYPE ((cabinet), GCAB_TYPE_CABINET))
-#define GCAB_IS_CABINET_CLASS(klass)     (G_TYPE_CHECK_CLASS_TYPE ((klass), GCAB_TYPE_CABINET))
-#define GCAB_CABINET_GET_CLASS(cabinet)  (G_TYPE_INSTANCE_GET_CLASS ((cabinet), GCAB_TYPE_CABINET, GCabCabinetClass))
+G_DECLARE_FINAL_TYPE(GCabCabinet, gcab_cabinet, GCAB, CABINET, GObject)
 
 /**
  * GCAB_ERROR:
@@ -57,17 +58,6 @@ typedef enum GCabError
     GCAB_ERROR_FORMAT,
     GCAB_ERROR_FAILED,
 } GCabError;
-
-typedef struct _GCabCabinetClass GCabCabinetClass;
-
-/**
- * GCabCabinet:
- *
- * An opaque object holding a Cabinet file reference.
- **/
-typedef struct _GCabCabinet GCabCabinet;
-
-GType gcab_cabinet_get_type (void) G_GNUC_CONST;
 
 GCabCabinet *      gcab_cabinet_new           (void);
 gboolean           gcab_cabinet_load          (GCabCabinet *cabinet,
@@ -109,8 +99,6 @@ gboolean           gcab_cabinet_extract_simple(GCabCabinet *cabinet,
 const GByteArray * gcab_cabinet_get_signature (GCabCabinet *cabinet,
                                                GCancellable *cancellable,
                                                GError **error);
-
-G_DEFINE_AUTOPTR_CLEANUP_FUNC(GCabCabinet, g_object_unref)
 
 G_END_DECLS
 

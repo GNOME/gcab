@@ -27,21 +27,13 @@
 
 G_BEGIN_DECLS
 
-#define GCAB_TYPE_FOLDER              (gcab_folder_get_type ())
-#define GCAB_FOLDER(folder)           (G_TYPE_CHECK_INSTANCE_CAST ((folder), GCAB_TYPE_FOLDER, GCabFolder))
-#define GCAB_FOLDER_CLASS(klass)      (G_TYPE_CHECK_CLASS_CAST ((klass), GCAB_TYPE_FOLDER, GCabFolderClass))
-#define GCAB_IS_FOLDER(folder)        (G_TYPE_CHECK_INSTANCE_TYPE ((folder), GCAB_TYPE_FOLDER))
-#define GCAB_IS_FOLDER_CLASS(klass)   (G_TYPE_CHECK_CLASS_TYPE ((klass), GCAB_TYPE_FOLDER))
-#define GCAB_FOLDER_GET_CLASS(folder) (G_TYPE_INSTANCE_GET_CLASS ((folder), GCAB_TYPE_FOLDER, GCabFolderClass))
-
-typedef struct _GCabFolderClass GCabFolderClass;
-
 /**
  * GCabFolder:
  *
  * An opaque object, referencing a folder in a Cabinet.
  **/
-typedef struct _GCabFolder GCabFolder;
+#define GCAB_TYPE_FOLDER              (gcab_folder_get_type ())
+G_DECLARE_FINAL_TYPE(GCabFolder, gcab_folder, GCAB, FOLDER, GObject)
 
 /**
  * GCabCompression:
@@ -63,8 +55,6 @@ typedef enum
     GCAB_COMPRESSION_MASK = 0xf,
 } GCabCompression;
 
-GType gcab_folder_get_type (void) G_GNUC_CONST;
-
 GCabFolder *    gcab_folder_new               (gint comptype);
 gboolean        gcab_folder_add_file          (GCabFolder *cabfolder,
                                                GCabFile *cabfile,
@@ -73,8 +63,6 @@ gboolean        gcab_folder_add_file          (GCabFolder *cabfolder,
                                                GError **error);
 guint           gcab_folder_get_nfiles        (GCabFolder *cabfolder);
 GSList *        gcab_folder_get_files         (GCabFolder *cabfolder);
-
-G_DEFINE_AUTOPTR_CLEANUP_FUNC(GCabFolder, g_object_unref)
 
 G_END_DECLS
 

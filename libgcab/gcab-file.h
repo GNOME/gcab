@@ -26,14 +26,13 @@
 
 G_BEGIN_DECLS
 
+/**
+ * GCabFile:
+ *
+ * An opaque object, referencing a file in a Cabinet.
+ **/
 #define GCAB_TYPE_FILE             (gcab_file_get_type ())
-#define GCAB_FILE(file)            (G_TYPE_CHECK_INSTANCE_CAST ((file), GCAB_TYPE_FILE, GCabFile))
-#define GCAB_FILE_CLASS(klass)     (G_TYPE_CHECK_CLASS_CAST ((klass), GCAB_TYPE_FILE, GCabFileClass))
-#define GCAB_IS_FILE(file)         (G_TYPE_CHECK_INSTANCE_TYPE ((file), GCAB_TYPE_FILE))
-#define GCAB_IS_FILE_CLASS(klass)  (G_TYPE_CHECK_CLASS_TYPE ((klass), GCAB_TYPE_FILE))
-#define GCAB_FILE_GET_CLASS(file)  (G_TYPE_INSTANCE_GET_CLASS ((file), GCAB_TYPE_FILE, GCabFileClass))
-
-typedef struct _GCabFileClass GCabFileClass;
+G_DECLARE_FINAL_TYPE(GCabFile, gcab_file, GCAB, FILE, GObject)
 
 /**
  * GCabFileAttribute:
@@ -57,13 +56,6 @@ typedef enum
 } GCabFileAttribute;
 
 /**
- * GCabFile:
- *
- * An opaque object, referencing a file in a Cabinet.
- **/
-typedef struct _GCabFile GCabFile;
-
-/**
  * GCabFileCallback:
  * @file: the file being processed
  * @user_data: user data passed to the callback.
@@ -73,8 +65,6 @@ typedef struct _GCabFile GCabFile;
  **/
 typedef gboolean (*GCabFileCallback) (GCabFile *file, gpointer user_data);
 
-GType gcab_file_get_type (void) G_GNUC_CONST;
-
 GCabFile *      gcab_file_new_with_file             (const gchar *name, GFile *file);
 GFile *         gcab_file_get_file                  (GCabFile *file);
 const gchar *   gcab_file_get_name                  (GCabFile *file);
@@ -83,8 +73,6 @@ guint32         gcab_file_get_attributes            (GCabFile *file);
 void            gcab_file_get_date                  (GCabFile *file, GTimeVal *result);
 const gchar *   gcab_file_get_extract_name          (GCabFile *file);
 void            gcab_file_set_extract_name          (GCabFile *file, const gchar *name);
-
-G_DEFINE_AUTOPTR_CLEANUP_FUNC(GCabFile, g_object_unref)
 
 G_END_DECLS
 

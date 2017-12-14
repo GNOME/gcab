@@ -1,6 +1,7 @@
 /*
  * LibGCab
  * Copyright (c) 2012, Marc-André Lureau <marcandre.lureau@gmail.com>
+ * Copyright (c) 2017, Richard Hughes <richard@hughsie.com>
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -38,9 +39,14 @@
  * must return a valid handle.
  */
 
-struct _GCabFileClass
+struct _GCabFile
 {
-    GObjectClass parent_class;
+    GObject parent_instance;
+
+    gchar *name;
+    gchar *extract_name;
+    GFile *file;
+    cfile_t cfile;
 };
 
 enum {
@@ -179,6 +185,41 @@ gcab_file_set_uoffset (GCabFile *self, guint32 uoffset)
     self->cfile.uoffset = uoffset;
 
     return TRUE;
+}
+
+G_GNUC_INTERNAL guint32
+gcab_file_get_uoffset (GCabFile *self)
+{
+    g_return_val_if_fail (GCAB_IS_FILE (self), 0);
+    return self->cfile.uoffset;
+}
+
+G_GNUC_INTERNAL guint32
+gcab_file_get_usize (GCabFile *self)
+{
+    g_return_val_if_fail (GCAB_IS_FILE (self), 0);
+    return self->cfile.usize;
+}
+
+G_GNUC_INTERNAL GFile *
+gcab_file_get_gfile (GCabFile *self)
+{
+    g_return_val_if_fail (GCAB_IS_FILE (self), NULL);
+    return self->file;
+}
+
+G_GNUC_INTERNAL void
+gcab_file_add_attribute (GCabFile *self, guint32 attribute)
+{
+    g_return_if_fail (GCAB_IS_FILE (self));
+    self->cfile.fattr |= attribute;
+}
+
+G_GNUC_INTERNAL cfile_t *
+gcab_file_get_cfile (GCabFile *self)
+{
+    g_return_val_if_fail (GCAB_IS_FILE (self), NULL);
+    return &self->cfile;
 }
 
 /**

@@ -44,9 +44,16 @@
  * gcab_folder_add_file().
  */
 
-struct _GCabFolderClass
+struct _GCabFolder
 {
-    GObjectClass parent_class;
+    GObject parent_instance;
+
+    GSList *files;
+    GHashTable *hash;
+    gint comptype;
+    GByteArray *reserved;
+    cfolder_t cfolder;
+    GInputStream *stream;
 };
 
 enum {
@@ -158,12 +165,19 @@ G_GNUC_INTERNAL gsize
 gcab_folder_get_ndatablocks (GCabFolder *self)
 {
     gsize total_size = 0;
-    GSList *l;
 
-    for (l = self->files; l != NULL; l = l->next)
-        total_size += GCAB_FILE (l->data)->cfile.usize;
+    for (GSList *l = self->files; l != NULL; l = l->next) {
+        GCabFile *file = GCAB_FILE (l->data);
+        total_size += gcab_file_get_usize (file);
+    }
 
     return total_size / DATABLOCKSIZE + 1 ;
+}
+
+G_GNUC_INTERNAL gint
+gcab_folder_get_comptype (GCabFolder *self)
+{
+    return self->comptype;
 }
 
 static gboolean
@@ -194,7 +208,7 @@ add_file_info (GCabFolder *self, GCabFile *file, GFileInfo *info,
         if (!recurse)
             return TRUE;
 
-        GFileEnumerator *dir = g_file_enumerate_children (file->file, FILE_ATTRS, 0, NULL, error);
+        GFileEnumerator *dir = g_file_enumerate_children (gcab_file_get_gfile (file), FILE_ATTRS, 0, NULL, error);
         if (*error) {
             g_warning ("Couldn't enumerate directory %s: %s", name, (*error)->message);
             g_clear_error (error);
@@ -202,7 +216,7 @@ add_file_info (GCabFolder *self, GCabFile *file, GFileInfo *info,
         }
 
         while ((info = g_file_enumerator_next_file (dir, NULL, error)) != NULL) {
-            GFile *child = g_file_get_child (file->file, g_file_info_get_name (info));
+            GFile *child = g_file_get_child (gcab_file_get_gfile (file), g_file_info_get_name (info));
             gchar *child_name = g_build_path ("\\", name, g_file_info_get_name (info), NULL);
             GCabFile *child_file = gcab_file_new_with_file (child_name, child);
 
@@ -346,7 +360,7 @@ sort_by_offset (GCabFile *a, GCabFile *b)
     g_return_val_if_fail (a != NULL, 0);
     g_return_val_if_fail (b != NULL, 0);
 
-    return (gint64)a->cfile.uoffset - (gint64)b->cfile.uoffset;
+    return (gint64) gcab_file_get_uoffset (a) - (gint64) gcab_file_get_uoffset (b);
 }
 
 G_GNUC_INTERNAL gboolean
@@ -426,8 +440,8 @@ gcab_folder_extract (GCabFolder *self,
         if (!out)
             goto end;
 
-        guint32 usize = file->cfile.usize;
-        guint32 uoffset = file->cfile.uoffset;
+        guint32 usize = gcab_file_get_usize (file);
+        guint32 uoffset = gcab_file_get_uoffset (file);
 
         /* let's rewind if need be */
         if (uoffset < nubytes) {
@@ -446,8 +460,8 @@ gcab_folder_extract (GCabFolder *self,
                     goto end;
                 continue;
             } else {
-                gsize offset = file->cfile.uoffset > nubytes ?
-                    file->cfile.uoffset - nubytes : 0;
+                gsize offset = gcab_file_get_uoffset (file) > nubytes ?
+                    gcab_file_get_uoffset (file) - nubytes : 0;
                 const void *p = &cdata.out[offset];
                 gsize count = MIN (usize, cdata.nubytes - offset);
                 if (!g_output_stream_write_all (G_OUTPUT_STREAM (out), p, count,
