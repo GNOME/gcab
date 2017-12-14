@@ -67,7 +67,7 @@ AC_OUTPUT([
   docs/reference/Makefile
   docs/reference/gcab-docs.sgml
   gcab.1
-  libgcab-1.0.pc
+  libgcab/libgcab-1.0.pc
   libgcab/Makefile
   po/Makefile.in
 ])

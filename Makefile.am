@@ -24,7 +24,7 @@ AM_CPPFLAGS =					\
 
 libgcab_includedir = $(includedir)/libgcab-1.0
 libgcab_priv_includedir = $(libgcab_includedir)/libgcab
-libgcab_include_HEADERS = libgcab.h
+libgcab_include_HEADERS = libgcab/libgcab.h
 libgcab_priv_include_HEADERS =			\
 	libgcab/gcab-cabinet.h			\
 	libgcab/gcab-enums.h			\
@@ -58,15 +58,15 @@ libgcab_1_0_la_LDFLAGS =				\
 	-version-info 0:0:0				\
 	-no-undefined					\
 	$(NULL)
-libgcab_1_0_la_DEPENDENCIES = libgcab.syms
+libgcab_1_0_la_DEPENDENCIES = libgcab/libgcab.syms
 libgcab/gcab-priv.h: libgcab/gcab-enums.h
 
 if HAVE_VSCRIPT
-libgcab_1_0_la_LDFLAGS += $(VSCRIPT_LDFLAGS),${srcdir}/libgcab.syms
+libgcab_1_0_la_LDFLAGS += $(VSCRIPT_LDFLAGS),${srcdir}/libgcab/libgcab.syms
 endif
 
 pkgconfigdir = $(libdir)/pkgconfig
-pkgconfig_DATA = libgcab-1.0.pc
+pkgconfig_DATA = libgcab/libgcab-1.0.pc
 
 man1_MANS = gcab.1
 
@@ -97,7 +97,7 @@ $(GCAB_ENUMS): %: %.etemplate $(ENUMS_FILES)
 
 EXTRA_DIST =					\
 	gcab.doap				\
-	libgcab.syms				\
+	libgcab/libgcab.syms			\
 	$(BUILT_SOURCES)			\
 	libgcab/gcab-enums.c.etemplate		\
 	libgcab/gcab-enums.h.etemplate		\
@@ -116,7 +116,7 @@ GCab_1_0_gir_CFLAGS = $(AM_CPPFLAGS)
 GCab_1_0_gir_INCLUDES = GObject-2.0 GLib-2.0 Gio-2.0
 GCab_1_0_gir_LIBS = libgcab-1.0.la
 GCab_1_0_gir_FILES =				\
-	$(top_srcdir)/libgcab.h			\
+	$(top_srcdir)/libgcab/libgcab.h		\
 	$(top_srcdir)/libgcab/gcab-cabinet.h	\
 	$(top_builddir)/libgcab/gcab-enums.h	\
 	$(top_srcdir)/libgcab/gcab-file.h	\
