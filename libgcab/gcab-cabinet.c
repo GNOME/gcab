@@ -486,7 +486,7 @@ gcab_cabinet_load (GCabCabinet *self,
  * gcab_cabinet_extract:
  * @cabinet: a #GCabCabinet
  * @path: the path to extract files
- * @file_callback: (allow-none) (scope call) (closure user_data): an optionnal #GCabFile callback,
+ * @file_callback: (allow-none) (scope call) (closure user_data): an optional #GCabFile callback,
  *     return %FALSE to filter out or skip files.
  * @progress_callback: (allow-none) (scope call) (closure user_data): a progress callback
  * @user_data: (closure): callback data
@@ -535,7 +535,7 @@ gcab_cabinet_extract (GCabCabinet *self,
  * gcab_cabinet_extract_simple:
  * @cabinet: a #GCabCabinet
  * @path: the path to extract files
- * @file_callback: (allow-none) (scope call) (closure user_data): an optionnal #GCabFile callback,
+ * @file_callback: (allow-none) (scope call) (closure user_data): an optional #GCabFile callback,
  *     return %FALSE to filter out or skip files.
  * @user_data: (closure): callback data
  * @cancellable: (allow-none): optional #GCancellable object,
