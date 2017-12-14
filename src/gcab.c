@@ -79,15 +79,15 @@ save_array_to_file (const GByteArray *array, const gchar *base, const gchar *suf
     g_autoptr(GFile) outputfile = NULL;
     g_autoptr(GOutputStream) output = NULL;
     resname = g_strdup_printf ("%s.%s", base, suffix);
-    g_print (_("Dumping %s data to: %s ...\n"), suffix, resname);
+    g_print ("%s %s...", _("Dumping data to:"), resname);
     outputfile = g_file_new_for_commandline_arg (resname);
     output = G_OUTPUT_STREAM (g_file_replace (outputfile, NULL, FALSE, 0, NULL, error));
     if (output == NULL) {
-        g_prefix_error (error, _("Cannot write file %s: "), resname);
+        g_prefix_error (error, "cannot write %s: ", resname);
         return FALSE;
     }
     if (!g_output_stream_write_all (output, array->data, array->len, NULL, NULL, error)) {
-        g_prefix_error (error, _("Cannot write file %s: "), resname);
+        g_prefix_error (error, "cannot write %s: ", resname);
         return FALSE;
     }
     return TRUE;
@@ -137,7 +137,7 @@ main (int argc, char *argv[])
     g_set_prgname (PACKAGE_NAME);
 
     context = g_option_context_new (_("- create a Cabinet file"));
-    g_autofree gchar *s = g_strdup_printf (_("Report bugs to <%s>"), PACKAGE_BUGREPORT);
+    g_autofree gchar *s = g_strdup_printf ("%s: %s", _("Report bugs to:"), PACKAGE_BUGREPORT);
     g_option_context_set_description (context, s);
     g_option_context_set_summary (context, _("\
 gcab saves many files together into a cabinet archive, and can restore\n\
