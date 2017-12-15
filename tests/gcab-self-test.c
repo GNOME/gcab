@@ -126,6 +126,12 @@ gcab_test_folder_func (void)
     g_assert_nonnull (cabfile_tmp);
     cabfile_tmp = gcab_folder_get_file_by_name (cabfolder, "notgoingtoexist");
     g_assert_null (cabfile_tmp);
+
+    /* find the extracted name too */
+    cabfile_tmp = gcab_folder_get_file_by_name (cabfolder, "test.bin");
+    gcab_file_set_extract_name (cabfile_tmp, "LVFS-test.bin");
+    cabfile_tmp = gcab_folder_get_file_by_name (cabfolder, "LVFS-test.bin");
+    g_assert_nonnull (cabfile_tmp);
 }
 
 static void

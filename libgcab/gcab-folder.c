@@ -378,9 +378,27 @@ gcab_folder_get_files (GCabFolder *self)
 GCabFile *
 gcab_folder_get_file_by_name (GCabFolder *self, const gchar *name)
 {
+    GCabFile *cabfile;
+
     g_return_val_if_fail (GCAB_IS_FOLDER (self), NULL);
     g_return_val_if_fail (name != NULL, NULL);
-    return g_hash_table_lookup (self->hash, name);
+
+    /* try the hash first */
+    cabfile = g_hash_table_lookup (self->hash, name);
+    if (cabfile != NULL)
+        return cabfile;
+
+    /* if the extract name is different, look for that too */
+    for (GSList *l = self->files; l != NULL; l = l->next) {
+        cabfile = GCAB_FILE (l->data);
+        if (gcab_file_get_name (cabfile) != gcab_file_get_extract_name (cabfile)) {
+            if (g_strcmp0 (gcab_file_get_extract_name (cabfile), name) == 0)
+                return cabfile;
+        }
+    }
+
+    /* nothing found */
+    return NULL;
 }
 
 static gint
