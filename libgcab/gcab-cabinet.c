@@ -448,7 +448,7 @@ gcab_cabinet_load (GCabCabinet *self,
             cfolder->reserved = NULL;
         }
 
-        GCabFolder *folder = gcab_folder_new_steal_cfolder (&cfolder, stream);
+        GCabFolder *folder = gcab_folder_new_steal_cfolder (&cfolder);
         if (blob != NULL)
             g_object_set (folder, "reserved", blob, NULL);
         g_ptr_array_add (self->folders, folder);
@@ -519,9 +519,13 @@ gcab_cabinet_extract (GCabCabinet *self,
         return FALSE;
     }
 
+    g_autoptr(GDataInputStream) data = g_data_input_stream_new (self->stream);
+    g_data_input_stream_set_byte_order (data, G_DATA_STREAM_BYTE_ORDER_LITTLE_ENDIAN);
+    g_filter_input_stream_set_close_base_stream (G_FILTER_INPUT_STREAM (data), FALSE);
+
     for (guint i = 0; i < self->folders->len; ++i) {
         GCabFolder *folder = g_ptr_array_index (self->folders, i);
-        if (!gcab_folder_extract (folder, path, self->cheader->res_data,
+        if (!gcab_folder_extract (folder, data, path, self->cheader->res_data,
                                   file_callback, progress_callback, user_data,
                                   cancellable, error)) {
             return FALSE;

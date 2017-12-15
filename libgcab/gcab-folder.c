@@ -54,7 +54,6 @@ struct _GCabFolder
     gint comptype;
     GByteArray *reserved;
     cfolder_t *cfolder;
-    GInputStream *stream;
 };
 
 enum {
@@ -84,8 +83,6 @@ gcab_folder_finalize (GObject *object)
     g_hash_table_unref (self->hash);
     if (self->reserved)
         g_byte_array_unref (self->reserved);
-    if (self->stream)
-        g_object_unref (self->stream);
 
     G_OBJECT_CLASS (gcab_folder_parent_class)->finalize (object);
 }
@@ -341,15 +338,13 @@ gcab_folder_new (gint comptype)
 }
 
 G_GNUC_INTERNAL GCabFolder *
-gcab_folder_new_steal_cfolder (cfolder_t **cfolder, GInputStream *stream)
+gcab_folder_new_steal_cfolder (cfolder_t **cfolder)
 {
     g_return_val_if_fail (cfolder != NULL, NULL);
-    g_return_val_if_fail (G_IS_INPUT_STREAM (stream), NULL);
 
     GCabFolder *self = g_object_new (GCAB_TYPE_FOLDER,
                                      "comptype", (*cfolder)->typecomp,
                                      NULL);
-    self->stream = g_object_ref (stream);
     self->cfolder = g_steal_pointer (cfolder);
 
     return self;
@@ -382,6 +377,7 @@ sort_by_offset (GCabFile *a, GCabFile *b)
 
 G_GNUC_INTERNAL gboolean
 gcab_folder_extract (GCabFolder *self,
+                     GDataInputStream *data,
                      GFile *path,
                      guint8 res_data,
                      GCabFileCallback file_callback,
@@ -391,7 +387,6 @@ gcab_folder_extract (GCabFolder *self,
                      GError **error)
 {
     GError *my_error = NULL;
-    g_autoptr(GDataInputStream) data = NULL;
     g_autoptr(GFileOutputStream) out = NULL;
     GSList *f = NULL;
     g_autoptr(GSList) files = NULL;
@@ -400,10 +395,6 @@ gcab_folder_extract (GCabFolder *self,
 
     /* never loaded from a stream */
     g_assert (self->cfolder != NULL);
-
-    data = g_data_input_stream_new (self->stream);
-    g_data_input_stream_set_byte_order (data, G_DATA_STREAM_BYTE_ORDER_LITTLE_ENDIAN);
-    g_filter_input_stream_set_close_base_stream (G_FILTER_INPUT_STREAM (data), FALSE);
 
     if (!g_seekable_seek (G_SEEKABLE (data), self->cfolder->offsetdata, G_SEEK_SET, cancellable, error))
         return FALSE;

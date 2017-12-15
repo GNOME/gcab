@@ -40,7 +40,7 @@
                                           _GCAB_GET (data, 1, 32,  8) |  \
                                           _GCAB_GET (data, 0, 32,  0))
 
-GCabFolder *     gcab_folder_new_steal_cfolder       (cfolder_t **cfolder, GInputStream *stream);
+GCabFolder *     gcab_folder_new_steal_cfolder       (cfolder_t **cfolder);
 GCabFile *       gcab_file_new_steal_cfile           (cfile_t   **cfile);
 
 gboolean         gcab_file_update_info               (GCabFile *file, GFileInfo *info);
@@ -53,6 +53,7 @@ void             gcab_file_add_attribute             (GCabFile *file, guint32 at
 
 gsize            gcab_folder_get_ndatablocks         (GCabFolder *folder);
 gboolean         gcab_folder_extract                 (GCabFolder *self,
+                                                      GDataInputStream *data,
                                                       GFile *path,
                                                       guint8 res_data,
                                                       GCabFileCallback file_callback,
