@@ -389,6 +389,46 @@ gcab_file_get_input_stream (GCabFile *self, GCancellable *cancellable, GError **
     return NULL;
 }
 
+G_GNUC_INTERNAL GOutputStream *
+gcab_file_get_output_stream (GCabFile *self,
+                             GFile *path_extract,
+                             GCancellable *cancellable,
+                             GError **error)
+{
+    /* make path have UNIX directory slashes */
+    g_autofree gchar *fname = g_strdup (gcab_file_get_extract_name (self));
+    g_strdelimit (fname, "\\", '/');
+
+    /* "Rebase" the file in the given path, to ensure we never escape it */
+    g_autoptr(GFile) file = g_file_resolve_relative_path (path_extract, fname);
+    if (!g_file_has_prefix (file, path_extract)) {
+        g_autofree gchar *rawpath = g_file_get_path (file);
+        if (rawpath != NULL) {
+            char *newpath = rawpath;
+            while (*newpath != 0 && *newpath == G_DIR_SEPARATOR) {
+                newpath++;
+            }
+            g_autoptr(GFile) newfile = g_file_resolve_relative_path (path_extract, newpath);
+            g_set_object (&file, newfile);
+        }
+    }
+
+    /* create parent directories */
+    g_autoptr(GFile) parent = g_file_get_parent (file);
+    g_autoptr(GError) error_local = NULL;
+    if (!g_file_make_directory_with_parents (parent, cancellable, &error_local)) {
+        if (!g_error_matches (error_local, G_IO_ERROR, G_IO_ERROR_EXISTS)) {
+            g_propagate_error (error, g_steal_pointer (&error_local));
+            return NULL;
+        }
+    }
+
+    /* write to a file */
+    return G_OUTPUT_STREAM (g_file_replace (file, NULL, FALSE,
+                                            G_FILE_CREATE_REPLACE_DESTINATION,
+                                            cancellable, error));
+}
+
 /**
  * gcab_file_get_extract_name:
  * @file: a #GCabFile

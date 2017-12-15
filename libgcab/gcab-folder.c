@@ -378,7 +378,7 @@ sort_by_offset (GCabFile *a, GCabFile *b)
 G_GNUC_INTERNAL gboolean
 gcab_folder_extract (GCabFolder *self,
                      GDataInputStream *data,
-                     GFile *path,
+                     GFile *path_extract,
                      guint8 res_data,
                      GCabFileCallback file_callback,
                      GFileProgressCallback progress_callback,
@@ -386,8 +386,6 @@ gcab_folder_extract (GCabFolder *self,
                      GCancellable *cancellable,
                      GError **error)
 {
-    GError *my_error = NULL;
-    g_autoptr(GFileOutputStream) out = NULL;
     GSList *f = NULL;
     g_autoptr(GSList) files = NULL;
     g_autoptr(cdata_t) cdata = g_new0 (cdata_t, 1);
@@ -407,41 +405,9 @@ gcab_folder_extract (GCabFolder *self,
         if (file_callback && !file_callback (file, callback_data))
             continue;
 
-        g_autofree gchar *fname = g_strdup (gcab_file_get_extract_name (file));
-        int i = 0, len = strlen (fname);
-        for (i = 0; i < len; i++)
-            if (fname[i] == '\\')
-                fname[i] = '/';
-
-        g_autoptr(GFile) gfile = g_file_resolve_relative_path (path, fname);
-
-        if (!g_file_has_prefix (gfile, path)) {
-            // "Rebase" the file in the given path, to ensure we never escape it
-            g_autofree gchar *rawpath = g_file_get_path (gfile);
-            if (rawpath != NULL) {
-                char *newpath = rawpath;
-                while (*newpath != 0 && *newpath == G_DIR_SEPARATOR) {
-                    newpath++;
-                }
-                g_autoptr(GFile) newgfile = g_file_resolve_relative_path (path, newpath);
-                g_set_object (&gfile, newgfile);
-            }
-        }
-
-        g_autoptr(GFile) parent = g_file_get_parent (gfile);
-
-        if (!g_file_make_directory_with_parents (parent, cancellable, &my_error)) {
-            if (g_error_matches (my_error, G_IO_ERROR, G_IO_ERROR_EXISTS))
-                g_clear_error (&my_error);
-            else {
-                g_propagate_error (error, my_error);
-                return FALSE;
-            }
-        }
-
-        g_autoptr(GFileOutputStream) out2 = NULL;
-        out2 = g_file_replace (gfile, NULL, FALSE, G_FILE_CREATE_REPLACE_DESTINATION, cancellable, error);
-        if (!out2)
+        g_autoptr(GOutputStream) out = NULL;
+        out = gcab_file_get_output_stream (file, path_extract, cancellable, error);
+        if (out == NULL)
             return FALSE;
 
         guint32 usize = gcab_file_get_usize (file);
@@ -468,7 +434,7 @@ gcab_folder_extract (GCabFolder *self,
                     gcab_file_get_uoffset (file) - nubytes : 0;
                 const void *p = &cdata->out[offset];
                 gsize count = MIN (usize, cdata->nubytes - offset);
-                if (!g_output_stream_write_all (G_OUTPUT_STREAM (out2), p, count,
+                if (!g_output_stream_write_all (G_OUTPUT_STREAM (out), p, count,
                                                 NULL, cancellable, error))
                     return FALSE;
                 usize -= count;
