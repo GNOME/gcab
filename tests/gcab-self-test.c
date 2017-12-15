@@ -119,6 +119,12 @@ gcab_test_folder_func (void)
     ret = gcab_folder_add_file (cabfolder, cabfile2, FALSE, NULL, &error);
     g_assert_error (error, GCAB_ERROR, GCAB_ERROR_FORMAT);
     g_assert (!ret);
+
+    /* find using the hash table */
+    cabfile_tmp = gcab_folder_get_file_by_name (cabfolder, "test.bin");
+    g_assert_nonnull (cabfile_tmp);
+    cabfile_tmp = gcab_folder_get_file_by_name (cabfolder, "notgoingtoexist");
+    g_assert_null (cabfile_tmp);
 }
 
 static void

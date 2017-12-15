@@ -366,6 +366,23 @@ gcab_folder_get_files (GCabFolder *self)
     return g_slist_reverse (g_slist_copy (self->files));
 }
 
+/**
+ * gcab_folder_get_file_by_name:
+ * @cabfolder: a #GCabFolder
+ * @name: a file name
+ *
+ * Gets a specific #GCabFile files contained in the @cabfolder.
+ *
+ * Returns: (transfer none): A #GCabFile, or %NULL if not found
+ **/
+GCabFile *
+gcab_folder_get_file_by_name (GCabFolder *self, const gchar *name)
+{
+    g_return_val_if_fail (GCAB_IS_FOLDER (self), NULL);
+    g_return_val_if_fail (name != NULL, NULL);
+    return g_hash_table_lookup (self->hash, name);
+}
+
 static gint
 sort_by_offset (GCabFile *a, GCabFile *b)
 {
