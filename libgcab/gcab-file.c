@@ -305,6 +305,22 @@ gcab_file_get_attributes (GCabFile *self)
 }
 
 /**
+ * gcab_file_set_attributes:
+ * @file: a #GCabFile
+ * @attr: the attributes, e.g. %GCAB_FILE_ATTRIBUTE_RDONLY
+ *
+ * Set the file attributes.
+ *
+ * Since: 1.0
+ **/
+void
+gcab_file_set_attributes (GCabFile *self, guint32 attr)
+{
+    g_return_if_fail (GCAB_IS_FILE (self));
+    self->cfile->fattr = attr;
+}
+
+/**
  * gcab_file_get_name:
  * @file: a #GCabFile
  *

@@ -74,6 +74,7 @@ gboolean        gcab_file_get_date                  (GCabFile *file, GTimeVal *r
 const gchar *   gcab_file_get_extract_name          (GCabFile *file);
 void            gcab_file_set_extract_name          (GCabFile *file, const gchar *name);
 void            gcab_file_set_date                  (GCabFile *file, const GTimeVal *tv);
+void            gcab_file_set_attributes            (GCabFile *file, guint32 attr);
 
 G_END_DECLS
 
