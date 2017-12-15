@@ -61,5 +61,8 @@ gboolean         gcab_folder_extract                 (GCabFolder *self,
                                                       gpointer callback_data,
                                                       GCancellable *cancellable,
                                                       GError **error);
+GInputStream    *gcab_file_get_input_stream          (GCabFile *file,
+                                                      GCancellable *cancellable,
+                                                      GError **error);
 
 #endif /* GCAB_PRIV_H */

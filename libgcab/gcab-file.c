@@ -376,6 +376,19 @@ gcab_file_new_steal_cfile (cfile_t **cfile)
     return file;
 }
 
+G_GNUC_INTERNAL GInputStream *
+gcab_file_get_input_stream (GCabFile *self, GCancellable *cancellable, GError **error)
+{
+    /* backed by a GFile */
+    if (self->file != NULL)
+        return G_INPUT_STREAM (g_file_read (self->file, cancellable, error));
+
+    /* nothing to do */
+    g_set_error (error, GCAB_ERROR, GCAB_ERROR_FORMAT,
+                 "No GFile for %s", gcab_file_get_name (self));
+    return NULL;
+}
+
 /**
  * gcab_file_get_extract_name:
  * @file: a #GCabFile
