@@ -461,6 +461,14 @@ gcab_folder_extract (GCabFolder *self,
 
         if (!g_output_stream_close (out, cancellable, error))
             return FALSE;
+
+        /* no backing GFile */
+        if (path_extract == NULL) {
+            g_autoptr(GBytes) blob = NULL;
+            blob = g_memory_output_stream_steal_as_bytes (G_MEMORY_OUTPUT_STREAM (out));
+            gcab_file_set_bytes (file, blob);
+        }
+
     }
 
     return TRUE;

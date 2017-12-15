@@ -22,6 +22,7 @@
 
 #include <limits.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include <libgcab.h>
 
@@ -254,6 +255,76 @@ _compute_checksum_for_file (GFile *file, GError **error)
 }
 
 static void
+gcab_test_cabinet_blob_func (void)
+{
+    gboolean ret;
+    g_autoptr(GError) error = NULL;
+    g_autoptr(GCabCabinet) cabinet = gcab_cabinet_new ();
+
+    /* create folder and add to cabinet */
+    g_autoptr(GCabFolder) folder = gcab_folder_new (GCAB_COMPRESSION_NONE);
+    ret = gcab_cabinet_add_folder (cabinet, folder, &error);
+    g_assert_no_error (error);
+    g_assert (ret);
+
+    /* add the two files */
+    struct {
+        const gchar *fn;
+        const gchar *contents;
+    } files[] = {
+        { "test.sh",            "echo ola\n" },
+        { "test.txt",           "Ola!\n" },
+        { NULL,                 NULL }
+    };
+    for (guint i = 0; files[i].fn != NULL; i++) {
+        g_autoptr(GBytes) bytes_tmp = g_bytes_new_static (files[i].contents,
+                                                          strlen (files[i].contents));
+        g_autoptr(GCabFile) cabfile = gcab_file_new_with_bytes (files[i].fn, bytes_tmp);
+
+        /* set the time and attributes */
+        g_autoptr(GDateTime) dt = dt = g_date_time_new_utc (2017, 9, 15, 0, 0, 0.f);
+        GTimeVal tv;
+        ret = g_date_time_to_timeval (dt, &tv);
+        g_assert (ret);
+        gcab_file_set_date (cabfile, &tv);
+        gcab_file_set_attributes (cabfile, GCAB_FILE_ATTRIBUTE_ARCH);
+
+        /* add file to folder */
+        ret = gcab_folder_add_file (folder, cabfile, FALSE, NULL, &error);
+        g_assert_no_error (error);
+        g_assert (ret);
+    }
+
+    /* write to a blob */
+    g_autoptr(GOutputStream) op = g_memory_output_stream_new_resizable ();
+    ret = gcab_cabinet_write_simple (cabinet, op, NULL, NULL, NULL, &error);
+    g_assert_no_error (error);
+    g_assert (ret);
+
+    /* get what the checksum is supposed to be */
+    g_autofree gchar *fn = gcab_test_get_filename ("test-none.cab");
+    g_assert (fn != NULL);
+    g_autoptr(GFile) file = g_file_new_for_path (fn);
+    g_assert (file != NULL);
+    g_autofree gchar *checksum = _compute_checksum_for_file (file, &error);
+    g_assert_no_error (error);
+    g_assert (checksum != NULL);
+
+    /* write for debugging */
+    ret = g_output_stream_close (op, NULL, &error);
+    g_assert_no_error (error);
+    g_assert (ret);
+    g_autoptr(GBytes) blob = g_memory_output_stream_steal_as_bytes (G_MEMORY_OUTPUT_STREAM (op));
+    ret = g_file_set_contents ("/tmp/test-none.cab", g_bytes_get_data (blob, NULL), g_bytes_get_size (blob), &error);
+    g_assert_no_error (error);
+    g_assert (ret);
+
+    /* verify the checksum */
+    g_autofree gchar *csum = g_compute_checksum_for_bytes (G_CHECKSUM_SHA1, blob);
+    g_assert_cmpstr (csum, ==, checksum);
+}
+
+static void
 gcab_test_cabinet_load_func (void)
 {
     struct {
@@ -304,6 +375,14 @@ gcab_test_cabinet_load_func (void)
         cabfolder_tmp = g_ptr_array_index (cabfolders, 0);
         g_assert_cmpint (gcab_folder_get_comptype (cabfolder_tmp), ==, tests[i].comptype);
 
+        g_autoptr(GSList) cabfiles = gcab_folder_get_files (cabfolder_tmp);
+        for (GSList *l = cabfiles; l != NULL; l = l->next) {
+            GCabFile *cabfile = GCAB_FILE (l->data);
+            g_assert_null (gcab_file_get_file (cabfile));
+            g_assert_null (gcab_file_get_bytes (cabfile));
+            g_assert_cmpint (gcab_file_get_attributes (cabfile), ==, GCAB_FILE_ATTRIBUTE_ARCH);
+        }
+
         file_tmpdir = g_file_new_for_path ("/tmp");
         ret = gcab_cabinet_extract_simple (cabinet, file_tmpdir, NULL, NULL, NULL, &error);
         g_assert_no_error (error);
@@ -316,6 +395,21 @@ gcab_test_cabinet_load_func (void)
             g_autofree gchar *csum = _compute_checksum_for_file (file_dst, &error);
             g_assert_no_error (error);
             g_assert (csum != NULL);
+            g_assert_cmpstr (csum, ==, files[j].checksum);
+        }
+
+        /* extract again to a memory blob on each GCabFile */
+        ret = gcab_cabinet_extract_simple (cabinet, NULL, NULL, NULL, NULL, &error);
+        g_assert_no_error (error);
+        g_assert (ret);
+
+        /* check each blob checksum */
+        for (guint j = 0; files[j].fn != NULL; j++) {
+            GCabFile *cabfile = gcab_folder_get_file_by_name (cabfolder_tmp, files[j].fn);
+            g_assert_nonnull (cabfile);
+            GBytes *blob = gcab_file_get_bytes (cabfile);
+            g_assert_nonnull (blob);
+            g_autofree gchar *csum = g_compute_checksum_for_bytes (G_CHECKSUM_SHA1, blob);
             g_assert_cmpstr (csum, ==, files[j].checksum);
         }
     }
@@ -495,6 +589,7 @@ main (int argc, char **argv)
     g_test_add_func ("/GCab/cabinet{error-cves}", gcab_test_cabinet_error_cves_func);
     g_test_add_func ("/GCab/cabinet{load}", gcab_test_cabinet_load_func);
     g_test_add_func ("/GCab/cabinet{write}", gcab_test_cabinet_write_func);
+    g_test_add_func ("/GCab/cabinet{blob}", gcab_test_cabinet_blob_func);
     g_test_add_func ("/GCab/cabinet{signature}", gcab_test_cabinet_signature_func);
     return g_test_run ();
 }

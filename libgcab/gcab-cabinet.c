@@ -478,7 +478,7 @@ gcab_cabinet_load (GCabCabinet *self,
 /**
  * gcab_cabinet_extract:
  * @cabinet: a #GCabCabinet
- * @path: the path to extract files
+ * @path: the path to extract files, or %NULL
  * @file_callback: (allow-none) (scope call) (closure user_data): an optional #GCabFile callback,
  *     return %FALSE to filter out or skip files.
  * @progress_callback: (allow-none) (scope call) (closure user_data): a progress callback
@@ -488,6 +488,9 @@ gcab_cabinet_load (GCabCabinet *self,
  * @error: (allow-none): #GError to set on error, or %NULL
  *
  * Extract files to given path.
+ *
+ * If @path is NULL then the files are decompressed to memory blobs stored on
+ * each #GCabFile.
  *
  * Returns: %TRUE on success.
  **/
@@ -501,7 +504,7 @@ gcab_cabinet_extract (GCabCabinet *self,
                       GError **error)
 {
     g_return_val_if_fail (GCAB_IS_CABINET (self), FALSE);
-    g_return_val_if_fail (G_IS_FILE (path), FALSE);
+    g_return_val_if_fail (!path || G_IS_FILE (path), FALSE);
     g_return_val_if_fail (!cancellable || G_IS_CANCELLABLE (cancellable), FALSE);
     g_return_val_if_fail (!error || *error == NULL, FALSE);
 

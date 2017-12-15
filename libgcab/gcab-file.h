@@ -66,7 +66,9 @@ typedef enum
 typedef gboolean (*GCabFileCallback) (GCabFile *file, gpointer user_data);
 
 GCabFile *      gcab_file_new_with_file             (const gchar *name, GFile *file);
+GCabFile *      gcab_file_new_with_bytes            (const gchar *name, GBytes *bytes);
 GFile *         gcab_file_get_file                  (GCabFile *file);
+GBytes *        gcab_file_get_bytes                 (GCabFile *file);
 const gchar *   gcab_file_get_name                  (GCabFile *file);
 guint32         gcab_file_get_size                  (GCabFile *file);
 guint32         gcab_file_get_attributes            (GCabFile *file);
