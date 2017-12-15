@@ -154,10 +154,11 @@ gboolean     cdata_read                         (cdata_t *cd,
                                                  GDataInputStream *in,
                                                  GCancellable *cancellable,
                                                  GError **error);
-void         cdata_finish                       (cdata_t *cd, GError **error);
+void         cdata_free                         (cdata_t *cd);
 
 G_DEFINE_AUTOPTR_CLEANUP_FUNC(cfolder_t, cfolder_free)
 G_DEFINE_AUTOPTR_CLEANUP_FUNC(cfile_t, cfile_free)
 G_DEFINE_AUTOPTR_CLEANUP_FUNC(cheader_t, cheader_free)
+G_DEFINE_AUTOPTR_CLEANUP_FUNC(cdata_t, cdata_free)
 
 #endif /* CABINET_H */

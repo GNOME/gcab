@@ -496,25 +496,21 @@ cdata_write (cdata_t *cd, GDataOutputStream *out, int type,
 }
 
 G_GNUC_INTERNAL void
-cdata_finish (cdata_t *cd, GError **error)
+cdata_free (cdata_t *cd)
 {
     z_stream *z = &cd->z;
-    int zret;
 
     if (cd->decomp.comptype == GCAB_COMPRESSION_LZX) {
         LZXfdi_clear (&cd->decomp);
-        return;
     }
 
-    if (!z->opaque)
-        return;
-
-    zret = inflateEnd (z);
-    z->opaque = NULL;
-
-    if (zret != Z_OK)
-        g_set_error (error, GCAB_ERROR, GCAB_ERROR_FAILED,
-                     "zlib failed: %s", zError (zret));
+    if (cd->decomp.comptype == GCAB_COMPRESSION_MSZIP) {
+        if (z->opaque) {
+            inflateEnd (z);
+            z->opaque = NULL;
+        }
+    }
+    g_free (cd);
 }
 
 static gint

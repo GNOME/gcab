@@ -391,12 +391,11 @@ gcab_folder_extract (GCabFolder *self,
                      GError **error)
 {
     GError *my_error = NULL;
-    gboolean success = FALSE;
     g_autoptr(GDataInputStream) data = NULL;
     g_autoptr(GFileOutputStream) out = NULL;
     GSList *f = NULL;
     g_autoptr(GSList) files = NULL;
-    cdata_t cdata = { 0, };
+    g_autoptr(cdata_t) cdata = g_new0 (cdata_t, 1);
     guint32 nubytes = 0;
 
     /* never loaded from a stream */
@@ -407,7 +406,7 @@ gcab_folder_extract (GCabFolder *self,
     g_filter_input_stream_set_close_base_stream (G_FILTER_INPUT_STREAM (data), FALSE);
 
     if (!g_seekable_seek (G_SEEKABLE (data), self->cfolder->offsetdata, G_SEEK_SET, cancellable, error))
-        goto end;
+        return FALSE;
 
     files = g_slist_sort (g_slist_copy (self->files), (GCompareFunc)sort_by_offset);
 
@@ -445,14 +444,14 @@ gcab_folder_extract (GCabFolder *self,
                 g_clear_error (&my_error);
             else {
                 g_propagate_error (error, my_error);
-                goto end;
+                return FALSE;
             }
         }
 
         g_autoptr(GFileOutputStream) out2 = NULL;
         out2 = g_file_replace (gfile, NULL, FALSE, G_FILE_CREATE_REPLACE_DESTINATION, cancellable, error);
         if (!out2)
-            goto end;
+            return FALSE;
 
         guint32 usize = gcab_file_get_usize (file);
         guint32 uoffset = gcab_file_get_uoffset (file);
@@ -461,36 +460,31 @@ gcab_folder_extract (GCabFolder *self,
         if (uoffset < nubytes) {
             if (!g_seekable_seek (G_SEEKABLE (data), self->cfolder->offsetdata,
                                   G_SEEK_SET, cancellable, error))
-                goto end;
-            bzero(&cdata, sizeof(cdata));
+                return FALSE;
+            bzero(cdata, sizeof(cdata_t));
             nubytes = 0;
         }
 
         while (usize > 0) {
-            if ((nubytes + cdata.nubytes) <= uoffset) {
-                nubytes += cdata.nubytes;
-                if (!cdata_read (&cdata, res_data, self->comptype,
+            if ((nubytes + cdata->nubytes) <= uoffset) {
+                nubytes += cdata->nubytes;
+                if (!cdata_read (cdata, res_data, self->comptype,
                                  data, cancellable, error))
-                    goto end;
+                    return FALSE;
                 continue;
             } else {
                 gsize offset = gcab_file_get_uoffset (file) > nubytes ?
                     gcab_file_get_uoffset (file) - nubytes : 0;
-                const void *p = &cdata.out[offset];
-                gsize count = MIN (usize, cdata.nubytes - offset);
+                const void *p = &cdata->out[offset];
+                gsize count = MIN (usize, cdata->nubytes - offset);
                 if (!g_output_stream_write_all (G_OUTPUT_STREAM (out2), p, count,
                                                 NULL, cancellable, error))
-                    goto end;
+                    return FALSE;
                 usize -= count;
                 uoffset += count;
             }
         }
     }
 
-    success = TRUE;
-
-end:
-    cdata_finish (&cdata, NULL);
-
-    return success;
+    return TRUE;
 }
