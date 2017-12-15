@@ -441,6 +441,9 @@ gcab_folder_extract (GCabFolder *self,
                 uoffset += count;
             }
         }
+
+        if (!g_output_stream_close (out, cancellable, error))
+            return FALSE;
     }
 
     return TRUE;
