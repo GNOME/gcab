@@ -490,20 +490,40 @@ cdata_read (cdata_t *cd, guint8 res_data, gint comptype,
     gboolean success = FALSE;
     int ret, zret = Z_OK;
     gint compression = comptype & GCAB_COMPRESSION_MASK;
-    guint8 *buf = compression == GCAB_COMPRESSION_NONE ? cd->out : cd->in;
+    gsize buf_sz;
+    guint8 *buf = NULL;
     guint32 datacsum;
     guint8 sizecsum[4];
     guint16 nbytes_le;
 
-    if (compression > GCAB_COMPRESSION_MSZIP &&
-        compression != GCAB_COMPRESSION_LZX) {
+    /* decompress directly into ->out for no decompression */
+    switch (compression) {
+    case GCAB_COMPRESSION_NONE:
+        buf = cd->out;
+        buf_sz = sizeof(cd->out);
+        break;
+    case GCAB_COMPRESSION_MSZIP:
+    case GCAB_COMPRESSION_LZX:
+        buf = cd->in;
+        buf_sz = sizeof(cd->in);
+        break;
+    default:
         g_set_error (error, GCAB_ERROR, GCAB_ERROR_FAILED,
                      _("unsupported compression method %d"), compression);
-        return FALSE;
+        break;
     }
+    if (buf == NULL)
+        return FALSE;
 
     R4 (cd->checksum);
     R2 (cd->ncbytes);
+    if (cd->ncbytes > buf_sz) {
+        g_set_error (error, GCAB_ERROR, GCAB_ERROR_FAILED,
+                     "tried to decompress %" G_GUINT16_FORMAT " bytes "
+                     "into buffer of size %" G_GSIZE_FORMAT,
+                     cd->ncbytes, buf_sz);
+        return FALSE;
+    }
     R2 (cd->nubytes);
     cd->reserved = g_malloc (res_data);
     RN (cd->reserved, res_data);
