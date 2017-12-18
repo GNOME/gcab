@@ -567,6 +567,13 @@ cdata_read (cdata_t *cd, guint8 res_data, gint comptype,
         return FALSE;
     }
     R2 (cd->nubytes);
+    if (cd->nubytes > CAB_BLOCKMAX) {
+        g_set_error (error, GCAB_ERROR, GCAB_ERROR_INVALID_DATA,
+                     "CDATA block of %" G_GUINT16_FORMAT " bytes "
+                     "was bigger than maximum size %i",
+                     cd->nubytes, CAB_BLOCKMAX);
+        return FALSE;
+    }
     RN (cd->reserved, res_data);
     RN (buf, cd->ncbytes);
 
