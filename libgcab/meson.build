@@ -80,6 +80,7 @@ if get_option('introspection')
     nsversion : '1.0',
     namespace : 'GCab',
     symbol_prefix : 'gcab',
+    header : 'libgcab.h',
     identifier_prefix : 'GCab',
     export_packages : 'libgcab',
     dependencies : [
