@@ -69,6 +69,7 @@ pkgg.generate(
 if get_option('introspection')
   gir = gnome.generate_gir(libgcab,
     sources : [
+      enums,
       'gcab-cabinet.c',
       'gcab-cabinet.h',
       'gcab-folder.c',
