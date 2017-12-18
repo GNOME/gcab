@@ -532,6 +532,7 @@ cdata_read (cdata_t *cd, guint8 res_data, gint comptype,
     gint compression = comptype & GCAB_COMPRESSION_MASK;
     guint8 *buf = compression == GCAB_COMPRESSION_NONE ? cd->out : cd->in;
     guint32 datacsum;
+    guint32 checksum_tmp;
     guint8 sizecsum[4];
     guint16 nbytes_le;
 
@@ -554,10 +555,15 @@ cdata_read (cdata_t *cd, guint8 res_data, gint comptype,
     memcpy (&sizecsum[0], &nbytes_le, 2);
     nbytes_le = GUINT16_TO_LE (cd->nubytes);
     memcpy (&sizecsum[2], &nbytes_le, 2);
-    if (_enforce_checksum () && cd->checksum != compute_checksum (sizecsum, sizeof(sizecsum), datacsum)) {
-        g_set_error_literal (error, GCAB_ERROR, GCAB_ERROR_INVALID_DATA,
-                             "incorrect checksum detected");
-        return FALSE;
+    checksum_tmp = compute_checksum (sizecsum, sizeof(sizecsum), datacsum);
+    if (cd->checksum != checksum_tmp) {
+        if (_enforce_checksum ()) {
+            g_set_error_literal (error, GCAB_ERROR, GCAB_ERROR_INVALID_DATA,
+                                 "incorrect checksum detected");
+            return FALSE;
+        }
+        if (g_getenv ("GCAB_DEBUG"))
+            g_debug ("CDATA checksum 0x%08x", (guint) checksum_tmp);
     }
 
     if (g_getenv ("GCAB_DEBUG")) {
