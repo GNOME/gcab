@@ -434,6 +434,9 @@ gcab_folder_extract (GCabFolder *self,
 
     files = g_slist_sort (g_slist_copy (self->files), (GCompareFunc)sort_by_offset);
 
+    /* this is allocated for every block, but currently unused */
+    cdata->reserved = g_malloc (res_data);
+
     for (f = files; f != NULL; f = f->next) {
         GCabFile *file = f->data;
 
@@ -453,7 +456,6 @@ gcab_folder_extract (GCabFolder *self,
             if (!g_seekable_seek (G_SEEKABLE (data), self->cfolder->offsetdata,
                                   G_SEEK_SET, cancellable, error))
                 return FALSE;
-            bzero(cdata, sizeof(cdata_t));
             nubytes = 0;
         }
 

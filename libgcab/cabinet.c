@@ -510,6 +510,7 @@ cdata_free (cdata_t *cd)
             z->opaque = NULL;
         }
     }
+    g_free (cd->reserved);
     g_free (cd);
 }
 
@@ -546,7 +547,6 @@ cdata_read (cdata_t *cd, guint8 res_data, gint comptype,
     R4 (cd->checksum);
     R2 (cd->ncbytes);
     R2 (cd->nubytes);
-    cd->reserved = g_malloc (res_data);
     RN (cd->reserved, res_data);
     RN (buf, cd->ncbytes);
 
