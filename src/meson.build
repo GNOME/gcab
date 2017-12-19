@@ -25,3 +25,21 @@ executable(
   install : true,
   install_dir : get_option('bindir')
 )
+
+executable(
+  'gcab-fuzz',
+  sources : [
+    'gcab-fuzz.c',
+  ],
+  include_directories : [
+    include_directories('..'),
+    include_directories('../libgcab'),
+  ],
+  dependencies : [
+    gio,
+  ],
+  link_with : [
+    libgcab,
+  ],
+  c_args : cargs,
+)
