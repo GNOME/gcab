@@ -43,6 +43,7 @@ LIBGCAB1_0.6 {
 } LIBGCAB1_0.5;
 
 LIBGCAB1_1.0 {
+        gcab_cabinet_get_size;
         gcab_file_get_bytes;
         gcab_file_new_with_bytes;
         gcab_file_set_attributes;

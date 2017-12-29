@@ -70,6 +70,7 @@ gboolean           gcab_cabinet_load          (GCabCabinet *cabinet,
                                                GError **error);
 
 GPtrArray *        gcab_cabinet_get_folders   (GCabCabinet *cabinet);
+guint32            gcab_cabinet_get_size      (GCabCabinet *cabinet);
 
 gboolean           gcab_cabinet_add_folder    (GCabCabinet *cabinet,
                                                GCabFolder *folder,

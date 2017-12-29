@@ -217,6 +217,7 @@ gcab_test_cabinet_func (void)
 
     /* create cabinet */
     cabinet = gcab_cabinet_new ();
+    g_assert_cmpint (gcab_cabinet_get_size (cabinet), ==, 0);
 
     /* add folder */
     folder = gcab_folder_new (GCAB_COMPRESSION_NONE);
@@ -335,12 +336,13 @@ gcab_test_cabinet_load_func (void)
 {
     struct {
         const gchar *fn;
+        guint32 size;
         GCabCompression comptype;
     } tests[] = {
-        { "test-none.cab",          GCAB_COMPRESSION_NONE },
-        { "test-mszip.cab",         GCAB_COMPRESSION_MSZIP },
-        { "test-signed.cab",        GCAB_COMPRESSION_NONE },
-        { NULL,                     0 }
+        { "test-none.cab",          115,    GCAB_COMPRESSION_NONE },
+        { "test-mszip.cab",         119,    GCAB_COMPRESSION_MSZIP },
+        { "test-signed.cab",        139,    GCAB_COMPRESSION_NONE },
+        { NULL,                     0,      0 }
     };
 
     for (guint i = 0; tests[i].fn != NULL; i++) {
@@ -374,6 +376,9 @@ gcab_test_cabinet_load_func (void)
         ret = gcab_cabinet_load (cabinet, in, NULL, &error);
         g_assert_no_error (error);
         g_assert (ret);
+
+        /* check size */
+        g_assert_cmpint (gcab_cabinet_get_size (cabinet), ==, tests[i].size);
 
         cabfolders = gcab_cabinet_get_folders (cabinet);
         g_assert (cabfolders != NULL);
@@ -495,11 +500,12 @@ gcab_test_cabinet_write_func (void)
 {
     struct {
         const gchar *fn;
+        guint32 size;
         GCabCompression comptype;
     } tests[] = {
-        { "test-none.cab",          GCAB_COMPRESSION_NONE },
-        { "test-mszip.cab",         GCAB_COMPRESSION_MSZIP },
-        { NULL,                     0 }
+        { "test-none.cab",          115,    GCAB_COMPRESSION_NONE },
+        { "test-mszip.cab",         119,    GCAB_COMPRESSION_MSZIP },
+        { NULL,                     0,      0 }
     };
 
     for (guint i = 0; tests[i].fn != NULL; i++) {
@@ -560,6 +566,9 @@ gcab_test_cabinet_write_func (void)
         ret = gcab_cabinet_write_simple (cabinet, op, NULL, NULL, NULL, &error);
         g_assert_no_error (error);
         g_assert (ret);
+
+        /* check size */
+        g_assert_cmpint (gcab_cabinet_get_size (cabinet), ==, tests[i].size);
 
         /* compare checksums */
         fn_in = gcab_test_get_filename (tests[i].fn);

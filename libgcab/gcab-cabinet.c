@@ -201,6 +201,24 @@ gcab_cabinet_get_folders (GCabCabinet *self)
 }
 
 /**
+ * gcab_cabinet_get_size:
+ * @cabinet:a #GCabCabinet
+ *
+ * Get the size of the compressed cabinet file.
+ *
+ * Returns: size in bytes
+ *
+ * Since: 1.0
+ **/
+guint32
+gcab_cabinet_get_size (GCabCabinet *self)
+{
+    if (self->cheader == NULL)
+        return 0;
+    return self->cheader->size;
+}
+
+/**
  * gcab_cabinet_write:
  * @cabinet: a #GCabCabinet
  * @stream: a #GOutputStream also #GSeekable
@@ -224,10 +242,7 @@ gcab_cabinet_write (GCabCabinet *self,
                     GCancellable *cancellable,
                     GError **error)
 {
-    cheader_t header = {
-        .offsetfiles = CFI_START, // CFHEADER + 1 * CFFOLDER
-        .nfolders = 1, // a single CAB folder is enough
-    };
+    g_autoptr(cheader_t) cheader = g_new0 (cheader_t, 1);
     cfolder_t folder = { 0, };
 
     g_return_val_if_fail (GCAB_IS_CABINET (self), FALSE);
@@ -235,6 +250,10 @@ gcab_cabinet_write (GCabCabinet *self,
     g_return_val_if_fail (G_IS_SEEKABLE (out), FALSE);
     g_return_val_if_fail (!cancellable || G_IS_CANCELLABLE (cancellable), FALSE);
     g_return_val_if_fail (!error || *error == NULL, FALSE);
+
+    /* FIXME: support more than one folder */
+    cheader->offsetfiles = CFI_START; // CFHEADER + 1 * CFFOLDER
+    cheader->nfolders = 1; // a single CAB folder is enough
 
     /* nothing to do */
     if (self->folders->len == 0) {
@@ -265,12 +284,12 @@ gcab_cabinet_write (GCabCabinet *self,
     g_data_output_stream_set_byte_order (dstream, G_DATA_STREAM_BYTE_ORDER_LITTLE_ENDIAN);
 
     if (self->reserved) {
-        header.offsetfiles += self->reserved->len + 4;
-        header.flags = CABINET_HEADER_RESERVE;
-        header.res_header = self->reserved->len;
-        header.res_folder = 0;
-        header.res_data = 0;
-        header.reserved = self->reserved->data;
+        cheader->offsetfiles += self->reserved->len + 4;
+        cheader->flags = CABINET_HEADER_RESERVE;
+        cheader->res_header = self->reserved->len;
+        cheader->res_folder = 0;
+        cheader->res_data = 0;
+        cheader->reserved = self->reserved->data;
     }
 
     files = gcab_folder_get_files (cabfolder);
@@ -280,7 +299,7 @@ gcab_cabinet_write (GCabCabinet *self,
     }
 
     folder.typecomp = gcab_folder_get_comptype (cabfolder);
-    folder.offsetdata = header.offsetfiles + nfiles * 16 + sumstr;
+    folder.offsetdata = cheader->offsetfiles + nfiles * 16 + sumstr;
     folder.ndatab = gcab_folder_get_ndatablocks (cabfolder);
 
     /* avoid seeking to allow growing output streams */
@@ -304,7 +323,7 @@ gcab_cabinet_write (GCabCabinet *self,
                                            cancellable, error)) == (DATABLOCKSIZE - offset)) {
             if (!cdata_write (&block, dstream, folder.typecomp, data, DATABLOCKSIZE, &written, cancellable, error))
                 return FALSE;
-            header.size += written;
+            cheader->size += written;
             offset = 0;
         }
 
@@ -316,18 +335,18 @@ gcab_cabinet_write (GCabCabinet *self,
     if (offset != 0) {
         if (!cdata_write (&block, dstream, folder.typecomp, data, offset, &written, cancellable, error))
             return FALSE;
-        header.size += written;
+        cheader->size += written;
     }
 
     if (!g_seekable_seek (G_SEEKABLE (out), 0,
                           G_SEEK_SET, cancellable, error))
         return FALSE;
 
-    header.nfiles = nfiles;
-    header.size += header.offsetfiles + nfiles * 16; /* 1st part cfile struct = 16 bytes */
-    header.size += sumstr;
+    cheader->nfiles = nfiles;
+    cheader->size += cheader->offsetfiles + nfiles * 16; /* 1st part cfile struct = 16 bytes */
+    cheader->size += sumstr;
 
-    if (!cheader_write (&header, dstream, cancellable, error))
+    if (!cheader_write (cheader, dstream, cancellable, error))
         return FALSE;
 
     if (!cfolder_write (&folder, dstream, cancellable, error))
@@ -345,6 +364,11 @@ gcab_cabinet_write (GCabCabinet *self,
         if (!cfile_write (gcab_file_get_cfile (file), dstream, cancellable, error))
             return FALSE;
     }
+
+    /* replace the cached copy */
+    if (self->cheader != NULL)
+        cheader_free (self->cheader);
+    self->cheader = g_steal_pointer (&cheader);
 
     return TRUE;
 }
