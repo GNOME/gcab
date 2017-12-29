@@ -43,3 +43,21 @@ executable(
   ],
   c_args : cargs,
 )
+
+executable(
+  'gcab-bzero',
+  sources : [
+    'gcab-bzero.c',
+  ],
+  include_directories : [
+    include_directories('..'),
+    include_directories('../libgcab'),
+  ],
+  dependencies : [
+    gio,
+  ],
+  link_with : [
+    libgcab,
+  ],
+  c_args : cargs,
+)
