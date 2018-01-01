@@ -2,15 +2,15 @@
 # Copyright (C) 2013 gcab's COPYRIGHT HOLDER
 # This file is distributed under the same license as the gcab package.
 # Christian Kirbach <Christian.Kirbach@gmail.com>, 2013.
-# Mario Blättermann <mario.blaettermann@gmail.com>, 2013, 2015.
+# Mario Blättermann <mario.blaettermann@gmail.com>, 2013, 2015, 2018.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: gcab master\n"
-"Report-Msgid-Bugs-To: http://bugzilla.gnome.org/enter_bug.cgi?"
-"product=gcab&keywords=I18N+L10N&component=general\n"
-"POT-Creation-Date: 2015-08-25 20:08+0000\n"
-"PO-Revision-Date: 2015-12-30 13:16+0100\n"
+"Report-Msgid-Bugs-To: https://bugzilla.gnome.org/enter_bug.cgi?"
+"product=msitools&keywords=I18N+L10N&component=gcab\n"
+"POT-Creation-Date: 2017-12-14 22:08+0000\n"
+"PO-Revision-Date: 2018-01-01 20:14+0100\n"
 "Last-Translator: Mario Blättermann <mario.blaettermann@gmail.com>\n"
 "Language-Team: German <gnome-de@gnome.org>\n"
 "Language: de\n"
@@ -18,87 +18,75 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
-"X-Generator: Poedit 1.8.5\n"
+"X-Generator: Poedit 2.0.5\n"
 
-# »Führend« ist meiner Meinung nach gängiger, im Falle führender Leerzeichen, Nullen usw.
-#: ../gcab.c:62
-#, c-format
-msgid "Removing leading '%s' from member names"
-msgstr "Führendes »%s« wird aus den Namen der Bestandteile entfernt"
+#: ../src/gcab.c:82
+msgid "Dumping data to:"
+msgstr "Daten werden abgelegt nach:"
 
-#: ../gcab.c:74
-#, c-format
-msgid "Dumping %s data to: %s ...\n"
-msgstr "%s Daten werden abgelegt nach: %s …\n"
-
-#: ../gcab.c:82
-#, c-format
-msgid "can't write file %s: %s"
-msgstr "Datei %s kann nicht geschrieben werden: %s"
-
-#: ../gcab.c:109
+#: ../src/gcab.c:114
 msgid "Print program version"
 msgstr "Programmversion ausgeben"
 
-#: ../gcab.c:110
+#: ../src/gcab.c:115
 msgid "Be verbose"
 msgstr "Ausführliche Meldungen"
 
-#: ../gcab.c:111
+#: ../src/gcab.c:116
 msgid "Create archive"
 msgstr "Archiv anlegen"
 
-#: ../gcab.c:112
+#: ../src/gcab.c:117
 msgid "Extract all files"
 msgstr "Alle Dateien auspacken"
 
-#: ../gcab.c:113
+#: ../src/gcab.c:118
 msgid "Dump reserved and extra data"
 msgstr "Reservierte und zusätzliche Daten ablegen"
 
-#: ../gcab.c:114
+#: ../src/gcab.c:119
 msgid "List content"
 msgstr "Inhalt auflisten"
 
-#: ../gcab.c:115
+#: ../src/gcab.c:120
 msgid "List content with file details"
 msgstr "Inhalt mit Details zu Dateien auflisten"
 
-#: ../gcab.c:116
+#: ../src/gcab.c:121
 msgid "Change to directory DIR"
 msgstr "In  Ordner ORDNER wechseln"
 
-#: ../gcab.c:116
+#: ../src/gcab.c:121
 msgid "DIR"
 msgstr "ORDNER"
 
-#: ../gcab.c:117
+#: ../src/gcab.c:122
 msgid "Use zip compression"
 msgstr "zip-Komprimierung verwenden"
 
-#: ../gcab.c:118
+#: ../src/gcab.c:123
 msgid "Do not include path"
 msgstr "Pfad nicht mit einschließen"
 
-#: ../gcab.c:119
+#: ../src/gcab.c:124
 msgid "Reserve space in cabinet for signing (e.g. -s 6144 reserves 6K bytes)"
 msgstr ""
-"Speicherplatz im Cabinet zum Signieren reservieren (z.B. -s 6144 reserviert 6 kbyte)"
+"Speicherplatz im Cabinet zum Signieren reservieren (z.B. -s 6144 reserviert "
+"6 kbyte)"
 
-#: ../gcab.c:120
+#: ../src/gcab.c:125
 msgid "FILE INPUT_FILES..."
 msgstr "DATEI EINGABE_DATEIEN …"
 
-#: ../gcab.c:134
+#: ../src/gcab.c:139
 msgid "- create a Cabinet file"
-msgstr "- Eine Cabinet-Datei erstellen"
+msgstr "– Eine Cabinet-Datei erstellen"
 
-#: ../gcab.c:135
-#, c-format
-msgid "Report bugs to <%s>"
-msgstr "Bitte melden Sie Fehler an <%s>"
+#: ../src/gcab.c:140
+msgid "Report bugs to:"
+msgstr "Bitte melden Sie Fehler an:"
 
-#: ../gcab.c:138
+#: ../src/gcab.c:142
 msgid ""
 "gcab saves many files together into a cabinet archive, and can restore\n"
 "individual files from the archive."
@@ -106,72 +94,54 @@ msgstr ""
 "gcab speichert mehrere Dateien gemeinsam in ein Cabinet-Archiv und\n"
 "kann einzelne Dateien aus dem Archiv auslesen."
 
-#: ../gcab.c:145
-#, c-format
-msgid "option parsing failed: %s\n"
-msgstr "Verarbeiten der Optionen schlug fehl: %s\n"
+#: ../src/gcab.c:149
+msgid "Option parsing failed"
+msgstr "Verarbeiten der Optionen schlug fehl"
 
-#: ../gcab.c:154
-msgid "Please specify a single operation."
-msgstr "Bitte geben Sie eine einzige Operation an."
+#: ../src/gcab.c:159
+msgid "Please specify a single operation"
+msgstr "Bitte geben Sie eine einzige Operation an"
 
-#: ../gcab.c:157
-msgid "cabinet file must be specified."
-msgstr "cabinet-Datei muss angegeben werden."
+#: ../src/gcab.c:164
+msgid "Cabinet file must be specified"
+msgstr "cabinet-Datei muss angegeben werden"
 
-#: ../gcab.c:171
-#, c-format
-msgid "can't open %s for reading: %s\n"
-msgstr "%s kann nicht zum Lesen geöffnet werden: %s\n"
+#: ../src/gcab.c:180
+msgid "Cannot open file for reading"
+msgstr "Datei kann nicht zum Lesen geöffnet werden"
 
-#: ../gcab.c:173
-#, c-format
-msgid "error reading %s: %s\n"
-msgstr "Fehler beim Lesen von »%s«: %s\n"
+#: ../src/gcab.c:184
+msgid "Error reading"
+msgstr "Fehler beim Lesen"
 
-#: ../gcab.c:208
-#, c-format
-msgid "error during extraction: %s"
-msgstr "Fehler während des Auspackens: %s"
+#: ../src/gcab.c:220
+msgid "Error during extraction"
+msgstr "Fehler während des Auspackens"
 
-#: ../gcab.c:220
-#, c-format
-msgid "error while reading signature: %s"
-msgstr "Fehler beim Lesen der Signatur: %s"
+#: ../src/gcab.c:235
+msgid "Error while reading signature"
+msgstr "Fehler beim Lesen der Signatur"
 
-#: ../gcab.c:231
-msgid "please specify input files."
-msgstr "bitte geben Sie Eingabedateien an."
+#: ../src/gcab.c:247
+msgid "No input files specified"
+msgstr "Keine Eingabedateien angegeben"
 
-#: ../gcab.c:249
-#, c-format
-msgid "Can't add file %s: %s"
-msgstr "Datei %s kann nicht hinzugefügt werden: %s"
+#: ../src/gcab.c:266
+msgid "Cannot add file"
+msgstr "Datei kann nicht hinzugefügt werden"
 
-#: ../gcab.c:259
-msgid "no files to be archived."
-msgstr "Es sind keine Dateien zu archivieren."
+#: ../src/gcab.c:272
+msgid "No files to be archived"
+msgstr "Es sind keine Dateien zu archivieren"
 
-#: ../gcab.c:265
-#, c-format
-msgid "can't create cab file %s: %s"
-msgstr "cab-Datei %s kann nicht erstellt werden: %s"
+#: ../src/gcab.c:280
+msgid "Cannot create cab file"
+msgstr "cab-Datei kann nicht erstellt werden"
 
-#: ../gcab.c:269
-#, c-format
-msgid "can't add folder to cab file %s: %s"
-msgstr "Ordner kann nicht zum Cabinet-Archiv »%s« hinzugefügt werden: %s"
+#: ../src/gcab.c:286
+msgid "Cannot add folder to cab file"
+msgstr "Ordner kann nicht zur Cabinet-Datei hinzugefügt werden"
 
-#: ../gcab.c:277
-#, c-format
-msgid "can't write cab file %s: %s"
-msgstr "cab-Datei %s kann nicht geschrieben werden: %s"
-
-#: ../libgcab/cabinet.c:20 ../libgcab/cabinet.c:468
-#, c-format
-msgid "unsupported compression method %d"
-msgstr "Nicht unterstützte Kompressionsmethode %d"
-
-#: ../libgcab/cabinet.c:482
-msgid "incorrect checksum detected"
-msgstr "Inkorrekte Prüfsumme erkannt"
+#: ../src/gcab.c:296
+msgid "Cannot write cab file"
+msgstr "cab-Datei kann nicht geschrieben werden"
