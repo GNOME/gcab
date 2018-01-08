@@ -1,103 +1,93 @@
 # Brazilian Portuguese translation for gcab.
-# Copyright (C) 2013 gcab's COPYRIGHT HOLDER
+# Copyright (C) 2018 gcab's COPYRIGHT HOLDER
 # This file is distributed under the same license as the gcab package.
 # Enrico Nicoletto <liverig@gmail.com>, 2013.
-# Rafael Fontenelle <rffontenelle@gmail.com>, 2013, 2015.
-#
+# Rafael Fontenelle <rafaelff@gnome.org>, 2013, 2015, 2018.
 msgid ""
 msgstr ""
 "Project-Id-Version: gcab master\n"
-"Report-Msgid-Bugs-To: http://bugzilla.gnome.org/enter_bug.cgi?"
-"product=gcab&keywords=I18N+L10N&component=general\n"
-"POT-Creation-Date: 2015-08-25 20:08+0000\n"
-"PO-Revision-Date: 2015-10-05 17:43-0300\n"
-"Last-Translator: Rafael Fontenelle <rffontenelle@gmail.com>\n"
+"Report-Msgid-Bugs-To: https://bugzilla.gnome.org/enter_bug.cgi?"
+"product=msitools&keywords=I18N+L10N&component=gcab\n"
+"POT-Creation-Date: 2017-12-14 22:08+0000\n"
+"PO-Revision-Date: 2018-01-08 20:23-0200\n"
+"Last-Translator: Rafael Fontenelle <rafaelff@gnome.org>\n"
 "Language-Team: Brazilian Portuguese <gnome-pt_br-list@gnome.org>\n"
 "Language: pt_BR\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
-"X-Generator: Poedit 1.8.3\n"
+"X-Generator: Virtaal 1.0.0-beta1\n"
+"X-Project-Style: gnome\n"
 
-#: ../gcab.c:62
-#, c-format
-msgid "Removing leading '%s' from member names"
-msgstr "Removendo \"%s\" da frente dos nomes dos membros"
+#: ../src/gcab.c:82
+#| msgid "Dumping %s data to: %s ...\n"
+msgid "Dumping data to:"
+msgstr "Despejando dados para:"
 
-#: ../gcab.c:74
-#, c-format
-msgid "Dumping %s data to: %s ...\n"
-msgstr "Despejando %s dados para: %s ...\n"
-
-#: ../gcab.c:82
-#, c-format
-msgid "can't write file %s: %s"
-msgstr "não foi possível escrever arquivo %s: %s"
-
-#: ../gcab.c:109
+#: ../src/gcab.c:114
 msgid "Print program version"
 msgstr "Informa a versão do programa"
 
-#: ../gcab.c:110
+#: ../src/gcab.c:115
 msgid "Be verbose"
 msgstr "Ser detalhista"
 
-#: ../gcab.c:111
+#: ../src/gcab.c:116
 msgid "Create archive"
 msgstr "Cria pacote"
 
-#: ../gcab.c:112
+#: ../src/gcab.c:117
 msgid "Extract all files"
 msgstr "Extrai todos os arquivos"
 
-#: ../gcab.c:113
+#: ../src/gcab.c:118
 msgid "Dump reserved and extra data"
 msgstr "Despejar dados reservados e adicionais"
 
-#: ../gcab.c:114
+#: ../src/gcab.c:119
 msgid "List content"
 msgstr "Lista conteúdo"
 
-#: ../gcab.c:115
+#: ../src/gcab.c:120
 msgid "List content with file details"
 msgstr "Lista conteúdo com detalhes de arquivo"
 
-#: ../gcab.c:116
+#: ../src/gcab.c:121
 msgid "Change to directory DIR"
 msgstr "Muda para o diretório DIR"
 
-#: ../gcab.c:116
+#: ../src/gcab.c:121
 msgid "DIR"
 msgstr "DIR"
 
-#: ../gcab.c:117
+#: ../src/gcab.c:122
 msgid "Use zip compression"
 msgstr "Usa compressão zip"
 
-#: ../gcab.c:118
+#: ../src/gcab.c:123
 msgid "Do not include path"
 msgstr "Não inclui caminho"
 
-#: ../gcab.c:119
+#: ../src/gcab.c:124
 msgid "Reserve space in cabinet for signing (e.g. -s 6144 reserves 6K bytes)"
 msgstr ""
 "Reservar espaço no cabinet para assinatura (ex: -s 6144 reserva 6K bytes)"
 
-#: ../gcab.c:120
+#: ../src/gcab.c:125
 msgid "FILE INPUT_FILES..."
 msgstr "ARQUIVO ARQUIVOS_ENTRADAS..."
 
-#: ../gcab.c:134
+#: ../src/gcab.c:139
 msgid "- create a Cabinet file"
 msgstr "- cria um arquivo Cabinet"
 
-#: ../gcab.c:135
-#, c-format
-msgid "Report bugs to <%s>"
-msgstr "Relate erros para <%s>"
+#: ../src/gcab.c:140
+#| msgid "Report bugs to <%s>"
+msgid "Report bugs to:"
+msgstr "Relate erros para:"
 
-#: ../gcab.c:138
+#: ../src/gcab.c:142
 msgid ""
 "gcab saves many files together into a cabinet archive, and can restore\n"
 "individual files from the archive."
@@ -105,72 +95,82 @@ msgstr ""
 "gcab salva muitos arquivos juntos em um pacote cabinet e pode restaurar\n"
 "arquivos individuais do pacote."
 
-#: ../gcab.c:145
-#, c-format
-msgid "option parsing failed: %s\n"
-msgstr "falha ao analisar opção: %s\n"
+#: ../src/gcab.c:149
+#| msgid "option parsing failed: %s\n"
+msgid "Option parsing failed"
+msgstr "Falha ao analisar opção"
 
-#: ../gcab.c:154
-msgid "Please specify a single operation."
-msgstr "Por favor, especifique uma única operação."
+#: ../src/gcab.c:159
+#| msgid "Please specify a single operation."
+msgid "Please specify a single operation"
+msgstr "Por favor, especifique uma única operação"
 
-#: ../gcab.c:157
-msgid "cabinet file must be specified."
-msgstr "arquivo cabinet deve ser especificado."
+#: ../src/gcab.c:164
+#| msgid "cabinet file must be specified."
+msgid "Cabinet file must be specified"
+msgstr "Arquivo cabinet deve ser especificado"
 
-#: ../gcab.c:171
-#, c-format
-msgid "can't open %s for reading: %s\n"
-msgstr "não foi possível abrir %s para leitura: %s\n"
+#: ../src/gcab.c:180
+#| msgid "can't open %s for reading: %s\n"
+msgid "Cannot open file for reading"
+msgstr "Não foi possível abrir arquivo para leitura"
 
-#: ../gcab.c:173
-#, c-format
-msgid "error reading %s: %s\n"
-msgstr "erro ao ler %s: %s\n"
+#: ../src/gcab.c:184
+#| msgid "error reading %s: %s\n"
+msgid "Error reading"
+msgstr "Erro de leitura"
 
-#: ../gcab.c:208
-#, c-format
-msgid "error during extraction: %s"
-msgstr "erro durante extração: %s"
+#: ../src/gcab.c:220
+#| msgid "error during extraction: %s"
+msgid "Error during extraction"
+msgstr "Erro durante extração"
 
-#: ../gcab.c:220
-#, c-format
-msgid "error while reading signature: %s"
-msgstr "ocorreu erro ao ler assinatura: %s"
+#: ../src/gcab.c:235
+#| msgid "error while reading signature: %s"
+msgid "Error while reading signature"
+msgstr "Ocorreu erro ao ler assinatura"
 
-#: ../gcab.c:231
-msgid "please specify input files."
-msgstr "por favor, especifique os arquivos de entrada."
+#: ../src/gcab.c:247
+#| msgid "cabinet file must be specified."
+msgid "No input files specified"
+msgstr "Nenhum arquivo cabinet especificado"
 
-#: ../gcab.c:249
-#, c-format
-msgid "Can't add file %s: %s"
-msgstr "Não foi possível adicionar o arquivo %s: %s"
+#: ../src/gcab.c:266
+#| msgid "Can't add file %s: %s"
+msgid "Cannot add file"
+msgstr "Não foi possível adicionar arquivo"
 
-#: ../gcab.c:259
-msgid "no files to be archived."
-msgstr "nenhum arquivo para ser empacotado."
+#: ../src/gcab.c:272
+#| msgid "no files to be archived."
+msgid "No files to be archived"
+msgstr "Nenhum arquivo para ser empacotado"
 
-#: ../gcab.c:265
-#, c-format
-msgid "can't create cab file %s: %s"
-msgstr "não foi possível criar o arquivo cab %s: %s"
+#: ../src/gcab.c:280
+#| msgid "can't create cab file %s: %s"
+msgid "Cannot create cab file"
+msgstr "Não foi possível criar o arquivo cab"
 
-#: ../gcab.c:269
-#, c-format
-msgid "can't add folder to cab file %s: %s"
-msgstr "não foi possível adicionar a pasta ao arquivo cab: %s: %s"
+#: ../src/gcab.c:286
+#| msgid "can't add folder to cab file %s: %s"
+msgid "Cannot add folder to cab file"
+msgstr "Não foi possível adicionar a pasta ao arquivo cab"
 
-#: ../gcab.c:277
-#, c-format
-msgid "can't write cab file %s: %s"
-msgstr "não foi possível escrever arquivo cab %s: %s"
+#: ../src/gcab.c:296
+#| msgid "can't write cab file %s: %s"
+msgid "Cannot write cab file"
+msgstr "Não foi possível escrever arquivo cab"
 
-#: ../libgcab/cabinet.c:20 ../libgcab/cabinet.c:468
-#, c-format
-msgid "unsupported compression method %d"
-msgstr "método de compressão %d não suportado"
+#~ msgid "Removing leading '%s' from member names"
+#~ msgstr "Removendo \"%s\" da frente dos nomes dos membros"
 
-#: ../libgcab/cabinet.c:482
-msgid "incorrect checksum detected"
-msgstr "checksum incorreto detectado"
+#~ msgid "can't write file %s: %s"
+#~ msgstr "não foi possível escrever arquivo %s: %s"
+
+#~ msgid "please specify input files."
+#~ msgstr "por favor, especifique os arquivos de entrada."
+
+#~ msgid "unsupported compression method %d"
+#~ msgstr "método de compressão %d não suportado"
+
+#~ msgid "incorrect checksum detected"
+#~ msgstr "checksum incorreto detectado"
