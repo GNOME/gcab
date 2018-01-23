@@ -82,11 +82,12 @@ if get_option('introspection')
     symbol_prefix : 'gcab',
     header : 'libgcab.h',
     identifier_prefix : 'GCab',
-    export_packages : 'libgcab',
+    export_packages : 'libgcab-1.0',
     dependencies : [
       gio,
     ],
     includes : [
+      'GLib-2.0',
       'Gio-2.0',
       'GObject-2.0',
     ],
