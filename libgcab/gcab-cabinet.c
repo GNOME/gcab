@@ -502,7 +502,7 @@ gcab_cabinet_load (GCabCabinet *self,
 /**
  * gcab_cabinet_extract:
  * @cabinet: a #GCabCabinet
- * @path: the path to extract files, or %NULL
+ * @path: (allow-none): the path to extract files
  * @file_callback: (allow-none) (scope call) (closure user_data): an optional #GCabFile callback,
  *     return %FALSE to filter out or skip files.
  * @progress_callback: (allow-none) (scope call) (closure user_data): a progress callback
