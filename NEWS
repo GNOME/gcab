@@ -1,3 +1,53 @@
+v1.0
+====
+
+Notes:
+ - This fixes the security bug known as CVE-2018-5345
+
+Translations:
+ - Add Friulian translation (Fabio Tomat)
+ - Updated Brazilian Portuguese translation (Rafael Fontenelle)
+ - Updated Danish translation (Ask Hjorth Larsen, Joe Hansen)
+ - Updated German translation (Mario Blättermann)
+ - Updated Polish translation (Piotr Drąg)
+ - Updated Russian translation (Stas Solovey)
+ - Updated Slovenian translation (Matej Urbančič)
+ - Updated Spanish translation (Daniel Mustieles)
+ - Updated Swedish translation (Anders Jonsson)
+
+New Features:
+ - Add a helper executable to create massive compressed archives (Richard Hughes)
+ - Add a special binary to use just for fuzzing (Richard Hughes)
+ - Add gcab_cabinet_get_size() (Richard Hughes)
+ - Add gcab_file_new_with_bytes() (Richard Hughes)
+ - Add gcab_file_set_attributes() (Richard Hughes)
+ - Add gcab_file_set_date() (Richard Hughes)
+ - Add gcab_folder_get_comptype() (Richard Hughes)
+ - Add gcab_folder_get_file_by_name() (Richard Hughes)
+ - Add some self tests to test libgcab (Richard Hughes)
+ - Switch to the Meson buildsystem (Richard Hughes)
+
+Bugfixes:
+ - Always check the return value when writing to the stream (Richard Hughes)
+ - Do not crash when ncbytes is larger than the buffer size (Richard Hughes)
+ - Do not encode timezone in generated files (Chris Lamb)
+ - Do not return translated errors from libraries (Richard Hughes)
+ - Explicitly enable C99 support (Philip Withnall)
+ - Fix a few 'Dereference of null pointer' warnings (Richard Hughes)
+ - Fix a large memory leak when parsing LZX cab files (Richard Hughes)
+ - Fix a theoretical crash when building the table entries (Richard Hughes)
+ - Fix buffer overrun when generating Huffman codes (Richard Hughes)
+ - Fix dependency on generated .h file (Philip Chimento)
+ - Fix invalid return annotation (Marc-André Lureau)
+ - Fix the calculation of the checksum on big endian machines (Richard Hughes)
+ - Fix -Wimplicit-fallthrough= (Marc-André Lureau)
+ - Replace all the custom typedefd unsigned types with working versions (Richard Hughes)
+ - Return detailed errors from gcab_cabinet_get_signature() (Richard Hughes)
+ - Use g_autoptr() to fix countless memory leaks when parsing corrupt files (Richard Hughes)
+ - Use g_autoptr() to fix several memory leaks on error in the library (Richard Hughes)
+ - Use G_DECLARE_FINAL_TYPE to remove lots of C boilerplate (Richard Hughes)
+ - Use glib-mkenum's prefixes to avoid sed (Emmanuele Bassi)
+
 v0.7
 ====
 
