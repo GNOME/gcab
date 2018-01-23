@@ -10,6 +10,7 @@ gcab_cabinet_add_folder
 gcab_cabinet_write
 gcab_cabinet_write_simple
 gcab_cabinet_get_signature
+gcab_cabinet_get_size
 GCAB_ERROR
 GCabError
 <SUBSECTION Standard>
@@ -37,8 +38,11 @@ gcab_file_get_extract_name
 gcab_file_get_file
 gcab_file_get_name
 gcab_file_get_size
+gcab_file_get_bytes
 gcab_file_new_with_file
+gcab_file_new_with_bytes
 gcab_file_set_extract_name
+gcab_file_set_attributes
 <SUBSECTION Standard>
 GCAB_FILE
 GCAB_FILE_CLASS
@@ -62,6 +66,7 @@ gcab_folder_add_file
 gcab_folder_get_files
 gcab_folder_get_nfiles
 gcab_folder_get_comptype
+gcab_folder_get_file_by_name
 <SUBSECTION Standard>
 GCAB_FOLDER
 GCAB_FOLDER_CLASS
