@@ -1,0 +1,43 @@
+GCab Release Notes
+
+1. Write NEWS entries for GCab in the same format as usual.
+
+git shortlog v1.0.. | grep -i -v trivial | grep -v Merge > NEWS.new
+
+--------------------------------------------------------------------------------
+Version 1.1
+~~~~~~~~~~~
+
+Notes:
+
+New Features:
+
+Bugfixes:
+--------------------------------------------------------------------------------
+
+4. Commit changes:
+
+# MAKE SURE THESE ARE CORRECT
+export release_version="1.1"
+export release_tag="v1.1"
+
+git commit -a -m "Release ${release_version}"
+git tag -s -f -m "Release ${release_version}" "${release_tag}"
+<gpg password>
+git push --tags
+git push
+
+5. run 'ninja dist'
+
+6. Upload tarball:
+
+scp meson-dist/*.tar.xz rhughes@master.gnome.org:
+ssh rhughes@master.gnome.org
+ftpadmin install gcab-*.tar.xz
+
+7. Do post release version bump in meson.build
+
+8. Commit trivial changes:
+
+git commit -a -m "trivial: post release version bump"
+git push
