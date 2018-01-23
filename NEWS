@@ -1,3 +1,22 @@
+v0.8
+====
+
+ - This fixes the security bug known as CVE-2018-5345
+ - Translation updates (Various)
+ - Always check the return value when writing to the stream (Richard Hughes)
+ - Do not crash when ncbytes is larger than the buffer size (Richard Hughes)
+ - Don't encode timezone in generated files (Chris Lamb)
+ - Don't use version script if unsupported (Philip Chimento)
+ - Explicitly enable C99 support (Philip Withnall)
+ - Fix a few 'Dereference of null pointer' warnings (Richard Hughes)
+ - Fix buffer overrun when generating Huffman codes (Richard Hughes)
+ - Fix builddir != srcdir builds (Emmanuele Bassi)
+ - Fix dependency on generated .h file (Philip Chimento)
+ - Fix invalid return annotation (Marc-André Lureau)
+ - Fix the calculation of the checksum on big endian machines (Richard Hughes)
+ - Fix -Wimplicit-fallthrough= (Marc-André Lureau)
+ - Use glib-mkenum's prefixes to avoid sed (Emmanuele Bassi)
+
 v0.7
 ====
 
