@@ -9,7 +9,7 @@ enums = gnome.mkenums(
   c_template : 'gcab-enums.c.etemplate',
   h_template : 'gcab-enums.h.etemplate',
   install_header : true,
-  install_dir : 'include/libgcab-1.0/libgcab',
+  install_dir : join_paths(get_option('includedir'), 'libgcab-1.0/libgcab'),
   symbol_prefix : 'gcab',
   identifier_prefix : 'GCab',
 )
