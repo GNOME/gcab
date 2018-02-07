@@ -6,97 +6,85 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: gcab master\n"
-"Report-Msgid-Bugs-To: http://bugzilla.gnome.org/enter_bug.cgi?"
-"product=gcab&keywords=I18N+L10N&component=general\n"
-"POT-Creation-Date: 2015-08-25 20:08+0000\n"
-"PO-Revision-Date: 2015-08-28 20:45+0800\n"
-"Last-Translator: Andika Triwidada <andika@gmail.com>\n"
+"Report-Msgid-Bugs-To: https://bugzilla.gnome.org/enter_bug.cgi?"
+"product=msitools&keywords=I18N+L10N&component=gcab\n"
+"POT-Creation-Date: 2018-01-26 14:27+0000\n"
+"PO-Revision-Date: 2018-01-31 11:40+0700\n"
+"Last-Translator: Kukuh Syafaat <syafaatkukuh@gmail.com>\n"
 "Language-Team: Indonesian <gnome-l10n-id@googlegroups.com>\n"
 "Language: id\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: Poedit 1.7.1\n"
+"X-Generator: Poedit 2.0.6\n"
 
-#: ../gcab.c:62
-#, c-format
-msgid "Removing leading '%s' from member names"
-msgstr "Menghapus awalan '%s' dari nama-nama anggota"
+#: src/gcab.c:82
+msgid "Dumping data to:"
+msgstr "Mencurahkan data ke:"
 
-#: ../gcab.c:74
-#, c-format
-msgid "Dumping %s data to: %s ...\n"
-msgstr "Mencurahkan data %s ke: %s ...\n"
-
-#: ../gcab.c:82
-#, c-format
-msgid "can't write file %s: %s"
-msgstr "tak bisa menulis berkas %s: %s"
-
-#: ../gcab.c:109
+#: src/gcab.c:114
 msgid "Print program version"
 msgstr "Cetak versi program"
 
-#: ../gcab.c:110
+#: src/gcab.c:115
 msgid "Be verbose"
 msgstr "Terrinci"
 
-#: ../gcab.c:111
+#: src/gcab.c:116
 msgid "Create archive"
 msgstr "Buat arsip"
 
-#: ../gcab.c:112
+#: src/gcab.c:117
 msgid "Extract all files"
 msgstr "Ekstrak semua berkas"
 
-#: ../gcab.c:113
+#: src/gcab.c:118
 msgid "Dump reserved and extra data"
 msgstr "Curahkan data ekstra dan cadangan"
 
-#: ../gcab.c:114
+#: src/gcab.c:119
 msgid "List content"
 msgstr "Tampilkan daftar isi"
 
-#: ../gcab.c:115
+#: src/gcab.c:120
 msgid "List content with file details"
 msgstr "Lihat daftar isi dengan rincian berkas"
 
-#: ../gcab.c:116
+#: src/gcab.c:121
 msgid "Change to directory DIR"
 msgstr "Ubah ke direktori DIR"
 
-#: ../gcab.c:116
+#: src/gcab.c:121
 msgid "DIR"
 msgstr "DIR"
 
-#: ../gcab.c:117
+#: src/gcab.c:122
 msgid "Use zip compression"
 msgstr "Gunakan kompresi zip"
 
-#: ../gcab.c:118
+#: src/gcab.c:123
 msgid "Do not include path"
 msgstr "Jangan sertakan path"
 
-#: ../gcab.c:119
+#: src/gcab.c:124
 msgid "Reserve space in cabinet for signing (e.g. -s 6144 reserves 6K bytes)"
 msgstr ""
 "Cadangkan ruang dalam kabinet untuk penandatanganan (mis. -s 6144 "
 "mencadangkan 6k bita)"
 
-#: ../gcab.c:120
+#: src/gcab.c:125
 msgid "FILE INPUT_FILES..."
 msgstr "BERKAS BERKAS_MASUKAN..."
 
-#: ../gcab.c:134
+#: src/gcab.c:139
 msgid "- create a Cabinet file"
 msgstr "- buat suatu berkas Kabinet"
 
-#: ../gcab.c:135
-#, c-format
-msgid "Report bugs to <%s>"
-msgstr "Laporkan kutu ke <%s>"
+#: src/gcab.c:140
+msgid "Report bugs to:"
+msgstr "Laporkan kutu ke:"
 
-#: ../gcab.c:138
+#: src/gcab.c:142
 msgid ""
 "gcab saves many files together into a cabinet archive, and can restore\n"
 "individual files from the archive."
@@ -104,72 +92,69 @@ msgstr ""
 "gcab menyimpan banyak berkas bersama-sama ke dalam suatu arsip\n"
 "kabinet, dan dapat memulihkan berkas individu dari arsip."
 
-#: ../gcab.c:145
-#, c-format
-msgid "option parsing failed: %s\n"
-msgstr "penguraian opsi gagal: %s\n"
+#: src/gcab.c:149
+msgid "Option parsing failed"
+msgstr "Penguraian opsi gagal"
 
-#: ../gcab.c:154
-msgid "Please specify a single operation."
-msgstr "Harap nyatakan suatu operasi tunggal."
+#: src/gcab.c:159
+msgid "Please specify a single operation"
+msgstr "Harap nyatakan suatu operasi tunggal"
 
-#: ../gcab.c:157
-msgid "cabinet file must be specified."
-msgstr "berkas kabinet mesti dinyatakan."
+#: src/gcab.c:164
+msgid "Cabinet file must be specified"
+msgstr "Berkas kabinet mesti dinyatakan"
 
-#: ../gcab.c:171
-#, c-format
-msgid "can't open %s for reading: %s\n"
-msgstr "tak bisa buka %s untuk baca: %s\n"
+#: src/gcab.c:180
+msgid "Cannot open file for reading"
+msgstr "Tidak bisa membuka berkas untuk dibaca"
 
-#: ../gcab.c:173
-#, c-format
-msgid "error reading %s: %s\n"
-msgstr "galat saat baca %s: %s\n"
+#: src/gcab.c:184
+msgid "Error reading"
+msgstr "Galat saat baca"
 
-#: ../gcab.c:208
-#, c-format
-msgid "error during extraction: %s"
-msgstr "galat saat ekstraksi: %s"
+#: src/gcab.c:220
+msgid "Error during extraction"
+msgstr "Galat saat ekstraksi"
 
-#: ../gcab.c:220
-#, c-format
-msgid "error while reading signature: %s"
-msgstr "galat saat membaca tanda tangan: %s"
+#: src/gcab.c:235
+msgid "Error while reading signature"
+msgstr "galat saat membaca tanda tangan"
 
-#: ../gcab.c:231
-msgid "please specify input files."
-msgstr "harap nyatakan berkas masukan."
+#: src/gcab.c:247
+msgid "No input files specified"
+msgstr "Tidak ada berkas masukan yang ditentukan"
 
-#: ../gcab.c:249
-#, c-format
-msgid "Can't add file %s: %s"
-msgstr "Tak bisa tambahkan berkas %s: %s"
+#: src/gcab.c:266
+msgid "Cannot add file"
+msgstr "Tidak bisa menambahkan berkas"
 
-#: ../gcab.c:259
-msgid "no files to be archived."
-msgstr "tak ada berkas untuk diarsipkan."
+#: src/gcab.c:272
+msgid "No files to be archived"
+msgstr "Tidak ada berkas yang akan diarsipkan."
 
-#: ../gcab.c:265
-#, c-format
-msgid "can't create cab file %s: %s"
-msgstr "tak bisa buat berkas kab %s: %s"
+#: src/gcab.c:280
+msgid "Cannot create cab file"
+msgstr "Tidak bisa membuat berkas cab"
 
-#: ../gcab.c:269
-#, c-format
-msgid "can't add folder to cab file %s: %s"
-msgstr "tak bisa tambahkan folder ke berkas kab %s: %s"
+#: src/gcab.c:286
+msgid "Cannot add folder to cab file"
+msgstr "Tidak bisa menambahkan folder ke berkas kab"
 
-#: ../gcab.c:277
-#, c-format
-msgid "can't write cab file %s: %s"
-msgstr "tak bisa tulisi berkas kab %s: %s"
+#: src/gcab.c:296
+msgid "Cannot write cab file"
+msgstr "Tidak bisa menulis berkas kab"
 
-#: ../libgcab/cabinet.c:20 ../libgcab/cabinet.c:468
-#, c-format
-msgid "unsupported compression method %d"
-msgstr "metoda kompresi tak didukung %d"
+#~ msgid "Removing leading '%s' from member names"
+#~ msgstr "Menghapus awalan '%s' dari nama-nama anggota"
 
-#: ../libgcab/cabinet.c:482
-msgid "incorrect checksum detected"
-msgstr "﻿checksum yang salah terdeteksi"
+#~ msgid "can't write file %s: %s"
+#~ msgstr "tak bisa menulis berkas %s: %s"
+
+#~ msgid "please specify input files."
+#~ msgstr "harap nyatakan berkas masukan."
+
+#~ msgid "unsupported compression method %d"
+#~ msgstr "metoda kompresi tak didukung %d"
+
+#~ msgid "incorrect checksum detected"
+#~ msgstr "﻿checksum yang salah terdeteksi"
