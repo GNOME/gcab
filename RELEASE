@@ -5,8 +5,8 @@ GCab Release Notes
 git shortlog v1.0.. | grep -i -v trivial | grep -v Merge > NEWS.new
 
 --------------------------------------------------------------------------------
-Version 1.1
-~~~~~~~~~~~
+v1.1
+~~~~
 
 Notes:
 

@@ -1,3 +1,13 @@
+v1.1
+~~~~
+
+Bugfixes:
+ - Add git version in --version (Marc-André Lureau)
+ - Fix list of new symbols in index page (Marc-André Lureau)
+ - Fix unused declarations (Marc-André Lureau)
+ - Match the former autotools build (Jan Alexander Steffens)
+ - Specify gcab compoment in PACKAGE_BUGREPORT (Marc-André Lureau)
+
 v1.0
 ====
 
