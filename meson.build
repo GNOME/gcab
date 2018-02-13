@@ -8,7 +8,7 @@ project('gcab', 'c',
 git_version = []
 git = find_program('git', required: false)
 if git.found()
-  git_version = run_command(git, 'describe', '--abbrev=4', 'HEAD').stdout().strip().split('-')
+  git_version = run_command(git, 'describe', '--abbrev=4', '--dirty').stdout().strip().split('-')
 endif
 
 # libtool versioning
@@ -96,15 +96,19 @@ libz = dependency('zlib')
 gnome = import('gnome')
 i18n = import('i18n')
 
+if git_version.length() >= 3
+  package_string = '@0@ @1@.@2@-@3@'.format(meson.project_name(), git_version[0], git_version[1], git_version[2])
+  if git_version.length() == 4
+    package_string = '@0@-dirty'.format(package_string)
+  endif
+else
+  package_string = '@0@ v@1@'.format(meson.project_name(), meson.project_version())
+endif
+
 conf = configuration_data()
 conf.set_quoted('GETTEXT_PACKAGE', meson.project_name())
 conf.set_quoted('PACKAGE_NAME', meson.project_name())
-if git_version.length() == 3
-  conf.set_quoted('PACKAGE_STRING', '@0@ @1@.@2@-@3@'.format(meson.project_name(), git_version[0], git_version[1], git_version[2]))
-else
-  conf.set_quoted('PACKAGE_STRING', '@0@ v@1@'.format(meson.project_name(), meson.project_version()))
-endif
-
+conf.set_quoted('PACKAGE_STRING', package_string)
 conf.set_quoted('LOCALEDIR', join_paths(get_option('prefix'), get_option('localedir')))
 conf.set_quoted('PACKAGE_BUGREPORT', 'https://bugzilla.gnome.org/enter_bug.cgi?product=msitools&component=gcab')
 conf.set_quoted('TESTDATADIR', join_paths(meson.source_root(), 'tests'))
