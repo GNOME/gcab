@@ -5,7 +5,11 @@ project('gcab', 'c',
   default_options : ['warning_level=2', 'c_std=c99'],
 )
 
-git_version = run_command(['git', 'describe', '--abbrev=4', 'HEAD']).stdout().strip().split('-')
+git_version = []
+git = find_program('git', required: false)
+if git.found()
+  git_version = run_command(git, 'describe', '--abbrev=4', 'HEAD').stdout().strip().split('-')
+endif
 
 # libtool versioning
 lt_current = '0'
