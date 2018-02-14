@@ -15,6 +15,7 @@ BuildRequires:  glib2-devel
 BuildRequires:  gobject-introspection-devel
 BuildRequires:  zlib-devel
 BuildRequires:  meson
+BuildRequires:  git
 
 Requires:       libgcab1%{?_isa} = %{version}-%{release}
 
