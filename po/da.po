@@ -1,15 +1,15 @@
 # Danish translation for gcab.
-# Copyright (C) 2017 gcab's COPYRIGHT HOLDER
+# Copyright (C) 2018 gcab's COPYRIGHT HOLDER
 # This file is distributed under the same license as the gcab package.
-# joehansen <joedalton2@yahoo.dk>, 2017.
+# joehansen <joedalton2@yahoo.dk>, 2017, 2018.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: gcab master\n"
 "Report-Msgid-Bugs-To: https://bugzilla.gnome.org/enter_bug.cgi?"
 "product=msitools&keywords=I18N+L10N&component=gcab\n"
-"POT-Creation-Date: 2017-02-22 19:27+0000\n"
-"PO-Revision-Date: 2017-02-22 19:10+0100\n"
+"POT-Creation-Date: 2018-01-26 14:27+0000\n"
+"PO-Revision-Date: 2018-03-03 19:10+0100\n"
 "Last-Translator: Joe Hansen <joedalton2@yahoo.dk>\n"
 "Language-Team: Danish <dansk@dansk-gruppen.dk>\n"
 "Language: da\n"
@@ -18,85 +18,73 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: ../gcab.c:62
-#, c-format
-msgid "Removing leading '%s' from member names"
-msgstr "Fjerner foranstillet “%s” fra elementnavne"
+#: src/gcab.c:82
+msgid "Dumping data to:"
+msgstr "Dumper data til:"
 
-#: ../gcab.c:74
-#, c-format
-msgid "Dumping %s data to: %s ...\n"
-msgstr "Dumper %s-data til: %s …\n"
-
-#: ../gcab.c:82
-#, c-format
-msgid "can't write file %s: %s"
-msgstr "kan ikke skrive filen %s: %s"
-
-#: ../gcab.c:109
+#: src/gcab.c:114
 msgid "Print program version"
 msgstr "Vis programversion"
 
-#: ../gcab.c:110
+#: src/gcab.c:115
 msgid "Be verbose"
 msgstr "Vær uddybende"
 
-#: ../gcab.c:111
+#: src/gcab.c:116
 msgid "Create archive"
 msgstr "Opret arkiv"
 
-#: ../gcab.c:112
+#: src/gcab.c:117
 msgid "Extract all files"
 msgstr "Udtræk alle filer"
 
-#: ../gcab.c:113
+#: src/gcab.c:118
 msgid "Dump reserved and extra data"
 msgstr "Dump reserverede og ekstra data"
 
-#: ../gcab.c:114
+#: src/gcab.c:119
 msgid "List content"
 msgstr "Vis indhold"
 
-#: ../gcab.c:115
+#: src/gcab.c:120
 msgid "List content with file details"
 msgstr "Vis indhold med fildetaljer"
 
-#: ../gcab.c:116
+#: src/gcab.c:121
 msgid "Change to directory DIR"
 msgstr "Ændr til mappen MAPPE"
 
-#: ../gcab.c:116
+#: src/gcab.c:121
 msgid "DIR"
 msgstr "MAPPE"
 
-#: ../gcab.c:117
+#: src/gcab.c:122
 msgid "Use zip compression"
 msgstr "Brug zip-komprimering"
 
-#: ../gcab.c:118
+#: src/gcab.c:123
 msgid "Do not include path"
 msgstr "Inkluder ikke sti"
 
-#: ../gcab.c:119
+#: src/gcab.c:124
 msgid "Reserve space in cabinet for signing (e.g. -s 6144 reserves 6K bytes)"
 msgstr ""
 "Reserver plads i cabinet for underskrivning (f.eks. -s 6144 reserverer 6K "
 "byte)"
 
-#: ../gcab.c:120
+#: src/gcab.c:125
 msgid "FILE INPUT_FILES..."
 msgstr "FIL INDDATA_FILER …"
 
-#: ../gcab.c:134
+#: src/gcab.c:139
 msgid "- create a Cabinet file"
 msgstr "- opret en Cabinetfil"
 
-#: ../gcab.c:135
-#, c-format
-msgid "Report bugs to <%s>"
-msgstr "Rapporter fejl til <%s>"
+#: src/gcab.c:140
+msgid "Report bugs to:"
+msgstr "Rapporter fejl til:"
 
-#: ../gcab.c:138
+#: src/gcab.c:142
 msgid ""
 "gcab saves many files together into a cabinet archive, and can restore\n"
 "individual files from the archive."
@@ -104,72 +92,55 @@ msgstr ""
 "gcab gemmer mange filer sammen i et cabinet-arkiv, og kan gendanne\n"
 "individuelle filer fra arkivet."
 
-#: ../gcab.c:145
-#, c-format
-msgid "option parsing failed: %s\n"
-msgstr "tilvalgsfortolkning mislykkedes: %s\n"
+#: src/gcab.c:149
+msgid "Option parsing failed"
+msgstr "Tilvalgsfortolkning mislykkedes"
 
-#: ../gcab.c:154
-msgid "Please specify a single operation."
-msgstr "Angiv venligst en enkelt operation."
+#: src/gcab.c:159
+msgid "Please specify a single operation"
+msgstr "Angiv venligst en enkelt operation"
 
-#: ../gcab.c:157
-msgid "cabinet file must be specified."
-msgstr "cabinetfil skal angives."
+#: src/gcab.c:164
+msgid "Cabinet file must be specified"
+msgstr "Cabinetfil skal angives"
 
-#: ../gcab.c:171
-#, c-format
-msgid "can't open %s for reading: %s\n"
-msgstr "kan ikke åbne %s for læsning: %s\n"
+#: src/gcab.c:180
+msgid "Cannot open file for reading"
+msgstr "Kan ikke åbne filen for læsning"
 
-#: ../gcab.c:173
-#, c-format
-msgid "error reading %s: %s\n"
-msgstr "der opstod en fejl under læsning af %s: %s\n"
+#: src/gcab.c:184
+msgid "Error reading"
+msgstr "Der opstod en læsefejl"
 
-#: ../gcab.c:208
-#, c-format
-msgid "error during extraction: %s"
-msgstr "der opstod en fejl under udtrækning: %s"
+#: src/gcab.c:220
+msgid "Error during extraction"
+msgstr "Der opstod en fejl under udtrækning"
 
-#: ../gcab.c:220
-#, c-format
-msgid "error while reading signature: %s"
-msgstr "der opstod en fejl under læsning af signatur: %s"
+#: src/gcab.c:235
+msgid "Error while reading signature"
+msgstr "Der opstod en fejl under læsning af signatur"
 
-#: ../gcab.c:231
-msgid "please specify input files."
-msgstr "angiv venligst inddatafiler."
+#: src/gcab.c:247
+msgid "No input files specified"
+msgstr "Ingen inddatafiler angivet"
 
-#: ../gcab.c:249
-#, c-format
-msgid "Can't add file %s: %s"
-msgstr "Kan ikke tilføje filen %s: %s"
+#: src/gcab.c:266
+msgid "Cannot add file"
+msgstr "Kan ikke tilføje filen"
 
-#: ../gcab.c:259
-msgid "no files to be archived."
-msgstr "der er ingen filer at arkivere."
+#: src/gcab.c:272
+msgid "No files to be archived"
+msgstr "Der er ingen filer at arkivere"
 
-#: ../gcab.c:265
-#, c-format
-msgid "can't create cab file %s: %s"
-msgstr "kan ikke oprette cab-filen %s: %s"
+#: src/gcab.c:280
+msgid "Cannot create cab file"
+msgstr "Kan ikke oprette cab-filen"
 
-#: ../gcab.c:269
-#, c-format
-msgid "can't add folder to cab file %s: %s"
-msgstr "kan ikke tilføje mappe til cab-filen %s: %s"
+#: src/gcab.c:286
+msgid "Cannot add folder to cab file"
+msgstr "Kan ikke tilføje mappe til cab-filen"
 
-#: ../gcab.c:277
-#, c-format
-msgid "can't write cab file %s: %s"
-msgstr "kan ikke skrive cab-filen %s: %s"
+#: src/gcab.c:296
+msgid "Cannot write cab file"
+msgstr "Kan ikke skrive cab-filen"
 
-#: ../libgcab/cabinet.c:20 ../libgcab/cabinet.c:468
-#, c-format
-msgid "unsupported compression method %d"
-msgstr "komprimeringsmetoden %d understøttes ikke"
-
-#: ../libgcab/cabinet.c:482
-msgid "incorrect checksum detected"
-msgstr "en fejlagtig kontrolsum blev detekteret"
