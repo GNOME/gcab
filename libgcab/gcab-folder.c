@@ -423,6 +423,7 @@ gcab_folder_extract (GCabFolder *self,
     g_autoptr(GSList) files = NULL;
     g_autoptr(cdata_t) cdata = g_new0 (cdata_t, 1);
     guint32 nubytes = 0;
+    guint8 *reserved;
 
     /* never loaded from a stream */
     g_assert (self->cfolder != NULL);
@@ -433,7 +434,7 @@ gcab_folder_extract (GCabFolder *self,
     files = g_slist_sort (g_slist_copy (self->files), (GCompareFunc)sort_by_offset);
 
     /* this is allocated for every block, but currently unused */
-    cdata->reserved = g_malloc (res_data);
+    cdata->reserved = reserved = g_malloc (res_data);
 
     for (f = files; f != NULL; f = f->next) {
         GCabFile *file = f->data;
@@ -454,6 +455,8 @@ gcab_folder_extract (GCabFolder *self,
             if (!g_seekable_seek (G_SEEKABLE (data), self->cfolder->offsetdata,
                                   G_SEEK_SET, cancellable, error))
                 return FALSE;
+            bzero(cdata, sizeof(cdata_t));
+            cdata->reserved = reserved;
             nubytes = 0;
         }
 
