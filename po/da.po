@@ -1,15 +1,15 @@
 # Danish translation for gcab.
 # Copyright (C) 2018 gcab's COPYRIGHT HOLDER
 # This file is distributed under the same license as the gcab package.
-# joehansen <joedalton2@yahoo.dk>, 2017.
-# Alan Mortensen <alanmortensen.am@gmail.com>
+# joehansen <joedalton2@yahoo.dk>, 2017, 2018.
+# Alan Mortensen <alanmortensen.am@gmail.com>, 2018.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: gcab master\n"
 "Report-Msgid-Bugs-To: https://gitlab.gnome.org/GNOME/gcab/issues\n"
 "POT-Creation-Date: 2018-06-10 16:11+0000\n"
-"PO-Revision-Date: 2018-11-06 19:53+0100\n"
+"PO-Revision-Date: 2018-12-06 20:59+0100\n"
 "Last-Translator: Alan Mortensen <alanmortensen.am@gmail.com>\n"
 "Language-Team: Danish <dansk@dansk-gruppen.dk>\n"
 "Language: da\n"
