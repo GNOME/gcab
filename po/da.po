@@ -1,22 +1,23 @@
 # Danish translation for gcab.
 # Copyright (C) 2018 gcab's COPYRIGHT HOLDER
 # This file is distributed under the same license as the gcab package.
-# joehansen <joedalton2@yahoo.dk>, 2017, 2018.
+# joehansen <joedalton2@yahoo.dk>, 2017.
+# Alan Mortensen <alanmortensen.am@gmail.com>
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: gcab master\n"
-"Report-Msgid-Bugs-To: https://bugzilla.gnome.org/enter_bug.cgi?"
-"product=msitools&keywords=I18N+L10N&component=gcab\n"
-"POT-Creation-Date: 2018-01-26 14:27+0000\n"
-"PO-Revision-Date: 2018-03-03 19:10+0100\n"
-"Last-Translator: Joe Hansen <joedalton2@yahoo.dk>\n"
+"Report-Msgid-Bugs-To: https://gitlab.gnome.org/GNOME/gcab/issues\n"
+"POT-Creation-Date: 2018-06-10 16:11+0000\n"
+"PO-Revision-Date: 2018-11-06 19:53+0100\n"
+"Last-Translator: Alan Mortensen <alanmortensen.am@gmail.com>\n"
 "Language-Team: Danish <dansk@dansk-gruppen.dk>\n"
 "Language: da\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Generator: Poedit 2.0.6\n"
 
 #: src/gcab.c:82
 msgid "Dumping data to:"
@@ -82,7 +83,7 @@ msgstr "- opret en Cabinetfil"
 
 #: src/gcab.c:140
 msgid "Report bugs to:"
-msgstr "Rapporter fejl til:"
+msgstr "Rapportér fejl til:"
 
 #: src/gcab.c:142
 msgid ""
@@ -106,27 +107,27 @@ msgstr "Cabinetfil skal angives"
 
 #: src/gcab.c:180
 msgid "Cannot open file for reading"
-msgstr "Kan ikke åbne filen for læsning"
+msgstr "Kan ikke åbne fil for læsning"
 
 #: src/gcab.c:184
 msgid "Error reading"
-msgstr "Der opstod en læsefejl"
+msgstr "Fejl under læsning"
 
 #: src/gcab.c:220
 msgid "Error during extraction"
-msgstr "Der opstod en fejl under udtrækning"
+msgstr "Fejl under udtrækning"
 
 #: src/gcab.c:235
 msgid "Error while reading signature"
-msgstr "Der opstod en fejl under læsning af signatur"
+msgstr "Fejl under læsning af signatur"
 
 #: src/gcab.c:247
 msgid "No input files specified"
-msgstr "Ingen inddatafiler angivet"
+msgstr "Ingen inputfiler angivet"
 
 #: src/gcab.c:266
 msgid "Cannot add file"
-msgstr "Kan ikke tilføje filen"
+msgstr "Kan ikke tilføje fil"
 
 #: src/gcab.c:272
 msgid "No files to be archived"
@@ -134,13 +135,27 @@ msgstr "Der er ingen filer at arkivere"
 
 #: src/gcab.c:280
 msgid "Cannot create cab file"
-msgstr "Kan ikke oprette cab-filen"
+msgstr "Kan ikke oprette cab-fil"
 
 #: src/gcab.c:286
 msgid "Cannot add folder to cab file"
-msgstr "Kan ikke tilføje mappe til cab-filen"
+msgstr "Kan ikke tilføje mappe til cab-fil"
 
 #: src/gcab.c:296
 msgid "Cannot write cab file"
-msgstr "Kan ikke skrive cab-filen"
+msgstr "Kan ikke skrive cab-fil"
 
+#~ msgid "Removing leading '%s' from member names"
+#~ msgstr "Fjerner foranstillet “%s” fra elementnavne"
+
+#~ msgid "can't write file %s: %s"
+#~ msgstr "kan ikke skrive filen %s: %s"
+
+#~ msgid "please specify input files."
+#~ msgstr "angiv venligst inddatafiler."
+
+#~ msgid "unsupported compression method %d"
+#~ msgstr "komprimeringsmetoden %d understøttes ikke"
+
+#~ msgid "incorrect checksum detected"
+#~ msgstr "en fejlagtig kontrolsum blev detekteret"
