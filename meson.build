@@ -118,8 +118,11 @@ configure_file(
 )
 
 subdir('libgcab')
-subdir('po')
 subdir('src')
+
+if get_option('nls')
+subdir('po')
+endif
 
 if get_option('docs')
 subdir('docs')
