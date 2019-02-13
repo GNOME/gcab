@@ -93,9 +93,11 @@ if get_option('introspection')
     ],
     install : true
   )
-  gnome.generate_vapi('libgcab-1.0',
-    sources: gir[0],
-    packages : ['gio-2.0'],
-    install : true,
-  )
+  if get_option('vapi')
+    gnome.generate_vapi('libgcab-1.0',
+      sources: gir[0],
+      packages : ['gio-2.0'],
+      install : true,
+    )
+  endif
 endif
