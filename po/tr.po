@@ -7,97 +7,84 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: gcab master\n"
-"Report-Msgid-Bugs-To: http://bugzilla.gnome.org/enter_bug.cgi?"
-"product=gcab&keywords=I18N+L10N&component=general\n"
-"POT-Creation-Date: 2015-08-25 20:08+0000\n"
-"PO-Revision-Date: 2015-12-31 22:50+0200\n"
-"Last-Translator: Muhammet Kara <muhammetk@gmail.com>\n"
+"Report-Msgid-Bugs-To: https://gitlab.gnome.org/GNOME/gcab/issues\n"
+"POT-Creation-Date: 2018-06-10 16:11+0000\n"
+"PO-Revision-Date: 2019-01-09 12:52+0200\n"
+"Last-Translator: Sabri Ünal <libreajans@gmail.com>\n"
 "Language-Team: Türkçe <gnome-turk@gnome.org>\n"
 "Language: tr\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"X-Generator: Gtranslator 2.91.7\n"
+"X-Generator: Poedit 2.0.6\n"
 "X-POOTLE-MTIME: 1419291970.000000\n"
 
-#: ../gcab.c:62
-#, c-format
-msgid "Removing leading '%s' from member names"
-msgstr "Üye adlarının başındaki '%s' siliniyor"
+#: src/gcab.c:82
+msgid "Dumping data to:"
+msgstr "Veriler şuraya boşaltılıyor:"
 
-#: ../gcab.c:74
-#, c-format
-msgid "Dumping %s data to: %s ...\n"
-msgstr "%s verileri şuraya boşaltılıyor: %s...\n"
-
-#: ../gcab.c:82
-#, c-format
-msgid "can't write file %s: %s"
-msgstr "%s dosyası yazılamıyor: %s"
-
-#: ../gcab.c:109
+#: src/gcab.c:114
 msgid "Print program version"
 msgstr "Program sürümünü yazdır"
 
-#: ../gcab.c:110
+#: src/gcab.c:115
 msgid "Be verbose"
 msgstr "Detaylı ol"
 
-#: ../gcab.c:111
+#: src/gcab.c:116
 msgid "Create archive"
 msgstr "Arşiv oluştur"
 
-#: ../gcab.c:112
+#: src/gcab.c:117
 msgid "Extract all files"
 msgstr "Tüm dosyaları çıkart"
 
-#: ../gcab.c:113
+#: src/gcab.c:118
 msgid "Dump reserved and extra data"
 msgstr "Ayrılmış ve ekstra veriyi dök"
 
-#: ../gcab.c:114
+#: src/gcab.c:119
 msgid "List content"
 msgstr "İçeriği listele"
 
-#: ../gcab.c:115
+#: src/gcab.c:120
 msgid "List content with file details"
 msgstr "İçeriği dosya ayrıntılarıyla birlikte listele"
 
-#: ../gcab.c:116
+#: src/gcab.c:121
 msgid "Change to directory DIR"
 msgstr "DİZİN klasörüne geç"
 
-#: ../gcab.c:116
+#: src/gcab.c:121
 msgid "DIR"
 msgstr "DİZİN"
 
-#: ../gcab.c:117
+#: src/gcab.c:122
 msgid "Use zip compression"
 msgstr "Zip sıkıştırma kullan"
 
-#: ../gcab.c:118
+#: src/gcab.c:123
 msgid "Do not include path"
 msgstr "Yolu dahil etme"
 
-#: ../gcab.c:119
+#: src/gcab.c:124
 msgid "Reserve space in cabinet for signing (e.g. -s 6144 reserves 6K bytes)"
 msgstr "İmzalamak için alan ayır (örneğin -s 6144, 6K bayt ayırır)"
 
-#: ../gcab.c:120
+#: src/gcab.c:125
 msgid "FILE INPUT_FILES..."
 msgstr "DOSYA GİRDİ_DOSYALARI..."
 
-#: ../gcab.c:134
+#: src/gcab.c:139
 msgid "- create a Cabinet file"
 msgstr "- bir Cabinet dosyası oluştur"
 
-#: ../gcab.c:135
-#, c-format
-msgid "Report bugs to <%s>"
-msgstr "Hataları şuraya bildirin: <%s>"
+#: src/gcab.c:140
+msgid "Report bugs to:"
+msgstr "Hataları şuraya bildir:"
 
-#: ../gcab.c:138
+#: src/gcab.c:142
 msgid ""
 "gcab saves many files together into a cabinet archive, and can restore\n"
 "individual files from the archive."
@@ -105,72 +92,69 @@ msgstr ""
 "gcab bir çok dosyayı bir kabin arşivine kaydeder ve bu arşivden\n"
 "tekil dosyaları geri yükleyebilir."
 
-#: ../gcab.c:145
-#, c-format
-msgid "option parsing failed: %s\n"
-msgstr "seçenek ayrıştırma başarısız oldu: %s\n"
+#: src/gcab.c:149
+msgid "Option parsing failed"
+msgstr "Seçenek ayrıştırma başarısız oldu"
 
-#: ../gcab.c:154
-msgid "Please specify a single operation."
-msgstr "Lütfen tek bir işlem belirtin."
+#: src/gcab.c:159
+msgid "Please specify a single operation"
+msgstr "Lütfen tek bir işlem belirtin"
 
-#: ../gcab.c:157
-msgid "cabinet file must be specified."
-msgstr "kabin dosyası belirtilmelidir."
+#: src/gcab.c:164
+msgid "Cabinet file must be specified"
+msgstr "Kabin dosyası belirtilmelidir"
 
-#: ../gcab.c:171
-#, c-format
-msgid "can't open %s for reading: %s\n"
-msgstr "%s okuma için açılamıyor: %s\n"
+#: src/gcab.c:180
+msgid "Cannot open file for reading"
+msgstr "Dosya okuma için açılamıyor"
 
-#: ../gcab.c:173
-#, c-format
-msgid "error reading %s: %s\n"
-msgstr "%s okuma hatası: %s\n"
+#: src/gcab.c:184
+msgid "Error reading"
+msgstr "Okuma hatası"
 
-#: ../gcab.c:208
-#, c-format
-msgid "error during extraction: %s"
-msgstr "çıkartma sırasında hata oluştu: %s"
+#: src/gcab.c:220
+msgid "Error during extraction"
+msgstr "Çıkartma sırasında hata oluştu"
 
-#: ../gcab.c:220
-#, c-format
-msgid "error while reading signature: %s"
-msgstr "imza okunurken hata oluştu: %s"
+#: src/gcab.c:235
+msgid "Error while reading signature"
+msgstr "İmza okunurken hata oluştu"
 
-#: ../gcab.c:231
-msgid "please specify input files."
-msgstr "Lütfen girdi dosyalarını belirtin."
+#: src/gcab.c:247
+msgid "No input files specified"
+msgstr "Girdi dosyaları belirtilmedi"
 
-#: ../gcab.c:249
-#, c-format
-msgid "Can't add file %s: %s"
-msgstr "%s dosyası eklenemiyor: %s"
+#: src/gcab.c:266
+msgid "Cannot add file"
+msgstr "Dosya eklenemiyor"
 
-#: ../gcab.c:259
-msgid "no files to be archived."
-msgstr "arşivlenecek dosya yok."
+#: src/gcab.c:272
+msgid "No files to be archived"
+msgstr "Arşivlenecek dosya yok"
 
-#: ../gcab.c:265
-#, c-format
-msgid "can't create cab file %s: %s"
-msgstr "cab dosyası %s oluşturulamıyor: %s"
+#: src/gcab.c:280
+msgid "Cannot create cab file"
+msgstr "Cab dosyası oluşturulamıyor"
 
-#: ../gcab.c:269
-#, c-format
-msgid "can't add folder to cab file %s: %s"
-msgstr "cab dosyası %s'e klasör eklenemiyor: %s"
+#: src/gcab.c:286
+msgid "Cannot add folder to cab file"
+msgstr "Cab dosyasına klasör eklenemiyor"
 
-#: ../gcab.c:277
-#, c-format
-msgid "can't write cab file %s: %s"
-msgstr "cab dosyası %s yazılamıyor: %s"
+#: src/gcab.c:296
+msgid "Cannot write cab file"
+msgstr "Cab dosyası yazılamıyor"
 
-#: ../libgcab/cabinet.c:20 ../libgcab/cabinet.c:468
-#, c-format
-msgid "unsupported compression method %d"
-msgstr "desteklenmeyen sıkıştırma yöntemi %d"
+#~ msgid "Removing leading '%s' from member names"
+#~ msgstr "Üye adlarının başındaki '%s' siliniyor"
 
-#: ../libgcab/cabinet.c:482
-msgid "incorrect checksum detected"
-msgstr "hatalı sağlama toplamı saptandı"
+#~ msgid "can't write file %s: %s"
+#~ msgstr "%s dosyası yazılamıyor: %s"
+
+#~ msgid "please specify input files."
+#~ msgstr "Lütfen girdi dosyalarını belirtin."
+
+#~ msgid "unsupported compression method %d"
+#~ msgstr "desteklenmeyen sıkıştırma yöntemi %d"
+
+#~ msgid "incorrect checksum detected"
+#~ msgstr "hatalı sağlama toplamı saptandı"
