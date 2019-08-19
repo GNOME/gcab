@@ -1,0 +1,173 @@
+# Romanian translation for gcab.
+# Copyright (C) 2019 gcab's COPYRIGHT HOLDER
+# This file is distributed under the same license as the gcab package.
+# Florentina Mușat <florentina.musat.28@gmail.com>, 2019.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: gcab 0_X\n"
+"Report-Msgid-Bugs-To: https://gitlab.gnome.org/GNOME/gcab/issues\n"
+"POT-Creation-Date: 2018-06-10 16:11+0000\n"
+"PO-Revision-Date: 2019-08-19 15:27+0300\n"
+"Language-Team: Romanian <gnomero-list@lists.sourceforge.net>\n"
+"Language: ro\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=3; plural=(n==1 ? 0 : (n==0 || (n%100 > 0 && n%100 < 20)) ? 1 : 2);;\n"
+"Last-Translator: Florentina Mușat <florentina.musat.28 [at] gmail [dot] com>\n"
+"X-Generator: Poedit 2.2.3\n"
+
+#: ../gcab.c:82
+#, c-format
+msgid "Removing leading '%s' from member names"
+msgstr "Se elimină prefixul „%s” din numele membrilor"
+
+#: ../gcab.c:94
+#, c-format
+msgid "Dumping %s data to: %s ...\n"
+msgstr "Se aruncă datele %s la: %s ...\n"
+
+#: ../gcab.c:102
+#, c-format
+msgid "can't write file %s: %s"
+msgstr "nu se poate scrie fișierul %s: %s"
+
+#: ../gcab.c:128
+msgid "Print program version"
+msgstr "Tipărește versiunea programului"
+
+#: ../gcab.c:129
+msgid "Be verbose"
+msgstr "Fii detaliat"
+
+#: ../gcab.c:130
+msgid "Create archive"
+msgstr "Creează arhiva"
+
+#: ../gcab.c:131
+msgid "Extract all files"
+msgstr "Extrage toate fișierele"
+
+#: ../gcab.c:132
+msgid "Dump reserved and extra data"
+msgstr "Aruncă datele rezervate și extra"
+
+#: ../gcab.c:133
+msgid "List content"
+msgstr "Listează conținutul"
+
+#: ../gcab.c:134
+msgid "List content with file details"
+msgstr "Listează conținutul cu detaliile fișierelor"
+
+#: ../gcab.c:135
+msgid "Change to directory DIR"
+msgstr "Schimbă la directorul DIR"
+
+#: ../gcab.c:135
+msgid "DIR"
+msgstr "DIR"
+
+#: ../gcab.c:136
+msgid "Use zip compression"
+msgstr "Utilizează compresia zip"
+
+#: ../gcab.c:137
+msgid "Do not include path"
+msgstr "Nu include calea"
+
+#: ../gcab.c:138
+msgid "Reserve space in cabinet for signing (e.g. -s 6144 reserves 6K bytes)"
+msgstr "Rezervă spațiu în cabinet pentru semnare (de ex. -s 6144 rezervă 6K octeți)"
+
+#: ../gcab.c:139
+msgid "FILE INPUT_FILES..."
+msgstr "FIȘIER FIȘIERE_INTRARE..."
+
+#: ../gcab.c:153
+msgid "- create a Cabinet file"
+msgstr "- creează un fișier Cabinet"
+
+#: ../gcab.c:154
+#, c-format
+msgid "Report bugs to <%s>"
+msgstr "Raportați defecțiuni la <%s>"
+
+#: ../gcab.c:157
+msgid ""
+"gcab saves many files together into a cabinet archive, and can restore\n"
+"individual files from the archive."
+msgstr ""
+"gcab salvează multe fișiere împreună într-o arhivă cabinet și poate restaura\n"
+"fișiere individuale din arhivă."
+
+#: ../gcab.c:164
+#, c-format
+msgid "option parsing failed: %s\n"
+msgstr "parsarea opțiunilor a eșuat: %s\n"
+
+#: ../gcab.c:173
+msgid "Please specify a single operation."
+msgstr "Specificați o singură operație."
+
+#: ../gcab.c:176
+msgid "cabinet file must be specified."
+msgstr "fișierul cabinet trebuie specificat."
+
+#: ../gcab.c:190
+#, c-format
+msgid "can't open %s for reading: %s\n"
+msgstr "nu se poate deschide %s pentru citire: %s\n"
+
+#: ../gcab.c:192
+#, c-format
+msgid "error reading %s: %s\n"
+msgstr "eroare la citirea %s: %s\n"
+
+#: ../gcab.c:227
+#, c-format
+msgid "error during extraction: %s"
+msgstr "eroare în timpul extragerii: %s"
+
+#: ../gcab.c:239
+#, c-format
+msgid "error while reading signature: %s"
+msgstr "eroare la citirea semnăturii: %s"
+
+#: ../gcab.c:250
+msgid "please specify input files."
+msgstr "specificați fișierele de intrare."
+
+#: ../gcab.c:268
+#, c-format
+msgid "Can't add file %s: %s"
+msgstr "Nu se poate adăuga fișierul %s: %s"
+
+#: ../gcab.c:278
+msgid "no files to be archived."
+msgstr "nu sunt fișiere de arhivat."
+
+#: ../gcab.c:284
+#, c-format
+msgid "can't create cab file %s: %s"
+msgstr "nu se poate crea fișierul cab %s: %s"
+
+#: ../gcab.c:288
+#, c-format
+msgid "can't add folder to cab file %s: %s"
+msgstr "nu se poate adăuga dosarul la fișierul cab %s: %s"
+
+#: ../gcab.c:296
+#, c-format
+msgid "can't write cab file %s: %s"
+msgstr "nu se poate scrie fișierul cab %s: %s"
+
+#: ../libgcab/cabinet.c:42 ../libgcab/cabinet.c:512
+#, c-format
+msgid "unsupported compression method %d"
+msgstr "metodă de compresie nesuportată %d"
+
+#: ../libgcab/cabinet.c:539
+msgid "incorrect checksum detected"
+msgstr "checksum incorect detectat"
