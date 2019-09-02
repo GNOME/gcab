@@ -365,7 +365,7 @@ gcab_test_cabinet_load_func (void)
         };
 
         /* read file */
-        g_print ("%s... ", tests[i].fn);
+        g_test_message ("%s... ", tests[i].fn);
         fn = gcab_test_get_filename (tests[i].fn);
         g_assert (fn != NULL);
         file = g_file_new_for_path (fn);
@@ -446,7 +446,7 @@ gcab_test_cabinet_error_cves_func (void)
         g_autoptr(GInputStream) in = NULL;
 
         /* read file */
-        g_print ("%s... ", tests[i]);
+        g_test_message ("%s... ", tests[i]);
         fn = gcab_test_get_filename (tests[i]);
         g_assert (fn != NULL);
         file = g_file_new_for_path (fn);
@@ -557,7 +557,7 @@ gcab_test_cabinet_write_func (void)
         }
 
         /* write the file */
-        g_print ("%s... ", tests[i].fn);
+        g_test_message ("%s... ", tests[i].fn);
         fn_out = g_build_filename ("/tmp", tests[i].fn, NULL);
         file_out = g_file_new_for_path (fn_out);
         op = G_OUTPUT_STREAM (g_file_replace (file_out, NULL, FALSE, 0, NULL, &error));
