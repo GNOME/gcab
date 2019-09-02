@@ -29,14 +29,7 @@
 static gchar *
 gcab_test_get_filename (const gchar *filename)
 {
-    gchar *tmp;
-    char full_tmp[PATH_MAX];
-    g_autofree gchar *path = NULL;
-    path = g_build_filename (TESTDATADIR, filename, NULL);
-    tmp = realpath (path, full_tmp);
-    if (tmp != NULL)
-        return g_strdup (full_tmp);
-    return NULL;
+    return g_test_build_filename (G_TEST_DIST, filename, NULL);
 }
 
 static void
