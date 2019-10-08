@@ -41,6 +41,7 @@ libgcab = shared_library(
   ],
   soversion : lt_current,
   version : lt_version,
+  darwin_versions: darwin_versions,
   dependencies : [
     gio,
     libz,
