@@ -1,10 +1,13 @@
 v1.2
-~~~~
+====
 
-No news yet.
+Bugfixes:
+ - Fix regression on rewinding rhbz#1608301
+ - translation updates
+ - build-sys fixes
 
 v1.1
-~~~~
+====
 
 Bugfixes:
  - Add git version in --version (Marc-André Lureau)
