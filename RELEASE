@@ -34,10 +34,3 @@ git push
 scp meson-dist/*.tar.xz rhughes@master.gnome.org:
 ssh rhughes@master.gnome.org
 ftpadmin install gcab-*.tar.xz
-
-7. Do post release version bump in meson.build
-
-8. Commit trivial changes:
-
-git commit -a -m "trivial: post release version bump"
-git push
