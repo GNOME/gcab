@@ -86,13 +86,18 @@ foreach arg: test_link_args
     global_link_args += arg
   endif
 endforeach
-add_global_link_arguments(
+add_project_link_arguments(
   global_link_args,
   language: 'c'
 )
 
 gio = dependency('gio-2.0', version : '>= 2.44.0')
 libz = dependency('zlib')
+
+gcab_deps = [
+  gio,
+  libz,
+]
 
 gnome = import('gnome')
 i18n = import('i18n')

@@ -56,6 +56,15 @@ libgcab = shared_library(
   install : true
 )
 
+gcab_dep = declare_dependency(
+  link_with : libgcab,
+  include_directories : [
+    include_directories('.'),
+    include_directories('..'),
+  ],
+  dependencies : gcab_deps
+)
+
 pkgg = import('pkgconfig')
 pkgg.generate(
   libraries : libgcab,
