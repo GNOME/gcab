@@ -20,7 +20,6 @@ darwin_versions = [lt_current.to_int() + 1, '@0@.@1@.0'.format(lt_current.to_int
 
 # get suported warning flags
 test_args = [
-  '-fstack-protector-strong',
   '-Waggregate-return',
   '-Wunused',
   '-Warray-bounds',
@@ -73,6 +72,10 @@ foreach arg: test_args
     add_project_arguments(arg, language : 'c')
   endif
 endforeach
+
+if not meson.is_cross_build()
+  add_project_arguments('-fstack-protector-strong', language : 'c')
+endif
 
 # enable full RELRO where possible
 # FIXME: until https://github.com/mesonbuild/meson/issues/1140 is fixed
