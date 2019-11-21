@@ -20,7 +20,6 @@ darwin_versions = [lt_current.to_int() + 1, '@0@.@1@.0'.format(lt_current.to_int
 
 # get suported warning flags
 test_args = [
-  '-fstack-protector-strong',
   '-Waggregate-return',
   '-Wunused',
   '-Warray-bounds',
@@ -74,6 +73,10 @@ foreach arg: test_args
   endif
 endforeach
 
+if not meson.is_cross_build()
+  add_project_arguments('-fstack-protector-strong', language : 'c')
+endif
+
 # enable full RELRO where possible
 # FIXME: until https://github.com/mesonbuild/meson/issues/1140 is fixed
 global_link_args = []
@@ -86,13 +89,18 @@ foreach arg: test_link_args
     global_link_args += arg
   endif
 endforeach
-add_global_link_arguments(
+add_project_link_arguments(
   global_link_args,
   language: 'c'
 )
 
 gio = dependency('gio-2.0', version : '>= 2.44.0')
 libz = dependency('zlib')
+
+gcab_deps = [
+  gio,
+  libz,
+]
 
 gnome = import('gnome')
 i18n = import('i18n')

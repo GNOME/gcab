@@ -455,7 +455,7 @@ gcab_folder_extract (GCabFolder *self,
             if (!g_seekable_seek (G_SEEKABLE (data), self->cfolder->offsetdata,
                                   G_SEEK_SET, cancellable, error))
                 return FALSE;
-            bzero(cdata, sizeof(cdata_t));
+            memset(cdata, 0x0, sizeof(cdata_t));
             cdata->reserved = reserved;
             nubytes = 0;
         }
