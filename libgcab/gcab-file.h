@@ -76,10 +76,12 @@ const gchar *   gcab_file_get_extract_name          (GCabFile *file);
 void            gcab_file_set_extract_name          (GCabFile *file, const gchar *name);
 void            gcab_file_set_attributes            (GCabFile *file, guint32 attr);
 GDateTime *     gcab_file_get_date_time             (GCabFile *file);
+void            gcab_file_set_date_time             (GCabFile *file, GDateTime *dt);
 
 G_GNUC_BEGIN_IGNORE_DEPRECATIONS
 G_DEPRECATED_FOR(gcab_file_get_date_time)
 gboolean        gcab_file_get_date                  (GCabFile *file, GTimeVal *result);
+G_DEPRECATED_FOR(gcab_file_set_date_time)
 void            gcab_file_set_date                  (GCabFile *file, const GTimeVal *tv);
 G_GNUC_END_IGNORE_DEPRECATIONS
 

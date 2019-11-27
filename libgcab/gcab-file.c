@@ -180,6 +180,29 @@ gcab_file_class_init (GCabFileClass *klass)
                             G_PARAM_STATIC_STRINGS));
 }
 
+/**
+ * gcab_file_set_date_time:
+ * @file: a #GCabFile
+ * @dt: a #GDateTime
+ *
+ * Sets the file modification date (instead of the date provided by the GFile)
+ *
+ * Since: 1.4
+ **/
+void
+gcab_file_set_date_time (GCabFile *self, GDateTime *dt)
+{
+    g_return_if_fail (GCAB_IS_FILE (self));
+    g_return_if_fail (dt != NULL);
+
+    self->cfile->date = ((g_date_time_get_year (dt) - 1980 ) << 9 ) +
+        ((g_date_time_get_month (dt)) << 5) +
+        (g_date_time_get_day_of_month (dt));
+    self->cfile->time = ((g_date_time_get_hour (dt)) << 11) +
+        (g_date_time_get_minute (dt) << 5) +
+        (g_date_time_get_second (dt) / 2);
+}
+
 G_GNUC_BEGIN_IGNORE_DEPRECATIONS
 /**
  * gcab_file_set_date:
@@ -194,12 +217,8 @@ void
 gcab_file_set_date (GCabFile *self, const GTimeVal *tv)
 {
     g_autoptr(GDateTime) dt = g_date_time_new_from_timeval_utc (tv);
-    self->cfile->date = ((g_date_time_get_year (dt) - 1980 ) << 9 ) +
-        ((g_date_time_get_month (dt)) << 5) +
-         (g_date_time_get_day_of_month (dt));
-    self->cfile->time = ((g_date_time_get_hour (dt)) << 11) +
-        (g_date_time_get_minute (dt) << 5) +
-        (g_date_time_get_second (dt) / 2);
+
+    gcab_file_set_date_time (self, dt);
 }
 G_GNUC_END_IGNORE_DEPRECATIONS
 

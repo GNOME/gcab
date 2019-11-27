@@ -54,4 +54,5 @@ LIBGCAB1_1.0 {
 
 LIBGCAB1_1.4 {
         gcab_file_get_date_time;
+        gcab_file_set_date_time;
 } LIBGCAB1_1.0;
