@@ -51,7 +51,7 @@ libgcab = shared_library(
     include_directories('.'),
     include_directories('..'),
   ],
-  link_args : vflag,
+  link_args : cc.get_supported_link_arguments([vflag]),
   link_depends : mapfile,
   install : true
 )
