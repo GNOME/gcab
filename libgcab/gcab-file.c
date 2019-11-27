@@ -180,6 +180,7 @@ gcab_file_class_init (GCabFileClass *klass)
                             G_PARAM_STATIC_STRINGS));
 }
 
+G_GNUC_BEGIN_IGNORE_DEPRECATIONS
 /**
  * gcab_file_set_date:
  * @file: a #GCabFile
@@ -200,6 +201,7 @@ gcab_file_set_date (GCabFile *self, const GTimeVal *tv)
         (g_date_time_get_minute (dt) << 5) +
         (g_date_time_get_second (dt) / 2);
 }
+G_GNUC_END_IGNORE_DEPRECATIONS
 
 G_GNUC_INTERNAL gboolean
 gcab_file_update_info (GCabFile *self, GFileInfo *info)
@@ -280,6 +282,7 @@ gcab_file_get_size (GCabFile *self)
     return self->cfile->usize;
 }
 
+G_GNUC_BEGIN_IGNORE_DEPRECATIONS
 /**
  * gcab_file_get_date:
  * @file: a #GCabFile
@@ -312,6 +315,7 @@ gcab_file_get_date (GCabFile *self, GTimeVal *tv)
         return FALSE;
     return g_date_time_to_timeval (dt, tv);
 }
+G_GNUC_END_IGNORE_DEPRECATIONS
 
 /**
  * gcab_file_get_attributes:

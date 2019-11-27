@@ -72,11 +72,14 @@ GBytes *        gcab_file_get_bytes                 (GCabFile *file);
 const gchar *   gcab_file_get_name                  (GCabFile *file);
 guint32         gcab_file_get_size                  (GCabFile *file);
 guint32         gcab_file_get_attributes            (GCabFile *file);
-gboolean        gcab_file_get_date                  (GCabFile *file, GTimeVal *result);
 const gchar *   gcab_file_get_extract_name          (GCabFile *file);
 void            gcab_file_set_extract_name          (GCabFile *file, const gchar *name);
-void            gcab_file_set_date                  (GCabFile *file, const GTimeVal *tv);
 void            gcab_file_set_attributes            (GCabFile *file, guint32 attr);
+
+G_GNUC_BEGIN_IGNORE_DEPRECATIONS
+gboolean        gcab_file_get_date                  (GCabFile *file, GTimeVal *result);
+void            gcab_file_set_date                  (GCabFile *file, const GTimeVal *tv);
+G_GNUC_END_IGNORE_DEPRECATIONS
 
 G_END_DECLS
 
