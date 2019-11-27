@@ -193,13 +193,9 @@ individual files from the archive.\
 
                 for (l = files; l != NULL; l = l->next) {
                     if (list_details) {
-                        gchar date[32];
-                        struct tm *tm;
-                        GTimeVal tv = {0};
-
-                        gcab_file_get_date (GCAB_FILE (l->data), &tv);
-                        tm = localtime (&tv.tv_sec);
-                        strftime (date, sizeof (date), "%Y-%m-%d %H:%M:%S", tm);
+                        g_autoptr(GDateTime) dt = gcab_file_get_date_time (GCAB_FILE (l->data));
+                        g_autoptr(GDateTime) dtl = g_date_time_to_local (dt);
+                        g_autofree char *date = g_date_time_format (dtl, "%Y-%m-%d %H:%M:%S");
 
                         g_print ("%s %u %s 0x%X\n",
                                  gcab_file_get_name (GCAB_FILE (l->data)),

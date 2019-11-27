@@ -225,14 +225,14 @@ G_GNUC_END_IGNORE_DEPRECATIONS
 G_GNUC_INTERNAL gboolean
 gcab_file_update_info (GCabFile *self, GFileInfo *info)
 {
-    GTimeVal tv;
+    g_autoptr(GDateTime) dt = NULL;
 
     g_return_val_if_fail (GCAB_IS_FILE (self), FALSE);
     g_return_val_if_fail (G_IS_FILE_INFO (info), FALSE);
 
-    g_file_info_get_modification_time (info, &tv);
+    dt = g_file_info_get_modification_date_time (info);
     if (self->cfile->date == 0)
-        gcab_file_set_date (self, &tv);
+        gcab_file_set_date_time (self, dt);
     self->cfile->usize = g_file_info_get_size (info);
     self->cfile->fattr = GCAB_FILE_ATTRIBUTE_ARCH;
 

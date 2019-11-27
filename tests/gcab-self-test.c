@@ -35,8 +35,6 @@ gcab_test_get_filename (const gchar *filename)
 static void
 gcab_test_file_func (void)
 {
-    gboolean ret;
-    GTimeVal tv;
     g_autofree gchar *fn = NULL;
     g_autoptr(GCabFile) cabfile = NULL;
     g_autoptr(GDateTime) dt = NULL;
@@ -52,9 +50,7 @@ gcab_test_file_func (void)
 
     /* set the time */
     dt_bday = g_date_time_new_utc (2017, 9, 15, 0, 0, 0.f);
-    ret = g_date_time_to_timeval (dt_bday, &tv);
-    g_assert (ret);
-    gcab_file_set_date (cabfile, &tv);
+    gcab_file_set_date_time (cabfile, dt_bday);
 
     /* verify */
     g_assert (gcab_file_get_file (cabfile) == gfile);
@@ -62,9 +58,7 @@ gcab_test_file_func (void)
     g_assert_cmpstr (gcab_file_get_extract_name (cabfile), ==, "tæst.bin");
     g_assert_cmpint (gcab_file_get_size (cabfile), ==, 0);
     g_assert_cmpint (gcab_file_get_attributes (cabfile), ==, 0);
-    ret = gcab_file_get_date (cabfile, &tv);
-    g_assert (ret);
-    dt = g_date_time_new_from_timeval_utc (&tv);
+    dt = gcab_file_get_date_time (cabfile);
     g_assert_cmpint (g_date_time_get_year (dt), ==, 2017);
     g_assert_cmpint (g_date_time_get_month (dt), ==, 9);
     g_assert_cmpint (g_date_time_get_day_of_month (dt), ==, 15);
@@ -283,10 +277,7 @@ gcab_test_cabinet_blob_func (void)
 
         /* set the time and attributes */
         g_autoptr(GDateTime) dt = dt = g_date_time_new_utc (2017, 9, 15, 0, 0, 0.f);
-        GTimeVal tv;
-        ret = g_date_time_to_timeval (dt, &tv);
-        g_assert (ret);
-        gcab_file_set_date (cabfile, &tv);
+        gcab_file_set_date_time (cabfile, dt);
         gcab_file_set_attributes (cabfile, GCAB_FILE_ATTRIBUTE_ARCH);
 
         /* add file to folder */
@@ -536,13 +527,10 @@ gcab_test_cabinet_write_func (void)
             g_autoptr(GFile) file = g_file_new_for_path (fn_tmp);
             g_autoptr(GCabFile) cabfile = gcab_file_new_with_file (files[j].fn, file);
             g_autoptr(GDateTime) dt = NULL;
-            GTimeVal tv;
 
             /* set the time so the checksums match */
             dt = g_date_time_new_utc (2017, 9, 15, 0, 0, 0.f);
-            ret = g_date_time_to_timeval (dt, &tv);
-            g_assert (ret);
-            gcab_file_set_date (cabfile, &tv);
+            gcab_file_set_date_time (cabfile, dt);
 
             ret = gcab_folder_add_file (cabfolder, cabfile, FALSE, NULL, &error);
             g_assert_no_error (error);
