@@ -181,6 +181,30 @@ gcab_file_class_init (GCabFileClass *klass)
 }
 
 /**
+ * gcab_file_set_date_time:
+ * @file: a #GCabFile
+ * @dt: a #GDateTime
+ *
+ * Sets the file modification date (instead of the date provided by the GFile)
+ *
+ * Since: 1.4
+ **/
+void
+gcab_file_set_date_time (GCabFile *self, GDateTime *dt)
+{
+    g_return_if_fail (GCAB_IS_FILE (self));
+    g_return_if_fail (dt != NULL);
+
+    self->cfile->date = ((g_date_time_get_year (dt) - 1980 ) << 9 ) +
+        ((g_date_time_get_month (dt)) << 5) +
+        (g_date_time_get_day_of_month (dt));
+    self->cfile->time = ((g_date_time_get_hour (dt)) << 11) +
+        (g_date_time_get_minute (dt) << 5) +
+        (g_date_time_get_second (dt) / 2);
+}
+
+G_GNUC_BEGIN_IGNORE_DEPRECATIONS
+/**
  * gcab_file_set_date:
  * @file: a #GCabFile
  * @tv: a #GTimeVal
@@ -193,25 +217,22 @@ void
 gcab_file_set_date (GCabFile *self, const GTimeVal *tv)
 {
     g_autoptr(GDateTime) dt = g_date_time_new_from_timeval_utc (tv);
-    self->cfile->date = ((g_date_time_get_year (dt) - 1980 ) << 9 ) +
-        ((g_date_time_get_month (dt)) << 5) +
-         (g_date_time_get_day_of_month (dt));
-    self->cfile->time = ((g_date_time_get_hour (dt)) << 11) +
-        (g_date_time_get_minute (dt) << 5) +
-        (g_date_time_get_second (dt) / 2);
+
+    gcab_file_set_date_time (self, dt);
 }
+G_GNUC_END_IGNORE_DEPRECATIONS
 
 G_GNUC_INTERNAL gboolean
 gcab_file_update_info (GCabFile *self, GFileInfo *info)
 {
-    GTimeVal tv;
+    g_autoptr(GDateTime) dt = NULL;
 
     g_return_val_if_fail (GCAB_IS_FILE (self), FALSE);
     g_return_val_if_fail (G_IS_FILE_INFO (info), FALSE);
 
-    g_file_info_get_modification_time (info, &tv);
+    dt = g_file_info_get_modification_date_time (info);
     if (self->cfile->date == 0)
-        gcab_file_set_date (self, &tv);
+        gcab_file_set_date_time (self, dt);
     self->cfile->usize = g_file_info_get_size (info);
     self->cfile->fattr = GCAB_FILE_ATTRIBUTE_ARCH;
 
@@ -281,6 +302,36 @@ gcab_file_get_size (GCabFile *self)
 }
 
 /**
+ * gcab_file_get_date_time:
+ * @file: a #GCabFile
+ *
+ * Gets the file date and returns it as a #GDateTime..
+ *
+ * Since: 1.4
+ *
+ * Returns: file date, or NULL if unknown.
+ **/
+GDateTime *
+gcab_file_get_date_time (GCabFile *self)
+{
+    guint16 date, time;
+    g_autoptr(GDateTime) dt = NULL;
+
+    g_return_val_if_fail (GCAB_IS_FILE (self), NULL);
+
+    date = self->cfile->date;
+    time = self->cfile->time;
+    dt = g_date_time_new_utc ((date >> 9) + 1980,
+                              (date >> 5) & 0xf,
+                              (date & 0x1f),
+                              (time >> 11),
+                              (time >> 5) & 0x3f,
+                              (time & 0x1f) * 2);
+    return g_steal_pointer (&dt);
+}
+
+G_GNUC_BEGIN_IGNORE_DEPRECATIONS
+/**
  * gcab_file_get_date:
  * @file: a #GCabFile
  * @result: a #GTimeVal to return date
@@ -294,24 +345,18 @@ gcab_file_get_size (GCabFile *self)
 gboolean
 gcab_file_get_date (GCabFile *self, GTimeVal *tv)
 {
-    guint16 date, time;
     g_autoptr(GDateTime) dt = NULL;
 
     g_return_val_if_fail (GCAB_IS_FILE (self), FALSE);
     g_return_val_if_fail (tv != NULL, FALSE);
 
-    date = self->cfile->date;
-    time = self->cfile->time;
-    dt = g_date_time_new_utc ((date >> 9) + 1980,
-                              (date >> 5) & 0xf,
-                              (date & 0x1f),
-                              (time >> 11),
-                              (time >> 5) & 0x3f,
-                              (time & 0x1f) * 2);
+    dt = gcab_file_get_date_time (self);
     if (dt == NULL)
         return FALSE;
+
     return g_date_time_to_timeval (dt, tv);
 }
+G_GNUC_END_IGNORE_DEPRECATIONS
 
 /**
  * gcab_file_get_attributes:
