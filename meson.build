@@ -119,7 +119,7 @@ conf.set_quoted('GETTEXT_PACKAGE', meson.project_name())
 conf.set_quoted('PACKAGE_NAME', meson.project_name())
 conf.set_quoted('PACKAGE_STRING', package_string)
 conf.set_quoted('LOCALEDIR', join_paths(get_option('prefix'), get_option('localedir')))
-conf.set_quoted('PACKAGE_BUGREPORT', 'https://bugzilla.gnome.org/enter_bug.cgi?product=msitools&component=gcab')
+conf.set_quoted('PACKAGE_BUGREPORT', 'https://gitlab.gnome.org/GNOME/gcab/issues/new')
 configure_file(
   output : 'config.h',
   configuration : conf
