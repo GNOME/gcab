@@ -94,7 +94,7 @@ add_project_link_arguments(
   language: 'c'
 )
 
-gio = dependency('gio-2.0', version : '>= 2.44.0')
+gio = dependency('gio-2.0', version : '>= 2.62.0')
 libz = dependency('zlib')
 
 gcab_deps = [
