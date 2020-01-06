@@ -1,3 +1,14 @@
+v1.4
+====
+
+New Features:
+ - New GDateTime-based APIs
+ - Allow comping as meson subproject
+
+Bugfixes:
+ - build-sys fixes
+ - MacOS/Windows build support
+
 v1.3
 ====
 

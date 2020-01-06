@@ -1,5 +1,5 @@
 project('gcab', 'c',
-  version : '1.3',
+  version : '1.4',
   license : 'LGPL-2.1+',
   meson_version : '>=0.50.0',
   default_options : ['warning_level=2', 'c_std=c99'],
@@ -12,9 +12,9 @@ if git.found()
 endif
 
 # libtool versioning
-lt_current = 0
+lt_current = 1
 lt_revision = 0
-lt_age = 0
+lt_age = 1
 lt_version = '@0@.@1@.@2@'.format(lt_current - lt_age, lt_age, lt_revision)
 darwin_versions = [lt_current + 1, '@0@.@1@.0'.format(lt_current + 1, lt_revision)]
 
