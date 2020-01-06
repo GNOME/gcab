@@ -2,7 +2,7 @@ v1.3
 ====
 
 New Features:
-  - Installed test support (Simon McVittie)
+ - Installed test support (Simon McVittie)
 
 Bugfixes:
  - Fix file corruption on LZX extract
