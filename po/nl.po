@@ -1,22 +1,22 @@
 # Dutch translation for gcab.
 # Copyright (C) 2019 gcab's COPYRIGHT HOLDER
 # This file is distributed under the same license as the gcab package.
-# Nathan Follens <nthn@unseen.is>, 2019.
+# Nathan Follens <nthn@unseen.is>, 2019-2020.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: gcab master\n"
 "Report-Msgid-Bugs-To: https://gitlab.gnome.org/GNOME/gcab/issues\n"
-"POT-Creation-Date: 2019-02-13 16:54+0000\n"
-"PO-Revision-Date: 2019-02-26 14:20+0100\n"
+"POT-Creation-Date: 2019-10-08 07:58+0000\n"
+"PO-Revision-Date: 2020-02-27 19:51+0100\n"
+"Last-Translator: Nathan Follens <nthn@unseen.is>\n"
 "Language-Team: Dutch <gnome-nl-list@gnome.org>\n"
 "Language: nl\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
-"Last-Translator: Nathan Follens <nthn@unseen.is>\n"
-"X-Generator: Poedit 2.2.1\n"
+"X-Generator: Poedit 2.3\n"
 
 #: src/gcab.c:82
 msgid "Dumping data to:"
@@ -68,7 +68,9 @@ msgstr "Pad niet opnemen"
 
 #: src/gcab.c:124
 msgid "Reserve space in cabinet for signing (e.g. -s 6144 reserves 6K bytes)"
-msgstr "Houd ruimte in de het cabinet-bestand vrij voor ondertekenen (bv. -s 6144 houdt 6K bytes vrij)"
+msgstr ""
+"Houd ruimte in de het cabinet-bestand vrij voor ondertekenen (bv. -s 6144 "
+"houdt 6K bytes vrij)"
 
 #: src/gcab.c:125
 msgid "FILE INPUT_FILES..."
@@ -87,7 +89,8 @@ msgid ""
 "gcab saves many files together into a cabinet archive, and can restore\n"
 "individual files from the archive."
 msgstr ""
-"gcab slaat verschillende bestanden samen op in een cabinet-archief, en kan\n"
+"gcab slaat verschillende bestanden samen op in een cabinet-archief, en "
+"kan\n"
 "individuele bestanden uit het archief herstellen."
 
 #: src/gcab.c:149
@@ -112,7 +115,7 @@ msgstr "Fout bij lezen"
 
 #: src/gcab.c:220
 msgid "Error during extraction"
-msgstr "Fout tijden uitpakken"
+msgstr "Fout tijdens uitpakken"
 
 #: src/gcab.c:235
 msgid "Error while reading signature"
