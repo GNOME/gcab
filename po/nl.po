@@ -1,0 +1,179 @@
+# Dutch translation for gcab.
+# Copyright (C) 2019 gcab's COPYRIGHT HOLDER
+# This file is distributed under the same license as the gcab package.
+# Nathan Follens <nthn@unseen.is>, 2019-2020.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: gcab master\n"
+"Report-Msgid-Bugs-To: https://gitlab.gnome.org/GNOME/gcab/issues\n"
+"POT-Creation-Date: 2019-08-19 12:43+0000\n"
+"PO-Revision-Date: 2020-02-27 19:51+0100\n"
+"Last-Translator: Nathan Follens <nthn@unseen.is>\n"
+"Language-Team: Dutch <gnome-nl-list@gnome.org>\n"
+"Language: nl\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Generator: Poedit 2.3\n"
+
+#: ../gcab.c:82
+#, c-format
+msgid "Removing leading '%s' from member names"
+msgstr "‘%s’ aan begin van lidnamen wordt verwijderd"
+
+#: ../gcab.c:94
+#, c-format
+msgid "Dumping %s data to: %s ...\n"
+msgstr "%s gegevens worden gedumpt naar: %s…\n"
+
+#: ../gcab.c:102
+#, c-format
+msgid "can't write file %s: %s"
+msgstr "kan bestand %s niet schrijven: %s"
+
+#: ../gcab.c:128
+msgid "Print program version"
+msgstr "Programmaversie tonen"
+
+#: ../gcab.c:129
+msgid "Be verbose"
+msgstr "Uitgebreide uitvoer"
+
+#: ../gcab.c:130
+msgid "Create archive"
+msgstr "Archief aanmaken"
+
+#: ../gcab.c:131
+msgid "Extract all files"
+msgstr "Alle bestanden uitpakken"
+
+#: ../gcab.c:132
+msgid "Dump reserved and extra data"
+msgstr "Vrijgehouden en extra gegevens dumpen"
+
+#: ../gcab.c:133
+msgid "List content"
+msgstr "Inhoud oplijsten"
+
+#: ../gcab.c:134
+msgid "List content with file details"
+msgstr "Inhoud met bestandsgegevens oplijsten"
+
+#: ../gcab.c:135
+msgid "Change to directory DIR"
+msgstr "Wijzigen naar map MAP"
+
+#: ../gcab.c:135
+msgid "DIR"
+msgstr "MAP"
+
+#: ../gcab.c:136
+msgid "Use zip compression"
+msgstr "Zip-compressie gebruiken"
+
+#: ../gcab.c:137
+msgid "Do not include path"
+msgstr "Pad niet opnemen"
+
+#: ../gcab.c:138
+msgid "Reserve space in cabinet for signing (e.g. -s 6144 reserves 6K bytes)"
+msgstr ""
+"Houd ruimte in de het cabinet-bestand vrij voor ondertekenen (bv. -s 6144 "
+"houdt 6K bytes vrij)"
+
+#: ../gcab.c:139
+msgid "FILE INPUT_FILES..."
+msgstr "BESTAND INVOERBESTANDEN…"
+
+#: ../gcab.c:153
+msgid "- create a Cabinet file"
+msgstr "- maak een Cabinet-bestand aan"
+
+#: ../gcab.c:154
+#, c-format
+msgid "Report bugs to <%s>"
+msgstr "Meld fouten aan <%s>"
+
+#: ../gcab.c:157
+msgid ""
+"gcab saves many files together into a cabinet archive, and can restore\n"
+"individual files from the archive."
+msgstr ""
+"gcab slaat verschillende bestanden samen op in een cabinet-archief, en "
+"kan\n"
+"individuele bestanden uit het archief herstellen."
+
+#: ../gcab.c:164
+#, c-format
+msgid "option parsing failed: %s\n"
+msgstr "ontleden van optie mislukt: %s\n"
+
+#: ../gcab.c:173
+msgid "Please specify a single operation."
+msgstr "Geef een enkele handeling op."
+
+#: ../gcab.c:176
+msgid "cabinet file must be specified."
+msgstr "cabinet-bestand moet opgegeven zijn."
+
+#: ../gcab.c:190
+#, c-format
+msgid "can't open %s for reading: %s\n"
+msgstr "kan %s niet openen voor lezen: %s\n"
+
+#: ../gcab.c:192
+#, c-format
+msgid "error reading %s: %s\n"
+msgstr "fout bij lezen van %s: %s\n"
+
+#: ../gcab.c:227
+#, c-format
+msgid "error during extraction: %s"
+msgstr "fout tijdens uitpakken: %s"
+
+#: ../gcab.c:239
+#, c-format
+msgid "error while reading signature: %s"
+msgstr "fout bij lezen van handtekening: %s"
+
+#: ../gcab.c:250
+msgid "please specify input files."
+msgstr "geef invoerbestanden op."
+
+#: ../gcab.c:268
+#, c-format
+msgid "Can't add file %s: %s"
+msgstr "Kan bestand %s niet toevoegen: %s"
+
+#: ../gcab.c:278
+msgid "no files to be archived."
+msgstr "geen bestanden om te archiveren."
+
+#: ../gcab.c:284
+#, c-format
+msgid "can't create cab file %s: %s"
+msgstr "kan cab-bestand %s niet aanmaken: %s"
+
+#: ../gcab.c:288
+#, c-format
+msgid "can't add folder to cab file %s: %s"
+msgstr "kan map niet toevoegen aan cab-bestand %s: %s"
+
+#: ../gcab.c:296
+#, c-format
+msgid "can't write cab file %s: %s"
+msgstr "kan cab-bestand %s niet schrijven: %s"
+
+#: ../libgcab/cabinet.c:42 ../libgcab/cabinet.c:512
+#, c-format
+msgid "unsupported compression method %d"
+msgstr "compressiemethode %d niet ondersteund"
+
+#: ../libgcab/cabinet.c:539
+msgid "incorrect checksum detected"
+msgstr "onjuiste controlesom gedetecteerd"
+
+#~ msgid "No input files specified"
+#~ msgstr "Geen invoerbestanden opgegeven"
