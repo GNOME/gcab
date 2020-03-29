@@ -1,0 +1,196 @@
+# Ukrainian translation for gcab.
+# Copyright (C) 2013 gcab's COPYRIGHT HOLDER
+# This file is distributed under the same license as the gcab package.
+#
+# zlatin <zalatik@hotmail.com>, 2013.
+# Yuri Chornoivan <yurchor@ukr.net>, 2020.
+msgid ""
+msgstr ""
+"Project-Id-Version: gcab master\n"
+"Report-Msgid-Bugs-To: https://gitlab.gnome.org/GNOME/gcab/issues\n"
+"POT-Creation-Date: 2020-02-27 18:53+0000\n"
+"PO-Revision-Date: 2020-03-29 16:34+0300\n"
+"Last-Translator: Yuri Chornoivan <yurchor@ukr.net>\n"
+"Language-Team: Ukrainian <trans-uk@lists.fedoraproject.org>\n"
+"Language: uk\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<"
+"=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
+"X-Generator: Lokalize 20.03.70\n"
+
+#: ../gcab.c:82
+#, c-format
+msgid "Removing leading '%s' from member names"
+msgstr "Видалення початкового префікса «%s» з назв файлів"
+
+#: ../gcab.c:94
+#, c-format
+#| msgid "Dumping data to:"
+msgid "Dumping %s data to: %s ...\n"
+msgstr "Створюємо дамп даних %s у %s...\n"
+
+#: ../gcab.c:102
+#, c-format
+#| msgid "Cannot write cab file"
+msgid "can't write file %s: %s"
+msgstr "Не вдалося записати файл cab %s: %s"
+
+#: ../gcab.c:128
+msgid "Print program version"
+msgstr "Вивести дані щодо версії програми"
+
+#: ../gcab.c:129
+msgid "Be verbose"
+msgstr "Режим докладних повідомлень"
+
+#: ../gcab.c:130
+msgid "Create archive"
+msgstr "Створити архів"
+
+#: ../gcab.c:131
+msgid "Extract all files"
+msgstr "Розпакувати всі файли"
+
+#: ../gcab.c:132
+msgid "Dump reserved and extra data"
+msgstr "Створити дамп зарезервованих та додаткових даних"
+
+#: ../gcab.c:133
+msgid "List content"
+msgstr "Вивести список вмісту"
+
+#: ../gcab.c:134
+msgid "List content with file details"
+msgstr "Вивести список вмісту із подробицями щодо файлів"
+
+#: ../gcab.c:135
+msgid "Change to directory DIR"
+msgstr "Перейти до теки КАТАЛОГ"
+
+#: ../gcab.c:135
+msgid "DIR"
+msgstr "КАТАЛОГ"
+
+#: ../gcab.c:136
+msgid "Use zip compression"
+msgstr "Використовувати метод стиснення zip"
+
+#: ../gcab.c:137
+msgid "Do not include path"
+msgstr "Не включати шлях"
+
+#: ../gcab.c:138
+msgid "Reserve space in cabinet for signing (e.g. -s 6144 reserves 6K bytes)"
+msgstr ""
+"Зарезервувати місце в архіві для підпису (наприклад -s 6144 резервує 6К байт)"
+
+#: ../gcab.c:139
+msgid "FILE INPUT_FILES..."
+msgstr "ФАЙЛ ВХІДНІ_ФАЙЛИ..."
+
+#: ../gcab.c:153
+msgid "- create a Cabinet file"
+msgstr "- створити файл архіву Cabinet"
+
+#: ../gcab.c:154
+#, c-format
+#| msgid "Report bugs to:"
+msgid "Report bugs to <%s>"
+msgstr "Адреса для повідомлень про вади: <%s>"
+
+#: ../gcab.c:157
+msgid ""
+"gcab saves many files together into a cabinet archive, and can restore\n"
+"individual files from the archive."
+msgstr ""
+"gcab зберігає багато файлів разом в один архів cabinet і може\n"
+"відновити окремі файли з архіву."
+
+#: ../gcab.c:164
+#, c-format
+#| msgid "Option parsing failed"
+msgid "option parsing failed: %s\n"
+msgstr "Не вдалося обробити параметри: %s\n"
+
+#: ../gcab.c:173
+#| msgid "Please specify a single operation"
+msgid "Please specify a single operation."
+msgstr "Будь ласка, вкажіть лише одну дію."
+
+#: ../gcab.c:176
+#| msgid "Cabinet file must be specified"
+msgid "cabinet file must be specified."
+msgstr "Слід вказати файл cabinet."
+
+#: ../gcab.c:190
+#, c-format
+#| msgid "Cannot open file for reading"
+msgid "can't open %s for reading: %s\n"
+msgstr "Не вдалося відкрити %s файл для читання: %s\n"
+
+#: ../gcab.c:192
+#, c-format
+#| msgid "Error reading"
+msgid "error reading %s: %s\n"
+msgstr "Помилка при читанні %s: %s\n"
+
+#: ../gcab.c:227
+#, c-format
+#| msgid "Error during extraction"
+msgid "error during extraction: %s"
+msgstr "Помилка при розпаковуванні: %s"
+
+#: ../gcab.c:239
+#, c-format
+#| msgid "Error while reading signature"
+msgid "error while reading signature: %s"
+msgstr "Помилка під час читання підпису: %s"
+
+#: ../gcab.c:250
+#| msgid "Please specify a single operation"
+msgid "please specify input files."
+msgstr "Будь ласка, вкажіть файли вхідних даних."
+
+#: ../gcab.c:268
+#, c-format
+#| msgid "Cannot add file"
+msgid "Can't add file %s: %s"
+msgstr "Не вдалося додати файл %s: %s"
+
+#: ../gcab.c:278
+#| msgid "No files to be archived"
+msgid "no files to be archived."
+msgstr "Не вказано файлів для архівування."
+
+#: ../gcab.c:284
+#, c-format
+#| msgid "Cannot create cab file"
+msgid "can't create cab file %s: %s"
+msgstr "Не вдалося створити файл cab %s: %s"
+
+#: ../gcab.c:288
+#, c-format
+#| msgid "Cannot add folder to cab file"
+msgid "can't add folder to cab file %s: %s"
+msgstr "Не вдалося додати теку до файла cab %s: %s"
+
+#: ../gcab.c:296
+#, c-format
+#| msgid "Cannot write cab file"
+msgid "can't write cab file %s: %s"
+msgstr "Не вдалося записати файл cab %s: %s"
+
+#: ../libgcab/cabinet.c:42 ../libgcab/cabinet.c:512
+#, c-format
+msgid "unsupported compression method %d"
+msgstr "непідтримуваний метод стискання %d"
+
+#: ../libgcab/cabinet.c:539
+msgid "incorrect checksum detected"
+msgstr "виявлено помилкову контрольну суму"
+
+#~| msgid "cabinet file must be specified."
+#~ msgid "No input files specified"
+#~ msgstr "Не вказано вхідних файлів"
