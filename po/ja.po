@@ -1,0 +1,173 @@
+# Japanese translation for gcab.
+# Copyright (C) 2020 gcab's COPYRIGHT HOLDER
+# This file is distributed under the same license as the gcab package.
+# sicklylife <translation@sicklylife.jp>, 2020.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: gcab 0_X\n"
+"Report-Msgid-Bugs-To: https://gitlab.gnome.org/GNOME/gcab/issues\n"
+"POT-Creation-Date: 2020-03-29 13:38+0000\n"
+"PO-Revision-Date: 2020-06-09 22:00+0000\n"
+"Last-Translator: sicklylife <translation@sicklylife.jp>\n"
+"Language-Team: Japanese <gnome-translation@gnome.gr.jp>\n"
+"Language: ja\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+#: ../gcab.c:82
+#, c-format
+msgid "Removing leading '%s' from member names"
+msgstr ""
+
+#: ../gcab.c:94
+#, c-format
+msgid "Dumping %s data to: %s ...\n"
+msgstr "%s のデータを次にダンプ中: %s ...\n"
+
+#: ../gcab.c:102
+#, c-format
+msgid "can't write file %s: %s"
+msgstr "%s に書き込めません: %s"
+
+#: ../gcab.c:128
+msgid "Print program version"
+msgstr "プログラムのバージョンを表示する"
+
+#: ../gcab.c:129
+msgid "Be verbose"
+msgstr "出力を詳細にする"
+
+#: ../gcab.c:130
+msgid "Create archive"
+msgstr "アーカイブを作成する"
+
+#: ../gcab.c:131
+msgid "Extract all files"
+msgstr "すべてのファイルを展開する"
+
+#: ../gcab.c:132
+msgid "Dump reserved and extra data"
+msgstr ""
+
+#: ../gcab.c:133
+msgid "List content"
+msgstr "内容を一覧表示する"
+
+#: ../gcab.c:134
+msgid "List content with file details"
+msgstr "内容とファイルの詳細を一覧表示する"
+
+#: ../gcab.c:135
+msgid "Change to directory DIR"
+msgstr "ディレクトリ DIR に変更する"
+
+#: ../gcab.c:135
+msgid "DIR"
+msgstr "DIR"
+
+#: ../gcab.c:136
+msgid "Use zip compression"
+msgstr "ZIP 圧縮を使用する"
+
+#: ../gcab.c:137
+msgid "Do not include path"
+msgstr "パスを含めない"
+
+#: ../gcab.c:138
+msgid "Reserve space in cabinet for signing (e.g. -s 6144 reserves 6K bytes)"
+msgstr ""
+"キャビネット内に署名用の領域を確保する (例: -s 6144 は 6 キロバイト確保します)"
+
+#: ../gcab.c:139
+msgid "FILE INPUT_FILES..."
+msgstr "FILE INPUT_FILES..."
+
+#: ../gcab.c:153
+msgid "- create a Cabinet file"
+msgstr "- キャビネットファイルを作成します"
+
+#: ../gcab.c:154
+#, c-format
+msgid "Report bugs to <%s>"
+msgstr "バグ報告先: <%s>"
+
+#: ../gcab.c:157
+msgid ""
+"gcab saves many files together into a cabinet archive, and can restore\n"
+"individual files from the archive."
+msgstr ""
+"gcab は複数のファイルを単一のキャビネットアーカイブへと保存し、\n"
+"そこからファイルを個別に取り出すことができます。"
+
+#: ../gcab.c:164
+#, c-format
+msgid "option parsing failed: %s\n"
+msgstr "オプションの解析に失敗しました: %s\n"
+
+#: ../gcab.c:173
+msgid "Please specify a single operation."
+msgstr "操作は一つだけ指定してください。"
+
+#: ../gcab.c:176
+msgid "cabinet file must be specified."
+msgstr "キャビネットファイルを指定する必要があります。"
+
+#: ../gcab.c:190
+#, c-format
+msgid "can't open %s for reading: %s\n"
+msgstr "%s を読み取り用に開けません: %s\n"
+
+#: ../gcab.c:192
+#, c-format
+msgid "error reading %s: %s\n"
+msgstr "%s の読み取りエラー: %s\n"
+
+#: ../gcab.c:227
+#, c-format
+msgid "error during extraction: %s"
+msgstr "展開中にエラーが発生しました: %s"
+
+#: ../gcab.c:239
+#, c-format
+msgid "error while reading signature: %s"
+msgstr "署名の読み取り中にエラーが発生しました: %s"
+
+#: ../gcab.c:250
+msgid "please specify input files."
+msgstr "入力ファイルを指定してください。"
+
+#: ../gcab.c:268
+#, c-format
+msgid "Can't add file %s: %s"
+msgstr "%s を追加できません: %s"
+
+#: ../gcab.c:278
+msgid "no files to be archived."
+msgstr "アーカイブに追加するファイルがありません。"
+
+#: ../gcab.c:284
+#, c-format
+msgid "can't create cab file %s: %s"
+msgstr "cab ファイル %s を作成できません: %s"
+
+#: ../gcab.c:288
+#, c-format
+msgid "can't add folder to cab file %s: %s"
+msgstr "cab ファイル %s にフォルダーを追加できません: %s"
+
+#: ../gcab.c:296
+#, c-format
+msgid "can't write cab file %s: %s"
+msgstr "cab ファイル %s に書き込めません: %s"
+
+#: ../libgcab/cabinet.c:42 ../libgcab/cabinet.c:512
+#, c-format
+msgid "unsupported compression method %d"
+msgstr "%d はサポートしていない圧縮方式です"
+
+#: ../libgcab/cabinet.c:539
+msgid "incorrect checksum detected"
+msgstr "正しくないチェックサムを検出しました"
