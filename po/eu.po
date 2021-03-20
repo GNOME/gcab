@@ -3,174 +3,171 @@
 # This file is distributed under the same license as the PACKAGE package.
 #
 # Iñaki Larrañaga Murgoitio <dooteo@zundan.com>, 2013, 2015.
+# Asier Sarasua Garmendia <asiersarasua@ni.eus>, 2021.
 #
 msgid ""
-msgstr ""
-"Project-Id-Version: gcab master\n"
-"Report-Msgid-Bugs-To: http://bugzilla.gnome.org/enter_bug.cgi?"
-"product=gcab&keywords=I18N+L10N&component=general\n"
-"POT-Creation-Date: 2015-04-04 17:34+0200\n"
-"PO-Revision-Date: 2015-04-04 17:35+0200\n"
-"Last-Translator: Iñaki Larrañaga Murgoitio <dooteo@zundan.com>\n"
-"Language-Team: Basque <librezale@librezale.org>\n"
+msgstr "Project-Id-Version: gcab master\n"
+"Report-Msgid-Bugs-To: https://gitlab.gnome.org/GNOME/gcab/issues\n"
+"POT-Creation-Date: 2020-06-09 15:35+0000\n"
+"PO-Revision-Date: 2021-03-20 18:58+0100\n"
+"Last-Translator: Asier Sarasua Garmendia <asiersarasua@ni.eus>\n"
+"Language-Team: Basque <librezale@librezale.eus>\n"
 "Language: eu\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
-"X-Generator: Lokalize 1.5\n"
 
-#: ../gcab.c:62
+#: ../gcab.c:82
 #, c-format
 msgid "Removing leading '%s' from member names"
 msgstr "Hasierako '%s' kideen izenetatik kentzen"
 
-#: ../gcab.c:74
+#: ../gcab.c:94
 #, c-format
 msgid "Dumping %s data to: %s ...\n"
 msgstr "'%s'(r)en datuak hona iraultzen: %s...\n"
 
-#: ../gcab.c:82
+#: ../gcab.c:102
 #, c-format
 msgid "can't write file %s: %s"
 msgstr "ezin da '%s' fitxategia idatzi: %s"
 
-#: ../gcab.c:109
+#: ../gcab.c:128
 msgid "Print program version"
 msgstr "Erakutsi programaren bertsioa"
 
-#: ../gcab.c:110
+#: ../gcab.c:129
 msgid "Be verbose"
 msgstr "Eman xehetasunak"
 
-#: ../gcab.c:111
+#: ../gcab.c:130
 msgid "Create archive"
 msgstr "Sortu artxiboa"
 
-#: ../gcab.c:112
+#: ../gcab.c:131
 msgid "Extract all files"
 msgstr "Erauzi fitxategi guztiak"
 
-#: ../gcab.c:113
+#: ../gcab.c:132
 msgid "Dump reserved and extra data"
 msgstr "Irauli gordetako datuak eta datu gehigarriak"
 
-#: ../gcab.c:114
+#: ../gcab.c:133
 msgid "List content"
 msgstr "Zerrendatu edukia"
 
-#: ../gcab.c:115
+#: ../gcab.c:134
 msgid "List content with file details"
 msgstr "Zerrendatu edukia fitxategien xehetasunekin"
 
-#: ../gcab.c:116
+#: ../gcab.c:135
 msgid "Change to directory DIR"
 msgstr "Aldatu DIR direktoriora"
 
-#: ../gcab.c:116
+#: ../gcab.c:135
 msgid "DIR"
 msgstr "DIR"
 
-#: ../gcab.c:117
+#: ../gcab.c:136
 msgid "Use zip compression"
 msgstr "Erabili zip konpresioa"
 
-#: ../gcab.c:118
+#: ../gcab.c:137
 msgid "Do not include path"
 msgstr "Ez sartu bide-izena"
 
-#: ../gcab.c:119
+#: ../gcab.c:138
 msgid "Reserve space in cabinet for signing (e.g. -s 6144 reserves 6K bytes)"
-msgstr ""
-"Gorde lekua 'cabinet' artxiboan sinatzeko (adib.  '-s 6144' aukerak 6 Kbyte "
-"gordetzen ditu)"
+msgstr "Gorde lekua 'cabinet' artxiboan sinatzeko (adib.  '-s 6144' aukerak 6 Kbyte gordetzen ditu)"
 
-#: ../gcab.c:120
+#: ../gcab.c:139
 msgid "FILE INPUT_FILES..."
 msgstr "ARTXIBOA SARRERAKO_FITXATEGIAK..."
 
 # Cabinet formatua artxibo konprimitua da, ezin da beraz 'fitxategi' bezala euskaratu.
-#: ../gcab.c:134
+#: ../gcab.c:153
 msgid "- create a Cabinet file"
 msgstr "- sortu Cabinet artxiboa"
 
-#: ../gcab.c:135
+#: ../gcab.c:154
 #, c-format
 msgid "Report bugs to <%s>"
 msgstr "Bidali erroreei buruzko informazioa hona: <%s>"
 
-#: ../gcab.c:138
+#: ../gcab.c:157
 msgid ""
 "gcab saves many files together into a cabinet archive, and can restore\n"
 "individual files from the archive."
-msgstr ""
-"gcab aplikazioak hainbat fitxategi batera gordetzen ditu 'cabinet' motako "
-"artxibo batean,\n"
+msgstr "gcab aplikazioak hainbat fitxategi batera gordetzen ditu 'cabinet' motako artxibo batean,\n"
 "eta banakako fitxategiak lehenera ditzake artxibotik."
 
-#: ../gcab.c:145
+#: ../gcab.c:164
 #, c-format
 msgid "option parsing failed: %s\n"
 msgstr "Huts egin du aukera aztertzean: %s\n"
 
-#: ../gcab.c:154
+#: ../gcab.c:173
 msgid "Please specify a single operation."
 msgstr "Zehaztu eragiketa bakar bat."
 
-#: ../gcab.c:157
+#: ../gcab.c:176
 msgid "cabinet file must be specified."
 msgstr "cabinet artxiboa zehaztu behar da."
 
-#: ../gcab.c:171
+#: ../gcab.c:190
 #, c-format
 msgid "can't open %s for reading: %s\n"
 msgstr "ezin da '%s' irakurtzeko ireki: %s\n"
 
-#: ../gcab.c:173
+#: ../gcab.c:192
 #, c-format
 msgid "error reading %s: %s\n"
 msgstr "errorea '%s' irakurtzean: %s\n"
 
-#: ../gcab.c:208
+#: ../gcab.c:227
 #, c-format
 msgid "error during extraction: %s"
 msgstr "errorea erauztean: %s"
 
-#: ../gcab.c:220
+#: ../gcab.c:239
 #, c-format
 msgid "error while reading signature: %s"
 msgstr "errorea sinadura irakurtzean: %s"
 
-#: ../gcab.c:231
+#: ../gcab.c:250
 msgid "please specify input files."
 msgstr "zehaztu sarrerako fitxategiak."
 
-#: ../gcab.c:249
+#: ../gcab.c:268
 #, c-format
 msgid "Can't add file %s: %s"
 msgstr "Ezin da '%s' fitxategia gehitu: %s"
 
-#: ../gcab.c:259
+#: ../gcab.c:278
 msgid "no files to be archived."
 msgstr "ez dago fitxategirik artxibatzeko."
 
-#: ../gcab.c:265
+#: ../gcab.c:284
 #, c-format
 msgid "can't create cab file %s: %s"
 msgstr "ezin da '%s' cab artxiboa sortu: %s"
 
-#: ../gcab.c:269
+#: ../gcab.c:288
 #, c-format
 msgid "can't add folder to cab file %s: %s"
 msgstr "ezin zaio '%s' cab artxiboari karpeta gehitu: %s"
 
-#: ../gcab.c:277
+#: ../gcab.c:296
 #, c-format
 msgid "can't write cab file %s: %s"
 msgstr "ezin da '%s' cab artxiboa idatzi: %s"
 
-#: ../libgcab/cabinet.c:20 ../libgcab/cabinet.c:468
+#: ../libgcab/cabinet.c:42 ../libgcab/cabinet.c:512
 #, c-format
 msgid "unsupported compression method %d"
 msgstr "onartu gabeko %d konpresio-metodoa"
 
+#: ../libgcab/cabinet.c:539
+msgid "incorrect checksum detected"
+msgstr "kontrol-batura okerra detektatu da"
