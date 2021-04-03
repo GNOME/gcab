@@ -8,8 +8,8 @@
 msgid ""
 msgstr "Project-Id-Version: gcab master\n"
 "Report-Msgid-Bugs-To: https://gitlab.gnome.org/GNOME/gcab/issues\n"
-"POT-Creation-Date: 2020-06-09 15:35+0000\n"
-"PO-Revision-Date: 2021-03-20 18:58+0100\n"
+"POT-Creation-Date: 2021-03-20 08:37+0000\n"
+"PO-Revision-Date: 2021-04-03 18:58+0100\n"
 "Last-Translator: Asier Sarasua Garmendia <asiersarasua@ni.eus>\n"
 "Language-Team: Basque <librezale@librezale.eus>\n"
 "Language: eu\n"
@@ -18,156 +18,141 @@ msgstr "Project-Id-Version: gcab master\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: ../gcab.c:82
-#, c-format
-msgid "Removing leading '%s' from member names"
-msgstr "Hasierako '%s' kideen izenetatik kentzen"
+#: src/gcab.c:82
+msgid "Dumping data to:"
+msgstr "Datuak hona iraultzen:"
 
-#: ../gcab.c:94
-#, c-format
-msgid "Dumping %s data to: %s ...\n"
-msgstr "'%s'(r)en datuak hona iraultzen: %s...\n"
-
-#: ../gcab.c:102
-#, c-format
-msgid "can't write file %s: %s"
-msgstr "ezin da '%s' fitxategia idatzi: %s"
-
-#: ../gcab.c:128
+#: src/gcab.c:114
 msgid "Print program version"
 msgstr "Erakutsi programaren bertsioa"
 
-#: ../gcab.c:129
+#: src/gcab.c:115
 msgid "Be verbose"
 msgstr "Eman xehetasunak"
 
-#: ../gcab.c:130
+#: src/gcab.c:116
 msgid "Create archive"
 msgstr "Sortu artxiboa"
 
-#: ../gcab.c:131
+#: src/gcab.c:117
 msgid "Extract all files"
 msgstr "Erauzi fitxategi guztiak"
 
-#: ../gcab.c:132
+#: src/gcab.c:118
 msgid "Dump reserved and extra data"
 msgstr "Irauli gordetako datuak eta datu gehigarriak"
 
-#: ../gcab.c:133
+#: src/gcab.c:119
 msgid "List content"
 msgstr "Zerrendatu edukia"
 
-#: ../gcab.c:134
+#: src/gcab.c:120
 msgid "List content with file details"
 msgstr "Zerrendatu edukia fitxategien xehetasunekin"
 
-#: ../gcab.c:135
+#: src/gcab.c:121
 msgid "Change to directory DIR"
 msgstr "Aldatu DIR direktoriora"
 
-#: ../gcab.c:135
+#: src/gcab.c:121
 msgid "DIR"
 msgstr "DIR"
 
-#: ../gcab.c:136
+#: src/gcab.c:122
 msgid "Use zip compression"
 msgstr "Erabili zip konpresioa"
 
-#: ../gcab.c:137
+#: src/gcab.c:123
 msgid "Do not include path"
 msgstr "Ez sartu bide-izena"
 
-#: ../gcab.c:138
+#: src/gcab.c:124
 msgid "Reserve space in cabinet for signing (e.g. -s 6144 reserves 6K bytes)"
 msgstr "Gorde lekua 'cabinet' artxiboan sinatzeko (adib.  '-s 6144' aukerak 6 Kbyte gordetzen ditu)"
 
-#: ../gcab.c:139
+#: src/gcab.c:125
 msgid "FILE INPUT_FILES..."
 msgstr "ARTXIBOA SARRERAKO_FITXATEGIAK..."
 
 # Cabinet formatua artxibo konprimitua da, ezin da beraz 'fitxategi' bezala euskaratu.
-#: ../gcab.c:153
+#: src/gcab.c:139
 msgid "- create a Cabinet file"
 msgstr "- sortu Cabinet artxiboa"
 
-#: ../gcab.c:154
-#, c-format
-msgid "Report bugs to <%s>"
-msgstr "Bidali erroreei buruzko informazioa hona: <%s>"
+#: src/gcab.c:140
+msgid "Report bugs to:"
+msgstr "Eman akatsaren berri hemen:"
 
-#: ../gcab.c:157
+#: src/gcab.c:142
 msgid ""
 "gcab saves many files together into a cabinet archive, and can restore\n"
 "individual files from the archive."
 msgstr "gcab aplikazioak hainbat fitxategi batera gordetzen ditu 'cabinet' motako artxibo batean,\n"
 "eta banakako fitxategiak lehenera ditzake artxibotik."
 
-#: ../gcab.c:164
-#, c-format
-msgid "option parsing failed: %s\n"
-msgstr "Huts egin du aukera aztertzean: %s\n"
+#: src/gcab.c:149
+msgid "Option parsing failed"
+msgstr "Aukeren analisiak huts egin du"
 
-#: ../gcab.c:173
-msgid "Please specify a single operation."
+#: src/gcab.c:159
+msgid "Please specify a single operation"
 msgstr "Zehaztu eragiketa bakar bat."
 
-#: ../gcab.c:176
-msgid "cabinet file must be specified."
-msgstr "cabinet artxiboa zehaztu behar da."
+#: src/gcab.c:164
+msgid "Cabinet file must be specified"
+msgstr "Cabinet artxiboa zehaztu behar da."
 
-#: ../gcab.c:190
-#, c-format
-msgid "can't open %s for reading: %s\n"
-msgstr "ezin da '%s' irakurtzeko ireki: %s\n"
+#: src/gcab.c:180
+msgid "Cannot open file for reading"
+msgstr "Ezin izan da fitxateia ireki irakurtzeko"
 
-#: ../gcab.c:192
-#, c-format
-msgid "error reading %s: %s\n"
-msgstr "errorea '%s' irakurtzean: %s\n"
+#: src/gcab.c:184
+msgid "Error reading"
+msgstr "Errorea irakurtzean"
 
-#: ../gcab.c:227
-#, c-format
-msgid "error during extraction: %s"
-msgstr "errorea erauztean: %s"
+#: src/gcab.c:216
+msgid "Error during extraction"
+msgstr "Errorea erauztean"
 
-#: ../gcab.c:239
-#, c-format
-msgid "error while reading signature: %s"
-msgstr "errorea sinadura irakurtzean: %s"
+#: src/gcab.c:231
+msgid "Error while reading signature"
+msgstr "Errorea sinadura irakurtzean"
 
-#: ../gcab.c:250
-msgid "please specify input files."
-msgstr "zehaztu sarrerako fitxategiak."
+#: src/gcab.c:243
+msgid "No input files specified"
+msgstr "Ez da sarrerako fitxategirik zehaztu"
 
-#: ../gcab.c:268
-#, c-format
-msgid "Can't add file %s: %s"
-msgstr "Ezin da '%s' fitxategia gehitu: %s"
+#: src/gcab.c:262
+msgid "Cannot add file"
+msgstr "Ezin izan da fitxategia gehitu"
 
-#: ../gcab.c:278
-msgid "no files to be archived."
-msgstr "ez dago fitxategirik artxibatzeko."
+#: src/gcab.c:268
+msgid "No files to be archived"
+msgstr "Ez dago fitxategirik artxibatzeko"
 
-#: ../gcab.c:284
-#, c-format
-msgid "can't create cab file %s: %s"
-msgstr "ezin da '%s' cab artxiboa sortu: %s"
+#: src/gcab.c:276
+msgid "Cannot create cab file"
+msgstr "Ezin da cab fitxategia sortu"
 
-#: ../gcab.c:288
-#, c-format
-msgid "can't add folder to cab file %s: %s"
-msgstr "ezin zaio '%s' cab artxiboari karpeta gehitu: %s"
+#: src/gcab.c:282
+msgid "Cannot add folder to cab file"
+msgstr "Ezin zaio karpeta gehitu cab fitxategiari"
 
-#: ../gcab.c:296
-#, c-format
-msgid "can't write cab file %s: %s"
-msgstr "ezin da '%s' cab artxiboa idatzi: %s"
+#: src/gcab.c:292
+msgid "Cannot write cab file"
+msgstr "Ezin da cab fitxategia idatzi"
 
-#: ../libgcab/cabinet.c:42 ../libgcab/cabinet.c:512
-#, c-format
-msgid "unsupported compression method %d"
-msgstr "onartu gabeko %d konpresio-metodoa"
+#~ msgid "Removing leading '%s' from member names"
+#~ msgstr "Hasierako '%s' kideen izenetatik kentzen"
 
-#: ../libgcab/cabinet.c:539
-msgid "incorrect checksum detected"
-msgstr "kontrol-batura okerra detektatu da"
+#~ msgid "can't write file %s: %s"
+#~ msgstr "ezin da '%s' fitxategia idatzi: %s"
+
+#~ msgid "please specify input files."
+#~ msgstr "zehaztu sarrerako fitxategiak."
+
+#~ msgid "unsupported compression method %d"
+#~ msgstr "onartu gabeko %d konpresio-metodoa"
+
+#~ msgid "incorrect checksum detected"
+#~ msgstr "kontrol-batura okerra detektatu da"
