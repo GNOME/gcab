@@ -3,22 +3,21 @@
 # This file is distributed under the same license as the gcab package.
 #
 # zlatin <zalatik@hotmail.com>, 2013.
-# Yuri Chornoivan <yurchor@ukr.net>, 2020.
+# Yuri Chornoivan <yurchor@ukr.net>, 2020, 2021.
 msgid ""
 msgstr ""
 "Project-Id-Version: gcab master\n"
 "Report-Msgid-Bugs-To: https://gitlab.gnome.org/GNOME/gcab/issues\n"
-"POT-Creation-Date: 2019-12-11 13:43+0000\n"
-"PO-Revision-Date: 2020-04-27 09:39+0300\n"
+"POT-Creation-Date: 2021-04-12 11:14+0000\n"
+"PO-Revision-Date: 2021-04-12 16:17+0300\n"
 "Last-Translator: Yuri Chornoivan <yurchor@ukr.net>\n"
 "Language-Team: Ukrainian <trans-uk@lists.fedoraproject.org>\n"
 "Language: uk\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<"
-"=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
-"X-Generator: Lokalize 20.07.70\n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
+"X-Generator: Lokalize 20.12.0\n"
 
 #: src/gcab.c:82
 msgid "Dumping data to:"
@@ -82,7 +81,6 @@ msgid "- create a Cabinet file"
 msgstr "- створення файла архіву Cabinet"
 
 #: src/gcab.c:140
-#| msgid "Report bugs to <%s>"
 msgid "Report bugs to:"
 msgstr "Адреса для повідомлень про вади:"
 
@@ -95,65 +93,58 @@ msgstr ""
 "відновити окремі файли з архіву."
 
 #: src/gcab.c:149
-#| msgid "option parsing failed: %s\n"
 msgid "Option parsing failed"
 msgstr "Не вдалося обробити параметри"
 
 #: src/gcab.c:159
-#| msgid "Please specify a single operation."
 msgid "Please specify a single operation"
 msgstr "Будь ласка, вкажіть лише одну дію"
 
 #: src/gcab.c:164
-#| msgid "cabinet file must be specified."
 msgid "Cabinet file must be specified"
 msgstr "Слід вказати файл cabinet"
 
 #: src/gcab.c:180
-#| msgid "can't open %s for reading: %s\n"
 msgid "Cannot open file for reading"
 msgstr "Не вдалося відкрити файл для читання"
 
 #: src/gcab.c:184
-#| msgid "error reading %s: %s\n"
 msgid "Error reading"
 msgstr "Помилка при читанні"
 
-#: src/gcab.c:216
-#| msgid "error during extraction: %s"
+#: src/gcab.c:206
+msgid "<unknown-date>"
+msgstr ""
+"<невідома-дата>"
+
+#: src/gcab.c:219
 msgid "Error during extraction"
 msgstr "Помилка при розпаковуванні"
 
-#: src/gcab.c:231
+#: src/gcab.c:234
 msgid "Error while reading signature"
 msgstr "Помилка під час читання підпису"
 
-#: src/gcab.c:243
-#| msgid "cabinet file must be specified."
+#: src/gcab.c:246
 msgid "No input files specified"
 msgstr "Не вказано вхідних файлів"
 
-#: src/gcab.c:262
-#| msgid "Can't add file %s: %s"
+#: src/gcab.c:265
 msgid "Cannot add file"
 msgstr "Не вдалося додати файл"
 
-#: src/gcab.c:268
-#| msgid "no files to be archived."
+#: src/gcab.c:271
 msgid "No files to be archived"
 msgstr "Не вказано файлів для архівування"
 
-#: src/gcab.c:276
-#| msgid "can't create cab file %s: %s"
+#: src/gcab.c:279
 msgid "Cannot create cab file"
 msgstr "Не вдалося створити файл cab"
 
-#: src/gcab.c:282
-#| msgid "can't add folder to cabinet: %s"
+#: src/gcab.c:285
 msgid "Cannot add folder to cab file"
 msgstr "Не вдалося додати теку до файла cab"
 
-#: src/gcab.c:292
-#| msgid "can't write cab file %s: %s"
+#: src/gcab.c:295
 msgid "Cannot write cab file"
 msgstr "Не вдалося записати файл cab"
