@@ -1,15 +1,15 @@
 # Polish translation for gcab.
-# Copyright © 2013-2018 the gcab authors.
+# Copyright © 2013-2021 the gcab authors.
 # This file is distributed under the same license as the gcab package.
-# Piotr Drąg <piotrdrag@gmail.com>, 2013-2018.
-# Aviary.pl <community-poland@mozilla.org>, 2013-2018.
+# Piotr Drąg <piotrdrag@gmail.com>, 2013-2021.
+# Aviary.pl <community-poland@mozilla.org>, 2013-2021.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: gcab\n"
-"Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-01-12 17:34+0100\n"
-"PO-Revision-Date: 2018-01-12 17:35+0100\n"
+"Report-Msgid-Bugs-To: https://gitlab.gnome.org/GNOME/gcab/issues\n"
+"POT-Creation-Date: 2021-04-12 11:14+0000\n"
+"PO-Revision-Date: 2021-04-18 12:15+0200\n"
 "Last-Translator: Piotr Drąg <piotrdrag@gmail.com>\n"
 "Language-Team: Polish <community-poland@mozilla.org>\n"
 "Language: pl\n"
@@ -19,72 +19,72 @@ msgstr ""
 "Plural-Forms: nplurals=3; plural=(n==1 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 "
 "|| n%100>=20) ? 1 : 2);\n"
 
-#: ../src/gcab.c:82
+#: src/gcab.c:82
 msgid "Dumping data to:"
 msgstr "Zrzucanie danych do:"
 
-#: ../src/gcab.c:114
+#: src/gcab.c:114
 msgid "Print program version"
 msgstr "Wyświetla wersję programu"
 
-#: ../src/gcab.c:115
+#: src/gcab.c:115
 msgid "Be verbose"
 msgstr "Więcej komunikatów"
 
-#: ../src/gcab.c:116
+#: src/gcab.c:116
 msgid "Create archive"
 msgstr "Tworzy archiwum"
 
-#: ../src/gcab.c:117
+#: src/gcab.c:117
 msgid "Extract all files"
 msgstr "Rozpakowuje wszystkie pliki"
 
-#: ../src/gcab.c:118
+#: src/gcab.c:118
 msgid "Dump reserved and extra data"
 msgstr "Zrzuca zarezerwowane i dodatkowe dane"
 
-#: ../src/gcab.c:119
+#: src/gcab.c:119
 msgid "List content"
 msgstr "Wyświetla listę zawartości"
 
-#: ../src/gcab.c:120
+#: src/gcab.c:120
 msgid "List content with file details"
 msgstr "Wyświetla listę zawartości z informacjami o plikach"
 
-#: ../src/gcab.c:121
+#: src/gcab.c:121
 msgid "Change to directory DIR"
 msgstr "Przechodzi do KATALOGU"
 
-#: ../src/gcab.c:121
+#: src/gcab.c:121
 msgid "DIR"
 msgstr "KATALOG"
 
-#: ../src/gcab.c:122
+#: src/gcab.c:122
 msgid "Use zip compression"
 msgstr "Używa kompresji zip"
 
-#: ../src/gcab.c:123
+#: src/gcab.c:123
 msgid "Do not include path"
 msgstr "Bez dołączania ścieżki"
 
-#: ../src/gcab.c:124
+#: src/gcab.c:124
 msgid "Reserve space in cabinet for signing (e.g. -s 6144 reserves 6K bytes)"
 msgstr ""
 "Rezerwuje miejsce w pliku Cabinet do podpisania (np. -s 6144 rezerwuje 6 KB)"
 
-#: ../src/gcab.c:125
+#: src/gcab.c:125
 msgid "FILE INPUT_FILES..."
 msgstr "PLIK PLIKI_WEJŚCIOWE…"
 
-#: ../src/gcab.c:139
+#: src/gcab.c:139
 msgid "- create a Cabinet file"
 msgstr "— tworzy plik Cabinet"
 
-#: ../src/gcab.c:140
+#: src/gcab.c:140
 msgid "Report bugs to:"
 msgstr "Prosimy zgłaszać błędy pod adresem (w języku angielskim):"
 
-#: ../src/gcab.c:142
+#: src/gcab.c:142
 msgid ""
 "gcab saves many files together into a cabinet archive, and can restore\n"
 "individual files from the archive."
@@ -92,54 +92,58 @@ msgstr ""
 "gcab zapisuje wiele plików w jednym archiwum Cabinet, a także przywraca\n"
 "pojedyncze pliki z archiwum."
 
-#: ../src/gcab.c:149
+#: src/gcab.c:149
 msgid "Option parsing failed"
 msgstr "Przetworzenie opcji się nie powiodło"
 
-#: ../src/gcab.c:159
+#: src/gcab.c:159
 msgid "Please specify a single operation"
 msgstr "Proszę podać jedno działanie"
 
-#: ../src/gcab.c:164
+#: src/gcab.c:164
 msgid "Cabinet file must be specified"
 msgstr "Należy podać plik Cabinet"
 
-#: ../src/gcab.c:180
+#: src/gcab.c:180
 msgid "Cannot open file for reading"
 msgstr "Nie można otworzyć pliku do odczytania"
 
-#: ../src/gcab.c:184
+#: src/gcab.c:184
 msgid "Error reading"
 msgstr "Błąd podczas odczytywania"
 
-#: ../src/gcab.c:220
+#: src/gcab.c:206
+msgid "<unknown-date>"
+msgstr "<nieznana-data>"
+
+#: src/gcab.c:219
 msgid "Error during extraction"
 msgstr "Błąd podczas rozpakowywania"
 
-#: ../src/gcab.c:235
+#: src/gcab.c:234
 msgid "Error while reading signature"
 msgstr "Błąd podczas odczytywania podpisu"
 
-#: ../src/gcab.c:247
+#: src/gcab.c:246
 msgid "No input files specified"
 msgstr "Nie podano plików wejściowych"
 
-#: ../src/gcab.c:266
+#: src/gcab.c:265
 msgid "Cannot add file"
 msgstr "Nie można dodać pliku"
 
-#: ../src/gcab.c:272
+#: src/gcab.c:271
 msgid "No files to be archived"
 msgstr "Brak plików do dołączenia do archiwum"
 
-#: ../src/gcab.c:280
+#: src/gcab.c:279
 msgid "Cannot create cab file"
 msgstr "Nie można utworzyć pliku Cabinet"
 
-#: ../src/gcab.c:286
+#: src/gcab.c:285
 msgid "Cannot add folder to cab file"
 msgstr "Nie można dodać katalogu do pliku Cabinet"
 
-#: ../src/gcab.c:296
+#: src/gcab.c:295
 msgid "Cannot write cab file"
 msgstr "Nie można zapisać pliku Cabinet"
