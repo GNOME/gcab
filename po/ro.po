@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gcab 0_X\n"
 "Report-Msgid-Bugs-To: https://gitlab.gnome.org/GNOME/gcab/issues\n"
-"POT-Creation-Date: 2020-04-27 06:40+0000\n"
-"PO-Revision-Date: 2020-05-21 17:52+0300\n"
+"POT-Creation-Date: 2021-04-12 11:14+0000\n"
+"PO-Revision-Date: 2021-05-05 13:43+0200\n"
 "Last-Translator: Florentina Mușat <emryslokadottir [at] gmail [dot] com>\n"
 "Language-Team: Romanian <gnomero-list@lists.sourceforge.net>\n"
 "Language: ro\n"
@@ -17,7 +17,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=(n==1 ? 0 : (n==0 || (n%100 > 0 && n%100 < "
 "20)) ? 1 : 2);;\n"
-"X-Generator: Poedit 2.3.1\n"
+"X-Generator: Poedit 2.4.2\n"
 
 #: src/gcab.c:82
 msgid "Dumping data to:"
@@ -113,35 +113,39 @@ msgstr "Nu se poate deschide fișierul pentru citire"
 msgid "Error reading"
 msgstr "Eroare la citire"
 
-#: src/gcab.c:216
+#: src/gcab.c:206
+msgid "<unknown-date>"
+msgstr "<dată-necunoscută>"
+
+#: src/gcab.c:219
 msgid "Error during extraction"
 msgstr "Eroare în timpul extragerii"
 
-#: src/gcab.c:231
+#: src/gcab.c:234
 msgid "Error while reading signature"
 msgstr "Eroare la citirea semnăturii"
 
-#: src/gcab.c:243
+#: src/gcab.c:246
 msgid "No input files specified"
 msgstr "Nu sunt fișiere de intrare specificate"
 
-#: src/gcab.c:262
+#: src/gcab.c:265
 msgid "Cannot add file"
 msgstr "Nu se poate adăuga fișierul"
 
-#: src/gcab.c:268
+#: src/gcab.c:271
 msgid "No files to be archived"
 msgstr "Nu sunt fișiere de arhivat"
 
-#: src/gcab.c:276
+#: src/gcab.c:279
 msgid "Cannot create cab file"
 msgstr "Nu se poate crea fișierul cab"
 
-#: src/gcab.c:282
+#: src/gcab.c:285
 msgid "Cannot add folder to cab file"
 msgstr "Nu se poate adăuga dosarul la fișierul cab"
 
-#: src/gcab.c:292
+#: src/gcab.c:295
 msgid "Cannot write cab file"
 msgstr "Nu se poate scrie fișierul cab"
 
