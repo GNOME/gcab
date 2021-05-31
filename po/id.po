@@ -6,17 +6,16 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: gcab master\n"
-"Report-Msgid-Bugs-To: https://bugzilla.gnome.org/enter_bug.cgi?"
-"product=msitools&keywords=I18N+L10N&component=gcab\n"
-"POT-Creation-Date: 2018-01-26 14:27+0000\n"
-"PO-Revision-Date: 2018-01-31 11:40+0700\n"
-"Last-Translator: Kukuh Syafaat <syafaatkukuh@gmail.com>\n"
+"Report-Msgid-Bugs-To: https://gitlab.gnome.org/GNOME/gcab/issues\n"
+"POT-Creation-Date: 2021-04-12 11:14+0000\n"
+"PO-Revision-Date: 2021-05-31 17:29+0700\n"
+"Last-Translator: Andika Triwidada <andika@gmail.com>\n"
 "Language-Team: Indonesian <gnome-l10n-id@googlegroups.com>\n"
 "Language: id\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: Poedit 2.0.6\n"
+"X-Generator: Poedit 2.4.2\n"
 
 #: src/gcab.c:82
 msgid "Dumping data to:"
@@ -110,51 +109,40 @@ msgstr "Tidak bisa membuka berkas untuk dibaca"
 
 #: src/gcab.c:184
 msgid "Error reading"
-msgstr "Galat saat baca"
+msgstr "Galat saat membaca"
 
-#: src/gcab.c:220
+#: src/gcab.c:206
+msgid "<unknown-date>"
+msgstr "<tanggal-tak-diketahui>"
+
+#: src/gcab.c:219
 msgid "Error during extraction"
 msgstr "Galat saat ekstraksi"
 
-#: src/gcab.c:235
+#: src/gcab.c:234
 msgid "Error while reading signature"
-msgstr "galat saat membaca tanda tangan"
+msgstr "Galat saat membaca tanda tangan"
 
-#: src/gcab.c:247
+#: src/gcab.c:246
 msgid "No input files specified"
 msgstr "Tidak ada berkas masukan yang ditentukan"
 
-#: src/gcab.c:266
+#: src/gcab.c:265
 msgid "Cannot add file"
 msgstr "Tidak bisa menambahkan berkas"
 
-#: src/gcab.c:272
+#: src/gcab.c:271
 msgid "No files to be archived"
-msgstr "Tidak ada berkas yang akan diarsipkan."
+msgstr "Tidak ada berkas yang akan diarsipkan"
 
-#: src/gcab.c:280
+#: src/gcab.c:279
 msgid "Cannot create cab file"
 msgstr "Tidak bisa membuat berkas cab"
 
-#: src/gcab.c:286
+#: src/gcab.c:285
 msgid "Cannot add folder to cab file"
 msgstr "Tidak bisa menambahkan folder ke berkas kab"
 
-#: src/gcab.c:296
+#: src/gcab.c:295
 msgid "Cannot write cab file"
 msgstr "Tidak bisa menulis berkas kab"
-
-#~ msgid "Removing leading '%s' from member names"
-#~ msgstr "Menghapus awalan '%s' dari nama-nama anggota"
-
-#~ msgid "can't write file %s: %s"
-#~ msgstr "tak bisa menulis berkas %s: %s"
-
-#~ msgid "please specify input files."
-#~ msgstr "harap nyatakan berkas masukan."
-
-#~ msgid "unsupported compression method %d"
-#~ msgstr "metoda kompresi tak didukung %d"
-
-#~ msgid "incorrect checksum detected"
-#~ msgstr "﻿checksum yang salah terdeteksi"
