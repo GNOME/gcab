@@ -1,15 +1,15 @@
 # Czech translation for gcab.
 # Copyright (C) 2013 gcab's COPYRIGHT HOLDER
 # This file is distributed under the same license as the gcab package.
-# Marek Černocký <marek@manet.cz>, 2013, 2015, 2018.
+#
+# Marek Černocký <marek@manet.cz>, 2013, 2015, 2018, 2021.
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: gcab master\n"
-"Report-Msgid-Bugs-To: https://bugzilla.gnome.org/enter_bug.cgi?"
-"product=msitools&keywords=I18N+L10N&component=gcab\n"
-"POT-Creation-Date: 2018-01-23 13:50+0000\n"
-"PO-Revision-Date: 2018-01-25 21:32+0100\n"
+"Project-Id-Version: gcab\n"
+"Report-Msgid-Bugs-To: https://gitlab.gnome.org/GNOME/gcab/issues\n"
+"POT-Creation-Date: 2021-04-12 11:14+0000\n"
+"PO-Revision-Date: 2021-09-05 07:40+0200\n"
 "Last-Translator: Marek Černocký <marek@manet.cz>\n"
 "Language-Team: čeština <gnome-cs-list@gnome.org>\n"
 "Language: cs\n"
@@ -19,73 +19,73 @@ msgstr ""
 "Plural-Forms: nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2;\n"
 "X-Generator: Gtranslator 2.91.7\n"
 
-#: ../src/gcab.c:82
+#: src/gcab.c:82
 msgid "Dumping data to:"
 msgstr "Vypisují se data do:"
 
-#: ../src/gcab.c:114
+#: src/gcab.c:114
 msgid "Print program version"
 msgstr "Vypsat verzi programu"
 
-#: ../src/gcab.c:115
+#: src/gcab.c:115
 msgid "Be verbose"
 msgstr "Podrobnosti"
 
-#: ../src/gcab.c:116
+#: src/gcab.c:116
 msgid "Create archive"
 msgstr "Vytvořit archiv"
 
-#: ../src/gcab.c:117
+#: src/gcab.c:117
 msgid "Extract all files"
 msgstr "Rozbalit všechny soubory"
 
-#: ../src/gcab.c:118
+#: src/gcab.c:118
 msgid "Dump reserved and extra data"
 msgstr "Vypsat rezervovaná a doplňková data"
 
-#: ../src/gcab.c:119
+#: src/gcab.c:119
 msgid "List content"
 msgstr "Vypsat obsah"
 
-#: ../src/gcab.c:120
+#: src/gcab.c:120
 msgid "List content with file details"
 msgstr "Vypsat obsah s podrobnostmi o souborech"
 
-#: ../src/gcab.c:121
+#: src/gcab.c:121
 msgid "Change to directory DIR"
 msgstr "Změnit složku na SLOŽKA"
 
-#: ../src/gcab.c:121
+#: src/gcab.c:121
 msgid "DIR"
 msgstr "SLOŽKA"
 
-#: ../src/gcab.c:122
+#: src/gcab.c:122
 msgid "Use zip compression"
 msgstr "Použít komprimaci zip"
 
-#: ../src/gcab.c:123
+#: src/gcab.c:123
 msgid "Do not include path"
 msgstr "Nezahrnovat cestu"
 
-#: ../src/gcab.c:124
+#: src/gcab.c:124
 msgid "Reserve space in cabinet for signing (e.g. -s 6144 reserves 6K bytes)"
 msgstr ""
 "Rezervovat v souboru CAB místo pro podpis (např. -s 6144 rezervuje 6 "
 "kilobajtů)"
 
-#: ../src/gcab.c:125
+#: src/gcab.c:125
 msgid "FILE INPUT_FILES..."
 msgstr "SOUBOR VSTUPNÍ_SOUBORY…"
 
-#: ../src/gcab.c:139
+#: src/gcab.c:139
 msgid "- create a Cabinet file"
 msgstr "– vytvořit soubor CAB"
 
-#: ../src/gcab.c:140
+#: src/gcab.c:140
 msgid "Report bugs to:"
 msgstr "Chyby hlaste na:"
 
-#: ../src/gcab.c:142
+#: src/gcab.c:142
 msgid ""
 "gcab saves many files together into a cabinet archive, and can restore\n"
 "individual files from the archive."
@@ -93,54 +93,58 @@ msgstr ""
 "gcab ukládá více souborů dohromady do archivu CAB a jednotlivé soubory\n"
 "umí z takového archivu obnovit."
 
-#: ../src/gcab.c:149
+#: src/gcab.c:149
 msgid "Option parsing failed"
 msgstr "Selhalo zpracování voleb"
 
-#: ../src/gcab.c:159
+#: src/gcab.c:159
 msgid "Please specify a single operation"
 msgstr "Určete prosím jednu z operací"
 
-#: ../src/gcab.c:164
+#: src/gcab.c:164
 msgid "Cabinet file must be specified"
 msgstr "Soubor CAB musí být zadán"
 
-#: ../src/gcab.c:180
+#: src/gcab.c:180
 msgid "Cannot open file for reading"
 msgstr "Nezdařilo se otevřít soubor pro čtení"
 
-#: ../src/gcab.c:184
+#: src/gcab.c:184
 msgid "Error reading"
 msgstr "Chyba čtení"
 
-#: ../src/gcab.c:220
+#: src/gcab.c:206
+msgid "<unknown-date>"
+msgstr "<neznámé-datum>"
+
+#: src/gcab.c:219
 msgid "Error during extraction"
 msgstr "Chyba během rozbalování"
 
-#: ../src/gcab.c:235
+#: src/gcab.c:234
 msgid "Error while reading signature"
 msgstr "Chyba při čtení podpisu"
 
-#: ../src/gcab.c:247
+#: src/gcab.c:246
 msgid "No input files specified"
 msgstr "Nebyl určen žádný vstupní soubor"
 
-#: ../src/gcab.c:266
+#: src/gcab.c:265
 msgid "Cannot add file"
 msgstr "Nezdařilo se přidat soubor"
 
-#: ../src/gcab.c:272
+#: src/gcab.c:271
 msgid "No files to be archived"
 msgstr "Nejsou žádné soubory k archivaci"
 
-#: ../src/gcab.c:280
+#: src/gcab.c:279
 msgid "Cannot create cab file"
 msgstr "Nezdařilo se vytvořit soubor CAB"
 
-#: ../src/gcab.c:286
+#: src/gcab.c:285
 msgid "Cannot add folder to cab file"
 msgstr "Nezdařilo se přidat složku do souboru CAB"
 
-#: ../src/gcab.c:296
+#: src/gcab.c:295
 msgid "Cannot write cab file"
 msgstr "Nezdařilo se zapsat soubor CAB"
