@@ -1,14 +1,14 @@
 # Lithuanian translation for gcab.
 # Copyright (C) 2013 gcab's COPYRIGHT HOLDER
 # This file is distributed under the same license as the gcab package.
-# Aurimas Černius <aurisc4@gmail.com>, 2013-2020.
+# Aurimas Černius <aurisc4@gmail.com>, 2013-2021.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: gcab master\n"
 "Report-Msgid-Bugs-To: https://gitlab.gnome.org/GNOME/gcab/issues\n"
-"POT-Creation-Date: 2020-05-28 11:48+0000\n"
-"PO-Revision-Date: 2020-09-06 21:56+0300\n"
+"POT-Creation-Date: 2021-04-12 11:14+0000\n"
+"PO-Revision-Date: 2021-09-06 14:00+0300\n"
 "Last-Translator: Aurimas Černius <aurisc4@gmail.com>\n"
 "Language-Team: Lietuvių <gnome-lt@lists.akl.lt>\n"
 "Language: lt\n"
@@ -17,10 +17,9 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && (n"
 "%100<10 || n%100>=20) ? 1 : 2)\n"
-"X-Generator: Gtranslator 3.36.0\n"
+"X-Generator: Gtranslator 40.0\n"
 
 #: src/gcab.c:82
-#| msgid "Dumping %s data to: %s ...\n"
 msgid "Dumping data to:"
 msgstr "Duomenys įrašomi į:"
 
@@ -82,7 +81,6 @@ msgid "- create a Cabinet file"
 msgstr "- sukurti Cabinet failą"
 
 #: src/gcab.c:140
-#| msgid "Report bugs to <%s>"
 msgid "Report bugs to:"
 msgstr "Pranešti apie klaidas adresu:"
 
@@ -95,67 +93,58 @@ msgstr ""
 "pavienius failus iš archyvo."
 
 #: src/gcab.c:149
-#| msgid "option parsing failed: %s\n"
 msgid "Option parsing failed"
 msgstr "nepavyko perskaityti parametro"
 
 #: src/gcab.c:159
-#| msgid "Please specify a single operation."
 msgid "Please specify a single operation"
 msgstr "Nurodykite vieną veiksmą"
 
 #: src/gcab.c:164
-#| msgid "cabinet file must be specified."
 msgid "Cabinet file must be specified"
 msgstr "turi būti nurodytas cabinet failas"
 
 #: src/gcab.c:180
-#| msgid "can't open %s for reading: %s\n"
 msgid "Cannot open file for reading"
 msgstr "nepavyksta atverti skaitymui"
 
 #: src/gcab.c:184
-#| msgid "error reading %s: %s\n"
 msgid "Error reading"
 msgstr "klaida skaitant"
 
-#: src/gcab.c:216
-#| msgid "error during extraction: %s"
+#: src/gcab.c:206
+msgid "<unknown-date>"
+msgstr "<unknown-date>"
+
+#: src/gcab.c:219
 msgid "Error during extraction"
 msgstr "klaida išskleidžiant"
 
-#: src/gcab.c:231
-#| msgid "error while reading signature: %s"
+#: src/gcab.c:234
 msgid "Error while reading signature"
 msgstr "klaida skaitant parašą"
 
-#: src/gcab.c:243
-#| msgid "cabinet file must be specified."
+#: src/gcab.c:246
 msgid "No input files specified"
 msgstr "turi būti nurodyti įvesties failai"
 
-#: src/gcab.c:262
-#| msgid "Can't add file %s: %s"
+#: src/gcab.c:265
 msgid "Cannot add file"
 msgstr "Nepavyksta pridėti failo"
 
-#: src/gcab.c:268
-#| msgid "no files to be archived."
+#: src/gcab.c:271
 msgid "No files to be archived"
 msgstr "nėra archyvuojamų failų"
 
-#: src/gcab.c:276
-#| msgid "can't create cab file %s: %s"
+#: src/gcab.c:279
 msgid "Cannot create cab file"
 msgstr "nepavyksta sukurti cab failo"
 
-#: src/gcab.c:282
-#| msgid "can't add folder to cab file %s: %s"
+#: src/gcab.c:285
 msgid "Cannot add folder to cab file"
 msgstr "nepavyksta pridėti aplanko į cab failą"
 
-#: src/gcab.c:292
-#| msgid "can't write cab file %s: %s"
+#: src/gcab.c:295
 msgid "Cannot write cab file"
 msgstr "nepavyksta įrašyti cab failo"
 
