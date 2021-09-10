@@ -1,23 +1,22 @@
 # Hungarian translation for gcab.
-# Copyright (C) 2013, 2015, 2018 Free Software Foundation, Inc.
+# Copyright (C) 2013, 2015, 2018, 2021 Free Software Foundation, Inc.
 # This file is distributed under the same license as the gcab package.
 #
-# Balázs Úr <urbalazs at gmail dot com>, 2013, 2015, 2018.
+# Balázs Úr <ur.balazs at fsf dot hu>, 2013, 2015, 2018, 2021.
 msgid ""
 msgstr ""
 "Project-Id-Version: gcab master\n"
-"Report-Msgid-Bugs-To: https://bugzilla.gnome.org/enter_bug.cgi?"
-"product=msitools&keywords=I18N+L10N&component=gcab\n"
-"POT-Creation-Date: 2018-01-26 14:27+0000\n"
-"PO-Revision-Date: 2018-01-27 10:05+0100\n"
-"Last-Translator: Balázs Úr <urbalazs@gmail.com>\n"
-"Language-Team: Hungarian <openscope at googlegroups dot com>\n"
+"Report-Msgid-Bugs-To: https://gitlab.gnome.org/GNOME/gcab/issues\n"
+"POT-Creation-Date: 2021-04-12 11:14+0000\n"
+"PO-Revision-Date: 2021-09-10 21:56+0200\n"
+"Last-Translator: Balázs Úr <ur.balazs at fsf dot hu>\n"
+"Language-Team: Hungarian <gnome-hu-list at gnome dot org>\n"
 "Language: hu\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
-"X-Generator: Lokalize 1.2\n"
+"X-Generator: Lokalize 19.12.3\n"
 
 #: src/gcab.c:82
 msgid "Dumping data to:"
@@ -113,35 +112,38 @@ msgstr "Nem nyitható meg a fájl olvasásra"
 msgid "Error reading"
 msgstr "Hiba az olvasás közben"
 
-#: src/gcab.c:220
+#: src/gcab.c:206
+msgid "<unknown-date>"
+msgstr "<ismeretlen-dátum>"
+
+#: src/gcab.c:219
 msgid "Error during extraction"
 msgstr "Hiba a kibontás során"
 
-#: src/gcab.c:235
+#: src/gcab.c:234
 msgid "Error while reading signature"
 msgstr "Hiba az aláírás olvasása közben"
 
-#: src/gcab.c:247
+#: src/gcab.c:246
 msgid "No input files specified"
 msgstr "Nincsenek bemeneti fájlok megadva"
 
-#: src/gcab.c:266
+#: src/gcab.c:265
 msgid "Cannot add file"
 msgstr "Nem lehet hozzáadni a fájlt"
 
-#: src/gcab.c:272
+#: src/gcab.c:271
 msgid "No files to be archived"
 msgstr "Nincsenek archiválandó fájlok"
 
-#: src/gcab.c:280
+#: src/gcab.c:279
 msgid "Cannot create cab file"
 msgstr "Nem hozható létre cab fájl"
 
-#: src/gcab.c:286
+#: src/gcab.c:285
 msgid "Cannot add folder to cab file"
 msgstr "Nem lehet mappát hozzáadni a cab fájlhoz"
 
-#: src/gcab.c:296
+#: src/gcab.c:295
 msgid "Cannot write cab file"
 msgstr "Nem írható a cab fájl"
-
