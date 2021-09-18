@@ -1,26 +1,24 @@
 # Serbian translation for gcab.
 # Copyright © 2013 gcab's COPYRIGHT HOLDER
 # This file is distributed under the same license as the gcab package.
-# Мирослав Николић <miroslavnikolic@rocketmail.com>, 2013—2018.
+# Мирослав Николић <miroslavnikolic@rocketmail.com>, 2013—2018, 2021.
 msgid ""
 msgstr ""
 "Project-Id-Version: gcab master\n"
-"Report-Msgid-Bugs-To: https://bugzilla.gnome.org/enter_bug.cgi?product=msitoo"
-"ls&keywords=I18N+L10N&component=gcab\n"
-"POT-Creation-Date: 2018-01-26 14:27+0000\n"
-"PO-Revision-Date: 2018-02-23 00:34+0200\n"
+"Report-Msgid-Bugs-To: https://gitlab.gnome.org/GNOME/gcab/issues\n"
+"POT-Creation-Date: 2021-04-12 11:14+0000\n"
+"PO-Revision-Date: 2021-09-18 08:38+0200\n"
 "Last-Translator: Мирослав Николић <miroslavnikolic@rocketmail.com>\n"
 "Language-Team: српски <gnome-sr@googlegroups.org>\n"
 "Language: sr\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=4; plural=n==1? 3 : n%10==1 && n%100!=11 ? 0 : "
-"n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2;\n"
+"Plural-Forms: nplurals=4; plural=n==1? 3 : n%10==1 && n%100!=11 ? 0 : n"
+"%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2;\n"
 "X-Project-Style: gnome\n"
 
 #: src/gcab.c:82
-#| msgid "Dumping %s data to: %s ...\n"
 msgid "Dumping data to:"
 msgstr "Избацујем податке у:"
 
@@ -82,7 +80,6 @@ msgid "- create a Cabinet file"
 msgstr "— направите Кабинет датотеку"
 
 #: src/gcab.c:140
-#| msgid "Report bugs to <%s>"
 msgid "Report bugs to:"
 msgstr "Грешке пријавите на:"
 
@@ -95,67 +92,58 @@ msgstr ""
 "појединачне датотеке из архиве."
 
 #: src/gcab.c:149
-#| msgid "option parsing failed: %s\n"
 msgid "Option parsing failed"
 msgstr "Није успела обрада опције"
 
 #: src/gcab.c:159
-#| msgid "Please specify a single operation."
 msgid "Please specify a single operation"
 msgstr "Наведите једну радњу"
 
 #: src/gcab.c:164
-#| msgid "cabinet file must be specified."
 msgid "Cabinet file must be specified"
 msgstr "Мора бити наведена кабинет датотека"
 
 #: src/gcab.c:180
-#| msgid "can't open %s for reading: %s\n"
 msgid "Cannot open file for reading"
 msgstr "Не могу да отворим датотеку за читање"
 
 #: src/gcab.c:184
-#| msgid "error reading %s: %s\n"
 msgid "Error reading"
 msgstr "Грешка читања"
 
-#: src/gcab.c:220
-#| msgid "error during extraction: %s"
+#: src/gcab.c:206
+msgid "<unknown-date>"
+msgstr "<непознат-датум>"
+
+#: src/gcab.c:219
 msgid "Error during extraction"
 msgstr "Грешка приликом извлачења"
 
-#: src/gcab.c:235
-#| msgid "error while reading signature: %s"
+#: src/gcab.c:234
 msgid "Error while reading signature"
 msgstr "Грешка приликом читања потписа"
 
-#: src/gcab.c:247
-#| msgid "cabinet file must be specified."
+#: src/gcab.c:246
 msgid "No input files specified"
 msgstr "Нису наведене улазне датотеке"
 
-#: src/gcab.c:266
-#| msgid "Can't add file %s: %s"
+#: src/gcab.c:265
 msgid "Cannot add file"
 msgstr "Не могу да додам датотеку"
 
-#: src/gcab.c:272
-#| msgid "no files to be archived."
+#: src/gcab.c:271
 msgid "No files to be archived"
 msgstr "Нема датотека за архивирање"
 
-#: src/gcab.c:280
-#| msgid "can't create cab file %s: %s"
+#: src/gcab.c:279
 msgid "Cannot create cab file"
 msgstr "Не могу да направим каб датотеку"
 
-#: src/gcab.c:286
-#| msgid "can't add folder to cab file %s: %s"
+#: src/gcab.c:285
 msgid "Cannot add folder to cab file"
 msgstr "Не могу да додам фасциклу у каб датотеку"
 
-#: src/gcab.c:296
-#| msgid "can't write cab file %s: %s"
+#: src/gcab.c:295
 msgid "Cannot write cab file"
 msgstr "Не могу да запишем каб датотеку"
 
