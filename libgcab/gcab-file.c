@@ -100,7 +100,18 @@ gcab_file_set_name (GCabFile *self, const gchar *name)
     self->cfile->name = fname;
 }
 
-G_GNUC_INTERNAL void
+/**
+ * gcab_file_set_bytes:
+ * @file: a #GCabFile
+ * @bytes: a #GBytes
+ *
+ * Replace the #GBytes associated with @self.
+ * This is most usefule when the #GCabFile has been created using
+ * gcab_file_new_with_bytes() and the data needs to be modified.
+ *
+ * Since: 1.5
+ **/
+void
 gcab_file_set_bytes (GCabFile *self, GBytes *bytes)
 {
     if (self->bytes != NULL)
