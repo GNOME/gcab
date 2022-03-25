@@ -1,22 +1,22 @@
 # Dutch translation for gcab.
 # Copyright (C) 2019 gcab's COPYRIGHT HOLDER
 # This file is distributed under the same license as the gcab package.
-# Nathan Follens <nthn@unseen.is>, 2019-2020.
+# Nathan Follens <nfollens@gnome.org>, 2019-2020, 2022.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: gcab master\n"
 "Report-Msgid-Bugs-To: https://gitlab.gnome.org/GNOME/gcab/issues\n"
-"POT-Creation-Date: 2019-10-08 07:58+0000\n"
-"PO-Revision-Date: 2020-02-27 19:51+0100\n"
-"Last-Translator: Nathan Follens <nthn@unseen.is>\n"
+"POT-Creation-Date: 2021-04-12 11:14+0000\n"
+"PO-Revision-Date: 2022-03-25 20:59+0100\n"
+"Last-Translator: Nathan Follens <nfollens@gnome.org>\n"
 "Language-Team: Dutch <gnome-nl-list@gnome.org>\n"
 "Language: nl\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
-"X-Generator: Poedit 2.3\n"
+"X-Generator: Poedit 3.0.1\n"
 
 #: src/gcab.c:82
 msgid "Dumping data to:"
@@ -69,7 +69,7 @@ msgstr "Pad niet opnemen"
 #: src/gcab.c:124
 msgid "Reserve space in cabinet for signing (e.g. -s 6144 reserves 6K bytes)"
 msgstr ""
-"Houd ruimte in de het cabinet-bestand vrij voor ondertekenen (bv. -s 6144 "
+"Houd ruimte in het cabinet-bestand vrij voor ondertekenen (bv. -s 6144 "
 "houdt 6K bytes vrij)"
 
 #: src/gcab.c:125
@@ -113,34 +113,38 @@ msgstr "Kan bestand niet voor lezen openen"
 msgid "Error reading"
 msgstr "Fout bij lezen"
 
-#: src/gcab.c:220
-msgid "Error during extraction"
-msgstr "Fout tijdens uitpakken"
+#: src/gcab.c:206
+msgid "<unknown-date>"
+msgstr "<unknown-date>"
 
-#: src/gcab.c:235
+#: src/gcab.c:219
+msgid "Error during extraction"
+msgstr "Fout bij uitpakken"
+
+#: src/gcab.c:234
 msgid "Error while reading signature"
 msgstr "Fout bij lezen van handtekening"
 
-#: src/gcab.c:247
+#: src/gcab.c:246
 msgid "No input files specified"
 msgstr "Geen invoerbestanden opgegeven"
 
-#: src/gcab.c:266
+#: src/gcab.c:265
 msgid "Cannot add file"
 msgstr "Kan bestand niet toevoegen"
 
-#: src/gcab.c:272
+#: src/gcab.c:271
 msgid "No files to be archived"
 msgstr "Geen bestanden om te archiveren"
 
-#: src/gcab.c:280
+#: src/gcab.c:279
 msgid "Cannot create cab file"
 msgstr "Kan cab-bestand niet aanmaken"
 
-#: src/gcab.c:286
+#: src/gcab.c:285
 msgid "Cannot add folder to cab file"
 msgstr "Kan map niet toevoegen aan cab-bestand"
 
-#: src/gcab.c:296
+#: src/gcab.c:295
 msgid "Cannot write cab file"
 msgstr "Kan cab-bestand niet schrijven"
