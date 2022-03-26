@@ -3,13 +3,13 @@
 # This file is distributed under the same license as the PACKAGE package.
 #
 # Iñaki Larrañaga Murgoitio <dooteo@zundan.com>, 2013, 2015.
-# Asier Sarasua Garmendia <asiersarasua@ni.eus>, 2021.
+# Asier Sarasua Garmendia <asiersarasua@ni.eus>, 2019, 2022.
 #
 msgid ""
 msgstr "Project-Id-Version: gcab master\n"
 "Report-Msgid-Bugs-To: https://gitlab.gnome.org/GNOME/gcab/issues\n"
-"POT-Creation-Date: 2021-03-20 08:37+0000\n"
-"PO-Revision-Date: 2021-04-03 18:58+0100\n"
+"POT-Creation-Date: 2021-04-12 11:14+0000\n"
+"PO-Revision-Date: 2022-03-26 18:58+0100\n"
 "Last-Translator: Asier Sarasua Garmendia <asiersarasua@ni.eus>\n"
 "Language-Team: Basque <librezale@librezale.eus>\n"
 "Language: eu\n"
@@ -110,35 +110,39 @@ msgstr "Ezin izan da fitxateia ireki irakurtzeko"
 msgid "Error reading"
 msgstr "Errorea irakurtzean"
 
-#: src/gcab.c:216
+#: src/gcab.c:206
+msgid "<unknown-date>"
+msgstr "<data-ezezaguna>"
+
+#: src/gcab.c:219
 msgid "Error during extraction"
 msgstr "Errorea erauztean"
 
-#: src/gcab.c:231
+#: src/gcab.c:234
 msgid "Error while reading signature"
 msgstr "Errorea sinadura irakurtzean"
 
-#: src/gcab.c:243
+#: src/gcab.c:246
 msgid "No input files specified"
 msgstr "Ez da sarrerako fitxategirik zehaztu"
 
-#: src/gcab.c:262
+#: src/gcab.c:265
 msgid "Cannot add file"
 msgstr "Ezin izan da fitxategia gehitu"
 
-#: src/gcab.c:268
+#: src/gcab.c:271
 msgid "No files to be archived"
 msgstr "Ez dago fitxategirik artxibatzeko"
 
-#: src/gcab.c:276
+#: src/gcab.c:279
 msgid "Cannot create cab file"
 msgstr "Ezin da cab fitxategia sortu"
 
-#: src/gcab.c:282
+#: src/gcab.c:285
 msgid "Cannot add folder to cab file"
 msgstr "Ezin zaio karpeta gehitu cab fitxategiari"
 
-#: src/gcab.c:292
+#: src/gcab.c:295
 msgid "Cannot write cab file"
 msgstr "Ezin da cab fitxategia idatzi"
 
