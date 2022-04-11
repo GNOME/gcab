@@ -2,14 +2,14 @@
 # Copyright (C) 2018 gcab's COPYRIGHT HOLDER
 # This file is distributed under the same license as the gcab package.
 # joehansen <joedalton2@yahoo.dk>, 2017, 2018.
-# Alan Mortensen <alanmortensen.am@gmail.com>, 2018.
+# Alan Mortensen <alanmortensen.am@gmail.com>, 2018, 2022.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: gcab master\n"
 "Report-Msgid-Bugs-To: https://gitlab.gnome.org/GNOME/gcab/issues\n"
-"POT-Creation-Date: 2018-06-10 16:11+0000\n"
-"PO-Revision-Date: 2018-12-06 20:59+0100\n"
+"POT-Creation-Date: 2021-04-12 11:14+0000\n"
+"PO-Revision-Date: 2022-03-21 17:14+0100\n"
 "Last-Translator: Alan Mortensen <alanmortensen.am@gmail.com>\n"
 "Language-Team: Danish <dansk@dansk-gruppen.dk>\n"
 "Language: da\n"
@@ -17,7 +17,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
-"X-Generator: Poedit 2.0.6\n"
+"X-Generator: Poedit 2.3\n"
 
 #: src/gcab.c:82
 msgid "Dumping data to:"
@@ -113,35 +113,39 @@ msgstr "Kan ikke åbne fil for læsning"
 msgid "Error reading"
 msgstr "Fejl under læsning"
 
-#: src/gcab.c:220
+#: src/gcab.c:206
+msgid "<unknown-date>"
+msgstr "<ukendt-dato>"
+
+#: src/gcab.c:219
 msgid "Error during extraction"
 msgstr "Fejl under udtrækning"
 
-#: src/gcab.c:235
+#: src/gcab.c:234
 msgid "Error while reading signature"
 msgstr "Fejl under læsning af signatur"
 
-#: src/gcab.c:247
+#: src/gcab.c:246
 msgid "No input files specified"
 msgstr "Ingen inputfiler angivet"
 
-#: src/gcab.c:266
+#: src/gcab.c:265
 msgid "Cannot add file"
 msgstr "Kan ikke tilføje fil"
 
-#: src/gcab.c:272
+#: src/gcab.c:271
 msgid "No files to be archived"
 msgstr "Der er ingen filer at arkivere"
 
-#: src/gcab.c:280
+#: src/gcab.c:279
 msgid "Cannot create cab file"
 msgstr "Kan ikke oprette cab-fil"
 
-#: src/gcab.c:286
+#: src/gcab.c:285
 msgid "Cannot add folder to cab file"
 msgstr "Kan ikke tilføje mappe til cab-fil"
 
-#: src/gcab.c:296
+#: src/gcab.c:295
 msgid "Cannot write cab file"
 msgstr "Kan ikke skrive cab-fil"
 
