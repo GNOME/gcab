@@ -68,7 +68,7 @@ main (int argc, char *argv[])
     }
 
     /* try to extract each file */
-    g_setenv ("GCAB_SKIP_CHECKSUM", "1", FALSE);
+    (void)g_setenv ("GCAB_SKIP_CHECKSUM", "1", FALSE);
     for (gint i = 1; i < argc; i++) {
         g_autoptr(GFile) file = g_file_new_for_commandline_arg (argv[i]);
         if (!_process_file (file, &error)) {

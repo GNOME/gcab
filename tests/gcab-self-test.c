@@ -419,7 +419,7 @@ gcab_test_cabinet_error_cves_func (void)
             "CVE-2015-4470.cab",
             "CVE-2015-4471.cab",
             NULL };
-    g_setenv ("GCAB_SKIP_CHECKSUM", "1", TRUE);
+    (void)g_setenv ("GCAB_SKIP_CHECKSUM", "1", TRUE);
     for (guint i = 0; tests[i] != NULL; i++) {
         gboolean ret;
         g_autofree gchar *fn = NULL;
@@ -572,7 +572,7 @@ main (int argc, char **argv)
 
     /* only critical and error are fatal */
     g_log_set_fatal_mask (NULL, G_LOG_LEVEL_ERROR | G_LOG_LEVEL_CRITICAL);
-    g_setenv ("G_MESSAGES_DEBUG", "all", TRUE);
+    (void)g_setenv ("G_MESSAGES_DEBUG", "all", TRUE);
 
     /* tests go here */
     g_test_add_func ("/GCab/file", gcab_test_file_func);
