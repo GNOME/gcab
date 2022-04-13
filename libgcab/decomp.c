@@ -99,7 +99,7 @@ struct Ziphuft **t, cab_LONG *m, fdi_decomp_state *decomp_state)
   cab_LONG *l;                  	/* stack of bits per table */
   register cab_ULONG *p;         	/* pointer into ZIP(c)[],ZIP(b)[],ZIP(v)[] */
   register struct Ziphuft *q;           /* points to current table */
-  struct Ziphuft r;                     /* table entry for structure assignment */
+  struct Ziphuft r = {0x0};             /* table entry for structure assignment */
   register cab_LONG w;                  /* bits before this table == (l * h) */
   cab_ULONG *xp;                 	/* pointer into x */
   cab_LONG y;                           /* number of dummy codes added */
