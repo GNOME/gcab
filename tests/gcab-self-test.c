@@ -276,7 +276,7 @@ gcab_test_cabinet_blob_func (void)
         g_autoptr(GCabFile) cabfile = gcab_file_new_with_bytes (files[i].fn, bytes_tmp);
 
         /* set the time and attributes */
-        g_autoptr(GDateTime) dt = dt = g_date_time_new_utc (2017, 9, 15, 0, 0, 0.f);
+        g_autoptr(GDateTime) dt = g_date_time_new_utc (2017, 9, 15, 0, 0, 0.f);
         gcab_file_set_date_time (cabfile, dt);
         gcab_file_set_attributes (cabfile, GCAB_FILE_ATTRIBUTE_ARCH);
 
