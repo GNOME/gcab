@@ -6,7 +6,7 @@ configure_file(
   install_dir : join_paths(get_option('mandir'), 'man1'),
 )
 
-executable(
+gcab = executable(
   'gcab',
   sources : [
     'gcab.c',
@@ -25,6 +25,7 @@ executable(
   install : true,
   install_dir : get_option('bindir')
 )
+meson.override_find_program('gcab', gcab)
 
 executable(
   'gcab-fuzz',
