@@ -1,6 +1,7 @@
 # Turkish translation for gcab.
-# Copyright (C) 2014 gcab's COPYRIGHT HOLDER
+# Copyright (C) 2014-2022 gcab's COPYRIGHT HOLDER
 # This file is distributed under the same license as the gcab package.
+#
 # Necdet Yücel <necdetyucel@gmail.com>, 2014.
 # Muhammet Kara <muhammetk@gmail.com>, 2014, 2015.
 #
@@ -8,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gcab master\n"
 "Report-Msgid-Bugs-To: https://gitlab.gnome.org/GNOME/gcab/issues\n"
-"POT-Creation-Date: 2018-06-10 16:11+0000\n"
+"POT-Creation-Date: 2022-04-13 12:09+0000\n"
 "PO-Revision-Date: 2019-01-09 12:52+0200\n"
 "Last-Translator: Sabri Ünal <libreajans@gmail.com>\n"
 "Language-Team: Türkçe <gnome-turk@gnome.org>\n"
@@ -112,35 +113,39 @@ msgstr "Dosya okuma için açılamıyor"
 msgid "Error reading"
 msgstr "Okuma hatası"
 
-#: src/gcab.c:220
+#: src/gcab.c:206
+msgid "<unknown-date>"
+msgstr "<bilinmeyen-tarih>"
+
+#: src/gcab.c:219
 msgid "Error during extraction"
 msgstr "Çıkartma sırasında hata oluştu"
 
-#: src/gcab.c:235
+#: src/gcab.c:234
 msgid "Error while reading signature"
 msgstr "İmza okunurken hata oluştu"
 
-#: src/gcab.c:247
+#: src/gcab.c:246
 msgid "No input files specified"
 msgstr "Girdi dosyaları belirtilmedi"
 
-#: src/gcab.c:266
+#: src/gcab.c:265
 msgid "Cannot add file"
 msgstr "Dosya eklenemiyor"
 
-#: src/gcab.c:272
+#: src/gcab.c:271
 msgid "No files to be archived"
 msgstr "Arşivlenecek dosya yok"
 
-#: src/gcab.c:280
+#: src/gcab.c:279
 msgid "Cannot create cab file"
 msgstr "Cab dosyası oluşturulamıyor"
 
-#: src/gcab.c:286
+#: src/gcab.c:285
 msgid "Cannot add folder to cab file"
 msgstr "Cab dosyasına klasör eklenemiyor"
 
-#: src/gcab.c:296
+#: src/gcab.c:295
 msgid "Cannot write cab file"
 msgstr "Cab dosyası yazılamıyor"
 
