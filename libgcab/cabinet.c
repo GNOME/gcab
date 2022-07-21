@@ -34,53 +34,6 @@ zfree (voidpf opaque, voidpf address)
     g_free (address);
 }
 
-static gboolean
-cdata_set (cdata_t *cd, int type, guint8 *data, size_t size, GError **error)
-{
-    if (type > GCAB_COMPRESSION_MSZIP) {
-        g_critical ("unsupported compression method %d", type);
-        return FALSE;
-    }
-
-    cd->nubytes = size;
-
-    if (type == 0) {
-        memcpy (cd->in, data, size);
-        cd->ncbytes = size;
-    }
-
-    if (type == GCAB_COMPRESSION_MSZIP) {
-        z_stream stream = { 0, };
-        int zret;
-
-        stream.zalloc = zalloc;
-        stream.zfree = zfree;
-        zret = deflateInit2 (&stream, Z_DEFAULT_COMPRESSION, Z_DEFLATED, -15, 8, Z_DEFAULT_STRATEGY);
-        if (zret != Z_OK) {
-            g_set_error (error, GCAB_ERROR, GCAB_ERROR_FAILED,
-                         "zlib deflateInit2 failed: %s", zError (zret));
-            return FALSE;
-        }
-        stream.next_in = data;
-        stream.avail_in = size;
-        stream.next_out = cd->in + 2;
-        stream.avail_out = sizeof (cd->in) - 2;
-        /* insert the signature */
-        cd->in[0] = 'C';
-        cd->in[1] = 'K';
-        zret = deflate (&stream, Z_FINISH);
-        if (zret != Z_OK && zret != Z_STREAM_END) {
-            g_set_error (error, GCAB_ERROR, GCAB_ERROR_FAILED,
-                         "zlib deflate failed: %s", zError (zret));
-            return FALSE;
-        }
-        deflateEnd (&stream);
-        cd->ncbytes = stream.total_out + 2;
-    }
-
-    return TRUE;
-}
-
 static char *
 _data_input_stream_read_until (GDataInputStream  *stream,
                                const gchar        *stop_chars,
@@ -478,8 +431,48 @@ cdata_write (cdata_t *cd, GDataOutputStream *out, int type,
              guint8 *data, size_t size, gsize *bytes_written,
              GCancellable *cancellable, GError **error)
 {
-    if (!cdata_set(cd, type, data, size, error))
+    switch (type) {
+    case GCAB_COMPRESSION_NONE:
+        memcpy (cd->in, data, size);
+        cd->ncbytes = size;
+        cd->nubytes = size;
+        break;
+
+    case GCAB_COMPRESSION_MSZIP:
+        z_stream deflate_stream = { 0, };
+        int zret;
+
+        deflate_stream.zalloc = zalloc;
+        deflate_stream.zfree = zfree;
+        zret = deflateInit2 (&deflate_stream, Z_DEFAULT_COMPRESSION,
+                             Z_DEFLATED, -15, 8, Z_DEFAULT_STRATEGY);
+        if (zret != Z_OK) {
+            g_set_error (error, GCAB_ERROR, GCAB_ERROR_FAILED,
+                         "zlib deflateInit2 failed: %s", zError (zret));
+            return FALSE;
+        }
+        deflate_stream.next_in = data;
+        deflate_stream.avail_in = size;
+        deflate_stream.next_out = cd->in + 2;
+        deflate_stream.avail_out = sizeof (cd->in) - 2;
+        /* insert the signature */
+        cd->in[0] = 'C';
+        cd->in[1] = 'K';
+        zret = deflate (&deflate_stream, Z_FINISH);
+        if (zret != Z_OK && zret != Z_STREAM_END) {
+            g_set_error (error, GCAB_ERROR, GCAB_ERROR_FAILED,
+                         "zlib deflate failed: %s", zError (zret));
+            return FALSE;
+        }
+        deflateEnd (&deflate_stream);
+        cd->ncbytes = deflate_stream.total_out + 2;
+        cd->nubytes = size;
+        break;
+
+    default:
+        g_critical ("unsupported compression method %d", type);
         return FALSE;
+    }
 
     guint32 datacsum = compute_checksum(cd->in, cd->ncbytes, 0);
     guint8 sizecsum[4];
