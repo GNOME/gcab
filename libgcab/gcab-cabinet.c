@@ -300,7 +300,7 @@ gcab_cabinet_write (GCabCabinet *self,
 
     folder.typecomp = gcab_folder_get_comptype (cabfolder);
     folder.offsetdata = cheader->offsetfiles + nfiles * 16 + sumstr;
-    folder.ndatab = gcab_folder_get_ndatablocks (cabfolder);
+    folder.ndatab = 0;
 
     /* avoid seeking to allow growing output streams */
     for (guint i = 0; i < folder.offsetdata; i++)
@@ -323,6 +323,7 @@ gcab_cabinet_write (GCabCabinet *self,
                                            cancellable, error)) == (DATABLOCKSIZE - offset)) {
             if (!cdata_write (&block, dstream, folder.typecomp, data, DATABLOCKSIZE, &written, cancellable, error))
                 return FALSE;
+            folder.ndatab++;
             cheader->size += written;
             offset = 0;
         }
@@ -335,6 +336,7 @@ gcab_cabinet_write (GCabCabinet *self,
     if (offset != 0) {
         if (!cdata_write (&block, dstream, folder.typecomp, data, offset, &written, cancellable, error))
             return FALSE;
+        folder.ndatab++;
         cheader->size += written;
     }
 
