@@ -40,7 +40,10 @@
 /* based on the spec
    http://msdn.microsoft.com/en-us/library/bb417343.aspx */
 
-#define DATABLOCKSIZE           32768
+#define CAB_MAX_BLOCK_SIZE                (32768)
+#define CAB_MAX_MSZIP_BLOCK_SIZE          (32768 + 12)
+#define CAB_MAX_LZX_BLOCK_SIZE            (32768 + 6144)
+#define CAB_MAX_COMPRESSED_BLOCK_SIZE     (CAB_MAX_LZX_BLOCK_SIZE)
 
 #define CFO_START               0x24    /* folder offset */
 #define CFI_START               0x2C    /* file offset */
@@ -100,8 +103,8 @@ typedef struct
     guint16 ncbytes;
     guint16 nubytes;
     guint8 *reserved;
-    guint8 in[CAB_INPUTMAX+2];
-    guint8 out[CAB_BLOCKMAX];
+    guint8 in[CAB_MAX_COMPRESSED_BLOCK_SIZE];
+    guint8 out[CAB_MAX_BLOCK_SIZE];
     /* using zlib */
     z_stream z;
     /* using wine decomp.h */

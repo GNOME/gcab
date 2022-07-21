@@ -117,14 +117,6 @@
   bitbuf = lb.bb; bitsleft = lb.bl; inpos = lb.ip; \
 } while (0)
 
-/* CAB data blocks are <= 32768 bytes in uncompressed form. Uncompressed
- * blocks have zero growth. MSZIP guarantees that it won't grow above
- * uncompressed size by more than 12 bytes. LZX guarantees it won't grow
- * more than 6144 bytes.
- */
-#define CAB_BLOCKMAX (32768)
-#define CAB_INPUTMAX (CAB_BLOCKMAX+6144)
-
 typedef guint8        cab_UBYTE; /* 8 bits  */
 typedef guint16       cab_UWORD; /* 16 bits */
 typedef guint32       cab_ULONG; /* 32 bits */
