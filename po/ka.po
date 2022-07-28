@@ -1,0 +1,163 @@
+# Georgian translation for gcab.
+# Copyright (C) 2022 gcab's COPYRIGHT HOLDER
+# This file is distributed under the same license as the gcab package.
+# Temuri Doghonadze <temuri.doghonadze@gmail.com>, 2022.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: gcab master\n"
+"Report-Msgid-Bugs-To: https://gitlab.gnome.org/GNOME/gcab/issues\n"
+"POT-Creation-Date: 2022-04-13 12:09+0000\n"
+"PO-Revision-Date: 2022-07-28 08:53+0200\n"
+"Last-Translator: Temuri Doghonadze <temuri.doghonadze@gmail.com>\n"
+"Language-Team: Georgian <(nothing)>\n"
+"Language: ka\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Generator: Poedit 3.1.1\n"
+"X-POOTLE-MTIME: 1419291970.000000\n"
+
+#: src/gcab.c:82
+msgid "Dumping data to:"
+msgstr "დამპის ჩაწერა:"
+
+#: src/gcab.c:114
+msgid "Print program version"
+msgstr "პროგრამის ვერსიის დაბეჭდვა"
+
+#: src/gcab.c:115
+msgid "Be verbose"
+msgstr "დამატებითი შეტყობინებები"
+
+#: src/gcab.c:116
+msgid "Create archive"
+msgstr "არქივის შექმნა"
+
+#: src/gcab.c:117
+msgid "Extract all files"
+msgstr "ყველა ფაილის გაშლა"
+
+#: src/gcab.c:118
+msgid "Dump reserved and extra data"
+msgstr "დარეზერვებულია და დამატებით მონაცემების დამპი"
+
+#: src/gcab.c:119
+msgid "List content"
+msgstr "შემცველობის სია"
+
+#: src/gcab.c:120
+msgid "List content with file details"
+msgstr "შემცველობის სია ფაილის დეტალებით"
+
+#: src/gcab.c:121
+msgid "Change to directory DIR"
+msgstr "საქაღალდე DIR-ზე გადასვლა"
+
+#: src/gcab.c:121
+msgid "DIR"
+msgstr "საქაღალდე"
+
+#: src/gcab.c:122
+msgid "Use zip compression"
+msgstr "Zip შეკუმშვის გამოყენება"
+
+#: src/gcab.c:123
+msgid "Do not include path"
+msgstr "არ ჩასვა ბილიკი"
+
+#: src/gcab.c:124
+msgid "Reserve space in cabinet for signing (e.g. -s 6144 reserves 6K bytes)"
+msgstr "კაბინეტის ფაილში ხელმოწერის ადგილის გამოტოვება (მაგ: -s 6144 64კილობაიტს დაარეზერვებს)"
+
+#: src/gcab.c:125
+msgid "FILE INPUT_FILES..."
+msgstr "ფაილი შესაყვანი_ფაილები..."
+
+#: src/gcab.c:139
+msgid "- create a Cabinet file"
+msgstr "- კაბინეტის ფაილის შექმნა"
+
+#: src/gcab.c:140
+msgid "Report bugs to:"
+msgstr "შეცდომების შესახებ მიწერეთ:"
+
+#: src/gcab.c:142
+msgid ""
+"gcab saves many files together into a cabinet archive, and can restore\n"
+"individual files from the archive."
+msgstr ""
+"cab ზოგავს ბევრ ფაილს ერთად კაბინეტის არქივში და შეუძლია\n"
+"არქივიდან ინდივიდუალური ფაილების აღდგენა."
+
+#: src/gcab.c:149
+msgid "Option parsing failed"
+msgstr "პარამეტრის დამუშავების შეცდომა"
+
+#: src/gcab.c:159
+msgid "Please specify a single operation"
+msgstr "აუცილებელია მხოლოდ ერთი ოპერაციის მითითება"
+
+#: src/gcab.c:164
+msgid "Cabinet file must be specified"
+msgstr "კაბინეტის ფაილის მითითება აუცილებელია"
+
+#: src/gcab.c:180
+msgid "Cannot open file for reading"
+msgstr "ფაილის წასაკითხად გახსნის შეცდომა"
+
+#: src/gcab.c:184
+msgid "Error reading"
+msgstr "წაკითხვის შეცდომა"
+
+#: src/gcab.c:206
+msgid "<unknown-date>"
+msgstr "<უცნობი-თარიღი>"
+
+#: src/gcab.c:219
+msgid "Error during extraction"
+msgstr "შეცდომა გაშლისას"
+
+#: src/gcab.c:234
+msgid "Error while reading signature"
+msgstr "შეცდომა ხელმოწერის კითხვისას"
+
+#: src/gcab.c:246
+msgid "No input files specified"
+msgstr "შეყვანის ფაილები მითითებული არაა"
+
+#: src/gcab.c:265
+msgid "Cannot add file"
+msgstr "ფაილის დამატება შეუძლებელია"
+
+#: src/gcab.c:271
+msgid "No files to be archived"
+msgstr "დასაარქივებელი ფაილების გარეშე"
+
+#: src/gcab.c:279
+msgid "Cannot create cab file"
+msgstr "Cab ფაილის შექმნის შეცდომა"
+
+#: src/gcab.c:285
+msgid "Cannot add folder to cab file"
+msgstr "Cab ფაილში საქაღალდის დამატება შეუძლებელია"
+
+#: src/gcab.c:295
+msgid "Cannot write cab file"
+msgstr "Cab ფაილის ჩაწერის შეცდომა"
+
+#~ msgid "Removing leading '%s' from member names"
+#~ msgstr "Üye adlarının başındaki '%s' siliniyor"
+
+#~ msgid "can't write file %s: %s"
+#~ msgstr "%s dosyası yazılamıyor: %s"
+
+#~ msgid "please specify input files."
+#~ msgstr "Lütfen girdi dosyalarını belirtin."
+
+#~ msgid "unsupported compression method %d"
+#~ msgstr "desteklenmeyen sıkıştırma yöntemi %d"
+
+#~ msgid "incorrect checksum detected"
+#~ msgstr "hatalı sağlama toplamı saptandı"
