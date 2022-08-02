@@ -51,7 +51,6 @@ GFile           *gcab_file_get_gfile                 (GCabFile *file);
 cfile_t         *gcab_file_get_cfile                 (GCabFile *file);
 void             gcab_file_add_attribute             (GCabFile *file, guint32 attribute);
 
-gsize            gcab_folder_get_ndatablocks         (GCabFolder *folder);
 gboolean         gcab_folder_extract                 (GCabFolder *self,
                                                       GDataInputStream *data,
                                                       GFile *path,

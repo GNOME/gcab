@@ -158,21 +158,6 @@ gcab_folder_class_init (GCabFolderClass *klass)
 
 }
 
-/* calculate the number of datablocks we will need:
-   cabinet files are written in blocks of 32768 bytes */
-G_GNUC_INTERNAL gsize
-gcab_folder_get_ndatablocks (GCabFolder *self)
-{
-    gsize total_size = 0;
-
-    for (GSList *l = self->files; l != NULL; l = l->next) {
-        GCabFile *file = GCAB_FILE (l->data);
-        total_size += gcab_file_get_usize (file);
-    }
-
-    return total_size / DATABLOCKSIZE + 1 ;
-}
-
 /**
  * gcab_folder_get_comptype:
  * @cabfolder: a #GCabFolder

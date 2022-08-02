@@ -34,53 +34,6 @@ zfree (voidpf opaque, voidpf address)
     g_free (address);
 }
 
-static gboolean
-cdata_set (cdata_t *cd, int type, guint8 *data, size_t size, GError **error)
-{
-    if (type > GCAB_COMPRESSION_MSZIP) {
-        g_critical ("unsupported compression method %d", type);
-        return FALSE;
-    }
-
-    cd->nubytes = size;
-
-    if (type == 0) {
-        memcpy (cd->in, data, size);
-        cd->ncbytes = size;
-    }
-
-    if (type == GCAB_COMPRESSION_MSZIP) {
-        z_stream stream = { 0, };
-        int zret;
-
-        stream.zalloc = zalloc;
-        stream.zfree = zfree;
-        zret = deflateInit2 (&stream, Z_DEFAULT_COMPRESSION, Z_DEFLATED, -15, 8, Z_DEFAULT_STRATEGY);
-        if (zret != Z_OK) {
-            g_set_error (error, GCAB_ERROR, GCAB_ERROR_FAILED,
-                         "zlib deflateInit2 failed: %s", zError (zret));
-            return FALSE;
-        }
-        stream.next_in = data;
-        stream.avail_in = size;
-        stream.next_out = cd->in + 2;
-        stream.avail_out = sizeof (cd->in) - 2;
-        /* insert the signature */
-        cd->in[0] = 'C';
-        cd->in[1] = 'K';
-        zret = deflate (&stream, Z_FINISH);
-        if (zret != Z_OK && zret != Z_STREAM_END) {
-            g_set_error (error, GCAB_ERROR, GCAB_ERROR_FAILED,
-                         "zlib deflate failed: %s", zError (zret));
-            return FALSE;
-        }
-        deflateEnd (&stream);
-        cd->ncbytes = stream.total_out + 2;
-    }
-
-    return TRUE;
-}
-
 static char *
 _data_input_stream_read_until (GDataInputStream  *stream,
                                const gchar        *stop_chars,
@@ -473,13 +426,71 @@ compute_checksum (guint8 *in, guint16 ncbytes, guint32 seed)
     return csum;
 }
 
+static gboolean
+cdata_deflate_block (cdata_t *cd, guint8 *data, size_t size, int level,
+                     GError **error)
+{
+    z_stream deflate_stream = { 0, };
+    int zret;
+
+    deflate_stream.zalloc = zalloc;
+    deflate_stream.zfree = zfree;
+    zret = deflateInit2 (&deflate_stream, level, Z_DEFLATED, -15, 8,
+                         Z_DEFAULT_STRATEGY);
+    if (zret != Z_OK) {
+        g_set_error (error, GCAB_ERROR, GCAB_ERROR_FAILED,
+                     "zlib deflateInit2 failed: %s", zError (zret));
+        return FALSE;
+    }
+    deflate_stream.next_in = data;
+    deflate_stream.avail_in = size;
+    deflate_stream.next_out = cd->in + 2;
+    deflate_stream.avail_out = sizeof (cd->in) - 2;
+    /* insert the signature */
+    cd->in[0] = 'C';
+    cd->in[1] = 'K';
+    zret = deflate (&deflate_stream, Z_FINISH);
+    if (zret != Z_OK && zret != Z_STREAM_END) {
+        g_set_error (error, GCAB_ERROR, GCAB_ERROR_FAILED,
+                     "zlib deflate failed: %s", zError (zret));
+        return FALSE;
+    }
+    deflateEnd (&deflate_stream);
+
+    cd->ncbytes = deflate_stream.total_out + 2;
+    cd->nubytes = size;
+
+    return TRUE;
+}
+
 G_GNUC_INTERNAL gboolean
 cdata_write (cdata_t *cd, GDataOutputStream *out, int type,
              guint8 *data, size_t size, gsize *bytes_written,
              GCancellable *cancellable, GError **error)
 {
-    if (!cdata_set(cd, type, data, size, error))
+    switch (type) {
+    case GCAB_COMPRESSION_NONE:
+        memcpy (cd->in, data, size);
+        cd->ncbytes = size;
+        cd->nubytes = size;
+        break;
+
+    case GCAB_COMPRESSION_MSZIP:
+        if (!cdata_deflate_block (cd, data, size, Z_DEFAULT_COMPRESSION, error))
+            return FALSE;
+
+        if (cd->ncbytes >= CAB_MAX_MSZIP_BLOCK_SIZE) {
+            /* if the compressor inflated the data, store it uncompressed */
+            if (!cdata_deflate_block (cd, data, size, Z_NO_COMPRESSION, error))
+                return FALSE;
+        }
+
+        break;
+
+    default:
+        g_critical ("unsupported compression method %d", type);
         return FALSE;
+    }
 
     guint32 datacsum = compute_checksum(cd->in, cd->ncbytes, 0);
     guint8 sizecsum[4];
@@ -577,11 +588,11 @@ cdata_read (cdata_t *cd, guint8 res_data, gint comptype,
         return FALSE;
     }
     R2 (cd->nubytes);
-    if (cd->nubytes > CAB_BLOCKMAX) {
+    if (cd->nubytes > CAB_MAX_BLOCK_SIZE) {
         g_set_error (error, GCAB_ERROR, GCAB_ERROR_INVALID_DATA,
                      "CDATA block of %" G_GUINT16_FORMAT " bytes "
                      "was bigger than maximum size %i",
-                     cd->nubytes, CAB_BLOCKMAX);
+                     cd->nubytes, CAB_MAX_BLOCK_SIZE);
         return FALSE;
     }
     RN (cd->reserved, res_data);
