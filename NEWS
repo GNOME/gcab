@@ -1,3 +1,22 @@
+v1.5
+====
+
+New Features:
+ - New gcab_file_set_bytes() API (!8)
+ - meson: Register the gcab executable with meson (!10)
+
+Bugfixes:
+ - Fixed MSZIP compression when deflate algorithm would expand (#16)
+
+   Previous versions of gcab can produce "incorrect" archives (when a compressed
+   block is larger than its input). They are however supported by gcab itself,
+   and we will keep support for it for the foreseeble future.
+
+ - gcab: avoid runtime warnings (!7)
+ - Fix coverity warnings (!9)
+
+Translation updates
+
 v1.4
 ====
 
