@@ -8,7 +8,7 @@ project('gcab', 'c',
 git_version = []
 git = find_program('git', required: false)
 if git.found()
-  git_version = run_command(git, 'describe', '--abbrev=4', '--dirty').stdout().strip().split('-')
+  git_version = run_command(git, 'describe', '--abbrev=4', '--dirty', check: true).stdout().strip().split('-')
 endif
 
 # libtool versioning
