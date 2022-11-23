@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gcab master\n"
 "Report-Msgid-Bugs-To: https://gitlab.gnome.org/GNOME/gcab/issues\n"
-"POT-Creation-Date: 2022-04-13 12:09+0000\n"
+"POT-Creation-Date: 2022-07-28 06:59+0000\n"
 "PO-Revision-Date: 2019-01-09 12:52+0200\n"
 "Last-Translator: Sabri Ünal <libreajans@gmail.com>\n"
 "Language-Team: Türkçe <gnome-turk@gnome.org>\n"
@@ -148,18 +148,3 @@ msgstr "Cab dosyasına klasör eklenemiyor"
 #: src/gcab.c:295
 msgid "Cannot write cab file"
 msgstr "Cab dosyası yazılamıyor"
-
-#~ msgid "Removing leading '%s' from member names"
-#~ msgstr "Üye adlarının başındaki '%s' siliniyor"
-
-#~ msgid "can't write file %s: %s"
-#~ msgstr "%s dosyası yazılamıyor: %s"
-
-#~ msgid "please specify input files."
-#~ msgstr "Lütfen girdi dosyalarını belirtin."
-
-#~ msgid "unsupported compression method %d"
-#~ msgstr "desteklenmeyen sıkıştırma yöntemi %d"
-
-#~ msgid "incorrect checksum detected"
-#~ msgstr "hatalı sağlama toplamı saptandı"
