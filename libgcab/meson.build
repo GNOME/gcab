@@ -37,7 +37,6 @@ libgcab = shared_library(
     'gcab-folder.c',
     'gcab-file.c',
     'cabinet.c',
-    'decomp.c',
   ],
   version : lt_version,
   darwin_versions: darwin_versions,

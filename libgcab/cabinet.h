@@ -35,15 +35,13 @@
 #include <zlib.h>
 
 #include "gcab-folder.h"
-#include "decomp.h"
 
 /* based on the spec
    http://msdn.microsoft.com/en-us/library/bb417343.aspx */
 
 #define CAB_MAX_BLOCK_SIZE                (32768)
 #define CAB_MAX_MSZIP_BLOCK_SIZE          (32768 + 12)
-#define CAB_MAX_LZX_BLOCK_SIZE            (32768 + 6144)
-#define CAB_MAX_COMPRESSED_BLOCK_SIZE     (CAB_MAX_LZX_BLOCK_SIZE)
+#define CAB_MAX_COMPRESSED_BLOCK_SIZE     (CAB_MAX_MSZIP_BLOCK_SIZE)
 
 #define CFO_START               0x24    /* folder offset */
 #define CFI_START               0x2C    /* file offset */
@@ -99,6 +97,7 @@ typedef struct
 
 typedef struct
 {
+    guint32 compression;
     guint32 checksum;
     guint16 ncbytes;
     guint16 nubytes;
@@ -107,9 +106,6 @@ typedef struct
     guint8 out[CAB_MAX_BLOCK_SIZE];
     /* using zlib */
     z_stream z;
-    /* using wine decomp.h */
-    FDI_Int fdi;
-    fdi_decomp_state decomp;
 } cdata_t;
 
 gboolean     cheader_write                      (cheader_t *ch,

@@ -10,7 +10,7 @@ gnome.gtkdoc(
     join_paths(meson.source_root(), 'libgcab'),
     join_paths(meson.build_root(), 'libgcab'),
   ],
-  ignore_headers : ['decomp.h', 'cabinet.h', 'gcab-priv.h'],
+  ignore_headers : ['cabinet.h', 'gcab-priv.h'],
   main_sgml : 'gcab-docs.sgml',
   fixxref_args: [
     '--html-dir=@0@'.format(docpath),

@@ -521,11 +521,7 @@ cdata_free (cdata_t *cd)
 {
     z_stream *z = &cd->z;
 
-    if (cd->decomp.comptype == GCAB_COMPRESSION_LZX) {
-        LZXfdi_clear (&cd->decomp);
-    }
-
-    if (cd->decomp.comptype == GCAB_COMPRESSION_MSZIP) {
+    if (cd->compression == GCAB_COMPRESSION_MSZIP) {
         if (z->opaque) {
             inflateEnd (z);
             z->opaque = NULL;
@@ -550,7 +546,7 @@ cdata_read (cdata_t *cd, guint8 res_data, gint comptype,
 
 {
     gboolean success = FALSE;
-    int ret, zret = Z_OK;
+    int zret = Z_OK;
     gint compression = comptype & GCAB_COMPRESSION_MASK;
     gsize buf_sz;
     guint8 *buf = NULL;
@@ -566,7 +562,6 @@ cdata_read (cdata_t *cd, guint8 res_data, gint comptype,
         buf_sz = sizeof(cd->out);
         break;
     case GCAB_COMPRESSION_MSZIP:
-    case GCAB_COMPRESSION_LZX:
         buf = cd->in;
         buf_sz = sizeof(cd->in);
         break;
@@ -624,30 +619,11 @@ cdata_read (cdata_t *cd, guint8 res_data, gint comptype,
         PND (cd, buf, 64);
     }
 
-    if (compression == GCAB_COMPRESSION_LZX) {
-        if (cd->fdi.alloc == NULL) {
-            cd->fdi.alloc = g_malloc;
-            cd->fdi.free = g_free;
-            cd->decomp.fdi = &cd->fdi;
-            cd->decomp.inbuf = cd->in;
-            cd->decomp.outbuf = cd->out;
-            cd->decomp.comptype = compression;
-
-            ret = LZXfdi_init((comptype >> 8) & 0x1f, &cd->decomp);
-            if (ret < 0)
-                goto end;
-        }
-
-        ret = LZXfdi_decomp (cd->ncbytes, cd->nubytes, &cd->decomp);
-        if (ret < 0)
-            goto end;
-    }
-
     if (compression == GCAB_COMPRESSION_MSZIP) {
         if (cd->in[0] != 'C' || cd->in[1] != 'K')
             goto end;
 
-        cd->decomp.comptype = compression;
+        cd->compression = compression;
         z_stream *z = &cd->z;
 
         z->avail_in = cd->ncbytes - 2;

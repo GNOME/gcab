@@ -18,7 +18,6 @@ CFILE_GLOB = $(top_srcdir)/libgcab/*.c
 EXTRA_HFILES =
 IGNORE_HFILES =					\
 	cabinet.h				\
-	decomp.h				\
 	gcab-priv.h				\
 	$(NULL)
 
