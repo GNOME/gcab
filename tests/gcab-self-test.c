@@ -420,6 +420,7 @@ gcab_test_cabinet_error_cves_func (void)
             "CVE-2015-4471.cab",
             NULL };
     (void)g_setenv ("GCAB_SKIP_CHECKSUM", "1", TRUE);
+    (void)g_setenv ("GCAB_SKIP_COMPRESSION_CHECK", "1", TRUE);
     for (guint i = 0; tests[i] != NULL; i++) {
         gboolean ret;
         g_autofree gchar *fn = NULL;
@@ -438,6 +439,7 @@ gcab_test_cabinet_error_cves_func (void)
         g_assert_no_error (error);
         g_assert (in != NULL);
         cabinet = gcab_cabinet_new ();
+        gcab_cabinet_add_allowed_compression (cabinet, GCAB_COMPRESSION_NONE);
         ret = gcab_cabinet_load (cabinet, in, NULL, &error);
         g_assert_no_error (error);
         g_assert (ret);
@@ -447,6 +449,44 @@ gcab_test_cabinet_error_cves_func (void)
         g_assert (!ret);
     }
     g_unsetenv ("GCAB_SKIP_CHECKSUM");
+    g_unsetenv ("GCAB_SKIP_COMPRESSION_CHECK");
+}
+
+static void
+gcab_test_cabinet_allowed_compression_func (void)
+{
+    gboolean ret;
+    g_autofree gchar *fn = NULL;
+    g_autoptr(GCabCabinet) cabinet = NULL;
+    g_autoptr(GError) error = NULL;
+    g_autoptr(GFile) file = NULL;
+    g_autoptr(GInputStream) in = NULL;
+
+    /* load file */
+    fn = gcab_test_get_filename ("test-mszip.cab");
+    g_assert (fn != NULL);
+    file = g_file_new_for_path (fn);
+    in = G_INPUT_STREAM (g_file_read (file, NULL, &error));
+    g_assert_no_error (error);
+    g_assert (in != NULL);
+
+    /* add the one it is not for a failure */
+    cabinet = gcab_cabinet_new ();
+    gcab_cabinet_add_allowed_compression (cabinet, GCAB_COMPRESSION_LZX);
+    ret = gcab_cabinet_load (cabinet, in, NULL, &error);
+    g_assert_error (error, GCAB_ERROR, GCAB_ERROR_NOT_SUPPORTED);
+    g_assert_false (ret);
+    g_clear_error (&error);
+    g_clear_object (&in);
+
+    /* add the correct one and try again */
+    in = G_INPUT_STREAM (g_file_read (file, NULL, &error));
+    g_assert_no_error (error);
+    g_assert (in != NULL);
+    gcab_cabinet_add_allowed_compression (cabinet, GCAB_COMPRESSION_MSZIP);
+    ret = gcab_cabinet_load (cabinet, in, NULL, &error);
+    g_assert_no_error (error);
+    g_assert (ret);
 }
 
 static void
@@ -468,6 +508,7 @@ gcab_test_cabinet_signature_func (void)
     g_assert_no_error (error);
     g_assert (in != NULL);
     cabinet = gcab_cabinet_new ();
+    gcab_cabinet_add_allowed_compression (cabinet, GCAB_COMPRESSION_NONE);
     ret = gcab_cabinet_load (cabinet, in, NULL, &error);
     g_assert_no_error (error);
     g_assert (ret);
@@ -587,5 +628,6 @@ main (int argc, char **argv)
     g_test_add_func ("/GCab/cabinet{write}", gcab_test_cabinet_write_func);
     g_test_add_func ("/GCab/cabinet{blob}", gcab_test_cabinet_blob_func);
     g_test_add_func ("/GCab/cabinet{signature}", gcab_test_cabinet_signature_func);
+    g_test_add_func ("/GCab/cabinet{allowed-compression}", gcab_test_cabinet_allowed_compression_func);
     return g_test_run ();
 }
