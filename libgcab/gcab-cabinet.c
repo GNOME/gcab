@@ -44,6 +44,7 @@ struct _GCabCabinet {
     cheader_t *cheader;
     GByteArray *signature;
     GInputStream *stream;
+    guint8 allowed_compression;
 };
 
 enum {
@@ -64,6 +65,7 @@ gcab_error_quark (void)
 static void
 gcab_cabinet_init (GCabCabinet *self)
 {
+    self->allowed_compression = GCAB_COMPRESSION_MASK;
     self->folders = g_ptr_array_new_with_free_func (g_object_unref);
 }
 
@@ -416,6 +418,41 @@ gcab_cabinet_new (void)
     return g_object_new (GCAB_TYPE_CABINET, NULL);
 }
 
+static gboolean
+gcab_cabinet_is_compression_allowed(GCabCabinet *self, GCabCompression compression)
+{
+    /* for the fuzzing self tests */
+    if (self->allowed_compression == 0)
+        return TRUE;
+    return (self->allowed_compression & (1ull << compression)) > 0;
+}
+
+/**
+ * gcab_cabinet_add_allowed_compression:
+ * @cabinet: a #GCabCabinet
+ * @compression: a #GCabCompression kind, e.g. %GCAB_COMPRESSION_MSZIP
+ *
+ * Adds a compression kind to the allow-list. By default, GCab will use all decompression support
+ * compiled in at build time. Once this function has been called only specific compression kinds
+ * will be used in functions like gcab_cabinet_load().
+ *
+ * Since: 1.6
+ **/
+void
+gcab_cabinet_add_allowed_compression (GCabCabinet *self, GCabCompression compression)
+{
+    g_return_if_fail (GCAB_IS_CABINET (self));
+    g_return_if_fail (compression < GCAB_COMPRESSION_MASK);
+
+    /* clear all */
+    if (self->allowed_compression == GCAB_COMPRESSION_MASK)
+        self->allowed_compression = 0x0;
+
+    /* enable this */
+    if (g_getenv ("GCAB_SKIP_COMPRESSION_CHECK") == NULL)
+        self->allowed_compression |= 1ull << compression;
+}
+
 /**
  * gcab_cabinet_load:
  * @cabinet: a #GCabCabinet
@@ -460,8 +497,19 @@ gcab_cabinet_load (GCabCabinet *self,
     for (guint i = 0; i < cheader->nfolders; i++) {
         g_autoptr(cfolder_t) cfolder = g_new0 (cfolder_t, 1);
         g_autoptr(GByteArray) blob = NULL;
+
         if (!cfolder_read (cfolder, cheader->res_folder, in, cancellable, error))
             return FALSE;
+
+        /* only allow some compression types at runtime */
+        if (!gcab_cabinet_is_compression_allowed (self, cfolder->typecomp)) {
+            g_set_error (error,
+                         GCAB_ERROR,
+                         GCAB_ERROR_NOT_SUPPORTED,
+                         "compression kind 0x%x not allowed",
+                         cfolder->typecomp);
+            return FALSE;
+        }
 
         /* steal this inelegantly */
         if (cfolder->reserved != NULL) {

@@ -64,6 +64,8 @@ typedef enum GCabError
 } GCabError;
 
 GCabCabinet *      gcab_cabinet_new           (void);
+void               gcab_cabinet_add_allowed_compression (GCabCabinet *self,
+                                               GCabCompression compression);
 gboolean           gcab_cabinet_load          (GCabCabinet *cabinet,
                                                GInputStream *stream,
                                                GCancellable *cancellable,

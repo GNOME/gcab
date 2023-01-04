@@ -60,3 +60,7 @@ LIBGCAB1_1.4 {
 LIBGCAB1_1.5 {
         gcab_file_set_bytes;
 } LIBGCAB1_1.4;
+
+LIBGCAB1_1.6 {
+        gcab_cabinet_add_allowed_compression;
+} LIBGCAB1_1.5;
