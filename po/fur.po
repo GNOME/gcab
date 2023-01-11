@@ -7,14 +7,15 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gcab master\n"
 "Report-Msgid-Bugs-To: https://gitlab.gnome.org/GNOME/gcab/issues\n"
-"POT-Creation-Date: 2018-06-10 16:11+0000\n"
-"PO-Revision-Date: 2019-03-06 09:13+0100\n"
-"Last-Translator: Fabio Tomat <f.t.public@gmail.com>\n"
-"Language-Team: Friulian <fur@li.org>\n"
+"POT-Creation-Date: 2022-07-28 06:59+0000\n"
+"PO-Revision-Date: 2023-01-11 20:42+0000\n"
+"Last-Translator: Fabio T. <f.t.public@gmail.com>\n"
+"Language-Team: Friulian <f.t.public@gmail.com>\n"
 "Language: fur\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"X-Editor: HaiPO 1.4 beta\n"
 "X-Generator: Poedit 2.2.1\n"
 
 #: src/gcab.c:82
@@ -67,7 +68,8 @@ msgstr "No stâ includi il percors"
 
 #: src/gcab.c:124
 msgid "Reserve space in cabinet for signing (e.g. -s 6144 reserves 6K bytes)"
-msgstr "Riserve spazi tal archivi cabinet pe firme (p.e. -s 6144 al riserve 6K byte)"
+msgstr ""
+"Riserve spazi tal archivi cabinet pe firme (p.e. -s 6144 al riserve 6K byte)"
 
 #: src/gcab.c:125
 msgid "FILE INPUT_FILES..."
@@ -109,35 +111,39 @@ msgstr "Impussibil vierzi il file pe leture"
 msgid "Error reading"
 msgstr "Erôr tal lei"
 
-#: src/gcab.c:220
+#: src/gcab.c:206
+msgid "<unknown-date>"
+msgstr "<date-no-cognossude>"
+
+#: src/gcab.c:219
 msgid "Error during extraction"
 msgstr "Erôr dilunc la estrazion"
 
-#: src/gcab.c:235
+#: src/gcab.c:234
 msgid "Error while reading signature"
 msgstr "Erôr inte leture de firme"
 
-#: src/gcab.c:247
+#: src/gcab.c:246
 msgid "No input files specified"
 msgstr "Nissun file di input specificât"
 
-#: src/gcab.c:266
+#: src/gcab.c:265
 msgid "Cannot add file"
 msgstr "Impussibil zontâ il file"
 
-#: src/gcab.c:272
+#: src/gcab.c:271
 msgid "No files to be archived"
 msgstr "Nissun file di archiviâ"
 
-#: src/gcab.c:280
+#: src/gcab.c:279
 msgid "Cannot create cab file"
 msgstr "Impussibil creâ il file cab"
 
-#: src/gcab.c:286
+#: src/gcab.c:285
 msgid "Cannot add folder to cab file"
 msgstr "Impussibil zontâ la cartele sul file cab"
 
-#: src/gcab.c:296
+#: src/gcab.c:295
 msgid "Cannot write cab file"
 msgstr "Impussibil scrivi il file cab"
 
