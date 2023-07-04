@@ -12,9 +12,9 @@ if git.found()
 endif
 
 # libtool versioning
-lt_current = 2
+lt_current = 3
 lt_revision = 0
-lt_age = 2
+lt_age = 3
 lt_version = '@0@.@1@.@2@'.format(lt_current - lt_age, lt_age, lt_revision)
 darwin_versions = [lt_current + 1, '@0@.@1@.0'.format(lt_current + 1, lt_revision)]
 
