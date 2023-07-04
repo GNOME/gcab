@@ -1,3 +1,15 @@
+v1.6
+====
+
+New Features:
+  - Allow specifying the allowed compression formats at runtime (!15)
+
+    This would allow us, for example, to disable the slightly scary LZX compression
+    format when parsing unknown files.
+
+Bugfixes:
+  - Do not require git when building from a tarball
+
 v1.5
 ====
 
