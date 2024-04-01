@@ -7,11 +7,10 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: gcab master\n"
-"Report-Msgid-Bugs-To: http://bugzilla.gnome.org/enter_bug.cgi?"
-"product=gcab&keywords=I18N+L10N&component=general\n"
-"POT-Creation-Date: 2016-03-12 21:28+0100\n"
-"PO-Revision-Date: 2016-03-12 21:28+0100\n"
-"Last-Translator: Matej Urbančič <mateju@svn.gnome.org>\n"
+"Report-Msgid-Bugs-To: https://gitlab.gnome.org/GNOME/gcab/issues\n"
+"POT-Creation-Date: 2022-07-28 06:59+0000\n"
+"PO-Revision-Date: 2024-04-01 19:29+0200\n"
+"Last-Translator: Martin Srebotnjak <miles@filmsi.net>\n"
 "Language-Team: Slovenian GNOME Translation Team <gnome-si@googlegroups.com>\n"
 "Language: sl\n"
 "MIME-Version: 1.0\n"
@@ -20,86 +19,74 @@ msgstr ""
 "Plural-Forms: nplurals=4; plural=(n%100==1 ? 1 : n%100==2 ? 2 : n%100==3 || n"
 "%100==4 ? 3 : 0);\n"
 "X-Poedit-SourceCharset: utf-8\n"
-"X-Generator: Poedit 1.8.4\n"
+"X-Generator: Poedit 2.2.1\n"
 
-#: ../gcab.c:62
-#, c-format
-msgid "Removing leading '%s' from member names"
-msgstr "Odstranjevanje začetnih '%s' iz imen"
+#: src/gcab.c:82
+msgid "Dumping data to:"
+msgstr "Odlaganje podatkov v:"
 
-#: ../gcab.c:74
-#, c-format
-msgid "Dumping %s data to: %s ...\n"
-msgstr "Odlaganje zapisa podatkov %s v: %s ...\n"
-
-#: ../gcab.c:82
-#, c-format
-msgid "can't write file %s: %s"
-msgstr "ni mogoče pisati v datoteko %s: %s"
-
-#: ../gcab.c:109
+#: src/gcab.c:114
 msgid "Print program version"
 msgstr "Izpiši različico programa"
 
-#: ../gcab.c:110
+#: src/gcab.c:115
 msgid "Be verbose"
 msgstr "Podrobni izpis"
 
-#: ../gcab.c:111
+#: src/gcab.c:116
 msgid "Create archive"
 msgstr "Ustvari arhiv"
 
-#: ../gcab.c:112
+#: src/gcab.c:117
 msgid "Extract all files"
 msgstr "Razširi vse datoteke"
 
-#: ../gcab.c:113
+#: src/gcab.c:118
 msgid "Dump reserved and extra data"
 msgstr "Odloži izpis zadržani in posebnih podatkov"
 
-#: ../gcab.c:114
+#: src/gcab.c:119
 msgid "List content"
 msgstr "Izpiši vsebino"
 
-#: ../gcab.c:115
+#: src/gcab.c:120
 msgid "List content with file details"
 msgstr "Izpiši seznam s podrobnostmi o datotekah"
 
-#: ../gcab.c:116
+#: src/gcab.c:121
 msgid "Change to directory DIR"
 msgstr "Zamenjaj mapo v mapo DIR"
 
-#: ../gcab.c:116
+#: src/gcab.c:121
 msgid "DIR"
 msgstr "MAPA"
 
-#: ../gcab.c:117
+#: src/gcab.c:122
 msgid "Use zip compression"
 msgstr "Uporabi stiskanje zip"
 
-#: ../gcab.c:118
+#: src/gcab.c:123
 msgid "Do not include path"
 msgstr "Ne vključi poti"
 
-#: ../gcab.c:119
+#: src/gcab.c:124
 msgid "Reserve space in cabinet for signing (e.g. -s 6144 reserves 6K bytes)"
 msgstr ""
 "Zadrži prostor v kabinetu za podpisovanje (na primer -s 6144 zadrži 6Kb)"
 
-#: ../gcab.c:120
+#: src/gcab.c:125
 msgid "FILE INPUT_FILES..."
 msgstr "DATOTEKA VHODNE_DATOTEKE ..."
 
-#: ../gcab.c:134
+#: src/gcab.c:139
 msgid "- create a Cabinet file"
 msgstr "- ustvari datoteko cab"
 
-#: ../gcab.c:135
-#, c-format
-msgid "Report bugs to <%s>"
-msgstr "Pošljite poročilo o hroščih na <%s>"
+#: src/gcab.c:140
+msgid "Report bugs to:"
+msgstr "Pošljite poročilo o hroščih na:"
 
-#: ../gcab.c:138
+#: src/gcab.c:142
 msgid ""
 "gcab saves many files together into a cabinet archive, and can restore\n"
 "individual files from the archive."
@@ -108,72 +95,73 @@ msgstr ""
 "obnovi\n"
 "iz arhiva vse ali le posamične datoteke."
 
-#: ../gcab.c:145
-#, c-format
-msgid "option parsing failed: %s\n"
-msgstr "razčlenjevanje možnosti je spodletelo: %s\n"
+#: src/gcab.c:149
+msgid "Option parsing failed"
+msgstr "Razčlenjevanje možnosti je spodletelo"
 
-#: ../gcab.c:154
-msgid "Please specify a single operation."
-msgstr "Navesti je treba le eno opravilo."
+#: src/gcab.c:159
+msgid "Please specify a single operation"
+msgstr "Navedite eno samo operacijo"
 
-#: ../gcab.c:157
-msgid "cabinet file must be specified."
-msgstr "določena mora biti datoteka cab."
+#: src/gcab.c:164
+msgid "Cabinet file must be specified"
+msgstr "Navesti je treba datoteko cab"
 
-#: ../gcab.c:171
-#, c-format
-msgid "can't open %s for reading: %s\n"
-msgstr "ni mogoče odpreti %s za branje: %s\n"
+#: src/gcab.c:180
+msgid "Cannot open file for reading"
+msgstr "Datoteke ni mogoče odpreti za branje"
 
-#: ../gcab.c:173
-#, c-format
-msgid "error reading %s: %s\n"
-msgstr "napaka med branjem %s: %s\n"
+#: src/gcab.c:184
+msgid "Error reading"
+msgstr "Napaka pri branju"
 
-#: ../gcab.c:208
-#, c-format
-msgid "error during extraction: %s"
-msgstr "napaka med razširjanjem: %s"
+#: src/gcab.c:206
+msgid "<unknown-date>"
+msgstr "<neznan-datum>"
 
-#: ../gcab.c:220
-#, c-format
-msgid "error while reading signature: %s"
-msgstr "napaka med branjem podpisa: %s"
+#: src/gcab.c:219
+msgid "Error during extraction"
+msgstr "Napaka med razširjanjem"
 
-#: ../gcab.c:231
-msgid "please specify input files."
-msgstr "določiti je treba vhodne datoteke"
+#: src/gcab.c:234
+msgid "Error while reading signature"
+msgstr "Napaka med branjem podpisa"
 
-#: ../gcab.c:249
-#, c-format
-msgid "Can't add file %s: %s"
-msgstr "Ni mogoče dodati datoteke %s: %s"
+#: src/gcab.c:246
+msgid "No input files specified"
+msgstr "Vhodne datoteke niso določene"
 
-#: ../gcab.c:259
-msgid "no files to be archived."
-msgstr "ni datotek za arhiviranje."
+#: src/gcab.c:265
+msgid "Cannot add file"
+msgstr "Ni mogoče dodati datoteke"
 
-#: ../gcab.c:265
-#, c-format
-msgid "can't create cab file %s: %s"
-msgstr "ni mogoče ustvariti datoteke cab %s: %s"
+#: src/gcab.c:271
+msgid "No files to be archived"
+msgstr "Ni datotek za arhiviranje"
 
-#: ../gcab.c:269
-#, c-format
-msgid "can't add folder to cab file %s: %s"
-msgstr "ni mogoče dodati mape v datoteko cab %s: %s"
+#: src/gcab.c:279
+msgid "Cannot create cab file"
+msgstr "Ni mogoče ustvariti datoteke cab"
 
-#: ../gcab.c:277
-#, c-format
-msgid "can't write cab file %s: %s"
-msgstr "ni mogoče zapisati datoteke cab %s: %s"
+#: src/gcab.c:285
+msgid "Cannot add folder to cab file"
+msgstr "Ni mogoče dodati mape v datoteko cab"
 
-#: ../libgcab/cabinet.c:20 ../libgcab/cabinet.c:468
-#, c-format
-msgid "unsupported compression method %d"
-msgstr "nepodprt način stiskanja %d"
+#: src/gcab.c:295
+msgid "Cannot write cab file"
+msgstr "Ni mogoče zapisati datoteke cab"
 
-#: ../libgcab/cabinet.c:482
-msgid "incorrect checksum detected"
-msgstr "zaznana je nepravilna nadzorna vsota"
+#~ msgid "Removing leading '%s' from member names"
+#~ msgstr "Odstranjevanje začetnih '%s' iz imen"
+
+#~ msgid "can't write file %s: %s"
+#~ msgstr "ni mogoče pisati v datoteko %s: %s"
+
+#~ msgid "please specify input files."
+#~ msgstr "določiti je treba vhodne datoteke"
+
+#~ msgid "unsupported compression method %d"
+#~ msgstr "nepodprt način stiskanja %d"
+
+#~ msgid "incorrect checksum detected"
+#~ msgstr "zaznana je nepravilna nadzorna vsota"
