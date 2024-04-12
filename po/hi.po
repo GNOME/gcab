@@ -1,0 +1,147 @@
+# Hindi translation for gcab.
+# Copyright (C) 2024 gcab's COPYRIGHT HOLDER
+# This file is distributed under the same license as the gcab package.
+# Scrambled777 <weblate.scrambled777@simplelogin.com>, 2024.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: gcab master\n"
+"Report-Msgid-Bugs-To: https://gitlab.gnome.org/GNOME/gcab/issues\n"
+"POT-Creation-Date: 2024-04-01 17:29+0000\n"
+"PO-Revision-Date: 2024-04-02 22:06+0530\n"
+"Last-Translator: Scrambled777 <weblate.scrambled777@simplelogin.com>\n"
+"Language-Team: Hindi\n"
+"Language: hi\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+"X-Generator: Gtranslator 46.0\n"
+
+#: src/gcab.c:82
+msgid "Dumping data to:"
+msgstr "डेटा यहां गिराया जायेगा:"
+
+#: src/gcab.c:114
+msgid "Print program version"
+msgstr "प्रोग्राम संस्करण प्रिंट करें"
+
+#: src/gcab.c:115
+msgid "Be verbose"
+msgstr "वाचाल रहे"
+
+#: src/gcab.c:116
+msgid "Create archive"
+msgstr "पुरालेख बनाएँ"
+
+#: src/gcab.c:117
+msgid "Extract all files"
+msgstr "सभी फाइलें निष्कर्षित करें"
+
+#: src/gcab.c:118
+msgid "Dump reserved and extra data"
+msgstr "आरक्षित और अतिरिक्त डेटा गरायें"
+
+#: src/gcab.c:119
+msgid "List content"
+msgstr "सूची सामग्री"
+
+#: src/gcab.c:120
+msgid "List content with file details"
+msgstr "फाइल विवरण के साथ सामग्री सूचीबद्ध करें"
+
+#: src/gcab.c:121
+msgid "Change to directory DIR"
+msgstr "निर्देशिका DIR में बदलें"
+
+#: src/gcab.c:121
+msgid "DIR"
+msgstr "DIR"
+
+#: src/gcab.c:122
+msgid "Use zip compression"
+msgstr "ज़िप संपीड़न का प्रयोग करें"
+
+#: src/gcab.c:123
+msgid "Do not include path"
+msgstr "पथ शामिल न करें"
+
+#: src/gcab.c:124
+msgid "Reserve space in cabinet for signing (e.g. -s 6144 reserves 6K bytes)"
+msgstr "हस्ताक्षर करने के लिए कैबिनेट में स्थान आरक्षित करें (जैसे -s 6144 आरक्षित 6K बाइट्स)"
+
+#: src/gcab.c:125
+msgid "FILE INPUT_FILES..."
+msgstr "फाइल इनपुट_फाइलें..."
+
+#: src/gcab.c:139
+msgid "- create a Cabinet file"
+msgstr "- एक कैबिनेट फाइल बनाएं"
+
+#: src/gcab.c:140
+msgid "Report bugs to:"
+msgstr "बग की रिपोर्ट यहां करें:"
+
+#: src/gcab.c:142
+msgid ""
+"gcab saves many files together into a cabinet archive, and can restore\n"
+"individual files from the archive."
+msgstr ""
+"gcab कई फाइलों को एक कैबिनेट पुरालेख में एक साथ सहेजता है, और पुनर्स्थापित कर सकता है\n"
+"पुरालेख से अलग-अलग फाइलें."
+
+#: src/gcab.c:149
+msgid "Option parsing failed"
+msgstr "विकल्प पार्सिंग विफल"
+
+#: src/gcab.c:159
+msgid "Please specify a single operation"
+msgstr "कृपया एक एकल अभियान निर्दिष्ट करें"
+
+#: src/gcab.c:164
+msgid "Cabinet file must be specified"
+msgstr "कैबिनेट फाइल निर्दिष्ट होनी चाहिए"
+
+#: src/gcab.c:180
+msgid "Cannot open file for reading"
+msgstr "पढ़ने के लिए फाइल नहीं खोली जा सकी"
+
+#: src/gcab.c:184
+msgid "Error reading"
+msgstr "पढ़ने में त्रुटि"
+
+#: src/gcab.c:206
+msgid "<unknown-date>"
+msgstr "<अज्ञात-तारीख>"
+
+#: src/gcab.c:219
+msgid "Error during extraction"
+msgstr "निष्कर्षण के दौरान त्रुटि"
+
+#: src/gcab.c:234
+msgid "Error while reading signature"
+msgstr "हस्ताक्षर पढ़ते समय त्रुटि"
+
+#: src/gcab.c:246
+msgid "No input files specified"
+msgstr "कोई इनपुट फाइल निर्दिष्ट नहीं है"
+
+#: src/gcab.c:265
+msgid "Cannot add file"
+msgstr "फाइल नहीं जोड़ सकते"
+
+#: src/gcab.c:271
+msgid "No files to be archived"
+msgstr "संग्रहीत करने के लिए कोई फाइल नहीं"
+
+#: src/gcab.c:279
+msgid "Cannot create cab file"
+msgstr "cab फाइल नहीं बनाई जा सकती"
+
+#: src/gcab.c:285
+msgid "Cannot add folder to cab file"
+msgstr "Cab फाइल में फोल्डर नहीं जोड़ा जा सकता"
+
+#: src/gcab.c:295
+msgid "Cannot write cab file"
+msgstr "cab फाइल नहीं लिख सकते"
