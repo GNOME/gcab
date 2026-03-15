@@ -1,0 +1,148 @@
+# Kazakh translation for gcab.
+# Copyright (C) 2026 gcab's COPYRIGHT HOLDER
+# This file is distributed under the same license as the gcab package.
+# Baurzhan Muftakhidinov <baurthefirst@gmail.com>,  2026.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: gcab master\n"
+"Report-Msgid-Bugs-To: https://gitlab.gnome.org/GNOME/gcab/issues\n"
+"POT-Creation-Date: 2023-01-04 09:03+0000\n"
+"PO-Revision-Date: 2026-03-15 12:17+0500\n"
+"Last-Translator: Baurzhan Muftakhidinov <baurthefirst@gmail.com>\n"
+"Language-Team: Kazakh <Kazakh>\n"
+"Language: kk\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Poedit 3.9\n"
+
+#: src/gcab.c:82
+msgid "Dumping data to:"
+msgstr "Деректерді келесіге дамптау:"
+
+#: src/gcab.c:114
+msgid "Print program version"
+msgstr "Бағдарлама нұсқасын шығару"
+
+#: src/gcab.c:115
+msgid "Be verbose"
+msgstr "Егжей-тегжейлі болу"
+
+#: src/gcab.c:116
+msgid "Create archive"
+msgstr "Архив құру"
+
+#: src/gcab.c:117
+msgid "Extract all files"
+msgstr "Барлық файлдарды тарқату"
+
+#: src/gcab.c:118
+msgid "Dump reserved and extra data"
+msgstr "Резервтелген және қосымша деректерді дамптау"
+
+#: src/gcab.c:119
+msgid "List content"
+msgstr "Мазмұнын тізімдеу"
+
+#: src/gcab.c:120
+msgid "List content with file details"
+msgstr "Файл мәліметтерімен мазмұнын тізімдеу"
+
+#: src/gcab.c:121
+msgid "Change to directory DIR"
+msgstr "DIR бумасына ауысу"
+
+#: src/gcab.c:121
+msgid "DIR"
+msgstr "БУМА"
+
+#: src/gcab.c:122
+msgid "Use zip compression"
+msgstr "zip сығуын қолдану"
+
+#: src/gcab.c:123
+msgid "Do not include path"
+msgstr "Жолды қоспау"
+
+#: src/gcab.c:124
+msgid "Reserve space in cabinet for signing (e.g. -s 6144 reserves 6K bytes)"
+msgstr ""
+"Қол қою үшін кабинет ішінде орын қалдыру (мысалы, -s 6144 параметрі 6 КБ "
+"резервтейді)"
+
+#: src/gcab.c:125
+msgid "FILE INPUT_FILES..."
+msgstr "ФАЙЛ КІРІС_ФАЙЛДАРЫ..."
+
+#: src/gcab.c:139
+msgid "- create a Cabinet file"
+msgstr "- Cabinet файлын құру"
+
+#: src/gcab.c:140
+msgid "Report bugs to:"
+msgstr "Қателер туралы хабарлау:"
+
+#: src/gcab.c:142
+msgid ""
+"gcab saves many files together into a cabinet archive, and can restore\n"
+"individual files from the archive."
+msgstr ""
+"gcab бірнеше файлды бірге кабинет архивіне сақтайды және архивтен\n"
+"жеке файлдарды қалпына келтіре алады."
+
+#: src/gcab.c:149
+msgid "Option parsing failed"
+msgstr "Опцияларды талдау сәтсіз аяқталды"
+
+#: src/gcab.c:159
+msgid "Please specify a single operation"
+msgstr "Бір ғана операцияны көрсетіңіз"
+
+#: src/gcab.c:164
+msgid "Cabinet file must be specified"
+msgstr "Cabinet файлы көрсетілуі тиіс"
+
+#: src/gcab.c:180
+msgid "Cannot open file for reading"
+msgstr "Файлды оқу үшін ашу мүмкін емес"
+
+#: src/gcab.c:184
+msgid "Error reading"
+msgstr "Оқу қатесі"
+
+#: src/gcab.c:206
+msgid "<unknown-date>"
+msgstr "<белгісіз-күн>"
+
+#: src/gcab.c:219
+msgid "Error during extraction"
+msgstr "Тарқату кезіндегі қате"
+
+#: src/gcab.c:234
+msgid "Error while reading signature"
+msgstr "Қолтаңбаны оқу кезіндегі қате"
+
+#: src/gcab.c:246
+msgid "No input files specified"
+msgstr "Кіріс файлдары көрсетілмеген"
+
+#: src/gcab.c:265
+msgid "Cannot add file"
+msgstr "Файлды қосу мүмкін емес"
+
+#: src/gcab.c:271
+msgid "No files to be archived"
+msgstr "Архивтелетін файлдар жоқ"
+
+#: src/gcab.c:279
+msgid "Cannot create cab file"
+msgstr "cab файлын құру мүмкін емес"
+
+#: src/gcab.c:285
+msgid "Cannot add folder to cab file"
+msgstr "cab файлына буманы қосу мүмкін емес"
+
+#: src/gcab.c:295
+msgid "Cannot write cab file"
+msgstr "cab файлын жазу мүмкін емес"
