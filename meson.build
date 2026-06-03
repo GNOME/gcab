@@ -1,7 +1,7 @@
 project('gcab', 'c',
   version : '1.6',
   license : 'LGPL-2.1+',
-  meson_version : '>=0.50.0',
+  meson_version : '>=0.56.0',
   default_options : ['warning_level=2', 'c_std=c99'],
 )
 
@@ -132,7 +132,7 @@ if get_option('nls')
 subdir('po')
 endif
 
-if get_option('docs')
+if get_option('docs') and get_option('introspection')
 subdir('docs')
 endif
 

@@ -1,0 +1,30 @@
+[library]
+version = "@version@"
+browse_url = "https://gitlab.gnome.org/GNOME/gcab"
+repository_url = "https://gitlab.gnome.org/GNOME/gcab.git"
+website_url = "https://wiki.gnome.org/msitools"
+authors = "Marc-André Lureau"
+license = "LGPL-2.1-or-later"
+description = "Cabinet file library"
+
+[theme]
+name = "basic"
+show_index_summary = true
+
+[source-location]
+base_url = "https://gitlab.gnome.org/GNOME/gcab/-/blob/master/"
+
+[dependencies.GLib-2.0]
+name = "GLib"
+description = "The base type system library"
+docs_url = "https://docs.gtk.org/glib/"
+
+[dependencies.GObject-2.0]
+name = "GObject"
+description = "The base type system library"
+docs_url = "https://docs.gtk.org/gobject/"
+
+[dependencies.Gio-2.0]
+name = "GIO"
+description = "GObject Interfaces and Objects, Networking, IPC, and I/O"
+docs_url = "https://docs.gtk.org/gio/"
