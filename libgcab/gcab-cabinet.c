@@ -226,7 +226,7 @@ gcab_cabinet_get_size (GCabCabinet *self)
  * @stream: a #GOutputStream also #GSeekable
  * @file_callback: (allow-none) (scope call) (closure user_data): report current file being saved
  * @progress_callback: (allow-none) (scope call) (closure user_data): report saving progress
- * @user_data: (closure): user data to pass to callbacks
+ * @user_data: user data to pass to callbacks
  * @cancellable: (allow-none): optional #GCancellable object,
  *     %NULL to ignore
  * @error: (allow-none): #GError to set on error, or %NULL
@@ -384,7 +384,7 @@ gcab_cabinet_write (GCabCabinet *self,
  * @cabinet: a #GCabCabinet
  * @stream: a #GOutputStream also #GSeekable
  * @file_callback: (allow-none) (scope call) (closure user_data): report current file being saved
- * @user_data: (closure): user data to pass to callbacks
+ * @user_data: user data to pass to callbacks
  * @cancellable: (allow-none): optional #GCancellable object,
  *     %NULL to ignore
  * @error: (allow-none): #GError to set on error, or %NULL
@@ -429,7 +429,7 @@ gcab_cabinet_is_compression_allowed(GCabCabinet *self, GCabCompression compressi
 
 /**
  * gcab_cabinet_add_allowed_compression:
- * @cabinet: a #GCabCabinet
+ * @self: a #GCabCabinet
  * @compression: a #GCabCompression kind, e.g. %GCAB_COMPRESSION_MSZIP
  *
  * Adds a compression kind to the allow-list. By default, GCab will use all decompression support
@@ -558,7 +558,7 @@ gcab_cabinet_load (GCabCabinet *self,
  * @file_callback: (allow-none) (scope call) (closure user_data): an optional #GCabFile callback,
  *     return %FALSE to filter out or skip files.
  * @progress_callback: (allow-none) (scope call) (closure user_data): a progress callback
- * @user_data: (closure): callback data
+ * @user_data: callback data
  * @cancellable: (allow-none): optional #GCancellable object,
  *     %NULL to ignore
  * @error: (allow-none): #GError to set on error, or %NULL
@@ -613,7 +613,7 @@ gcab_cabinet_extract (GCabCabinet *self,
  * @path: the path to extract files
  * @file_callback: (allow-none) (scope call) (closure user_data): an optional #GCabFile callback,
  *     return %FALSE to filter out or skip files.
- * @user_data: (closure): callback data
+ * @user_data: callback data
  * @cancellable: (allow-none): optional #GCancellable object,
  *     %NULL to ignore
  * @error: (allow-none): #GError to set on error, or %NULL
