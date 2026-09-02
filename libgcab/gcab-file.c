@@ -657,6 +657,5 @@ gcab_file_set_extract_name (GCabFile *self, const gchar *name)
 {
     g_return_if_fail (GCAB_IS_FILE (self));
 
-    g_free (self->extract_name);
-    self->extract_name = g_strdup (name);
+    g_set_str (&self->extract_name, name);
 }
