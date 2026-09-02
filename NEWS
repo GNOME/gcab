@@ -1,3 +1,29 @@
+v1.7
+====
+
+New Features:
+  - Multi-cabinet set support: load, chain, and extract across spanning cabinets
+  - New gcab_cabinet_load_from_file() to load from a GFile and auto-discover
+    adjacent cabinets
+  - New gcab_cabinet_get_next(), gcab_cabinet_get_prev(),
+    gcab_cabinet_set_next(), gcab_cabinet_set_prev() to chain cabinet sets
+  - New gcab_cabinet_get_next_name(), gcab_cabinet_get_prev_name() to query
+    cabinet set linkage
+  - New gcab_file_is_continued_from_prev(), gcab_file_is_continued_to_next()
+    to identify files spanning multiple cabinets
+
+Bugfixes:
+  - Fix memory leak of LZX/zlib state on folder rewind
+  - Fix checksum calculation to include per-CFDATA reserved bytes
+  - Fix g-ir-scanner warnings in gcab-cabinet.c
+
+Other:
+  - Switch documentation from gtk-doc to gi-docgen
+  - Apply gobject-linter code style fixes
+  - translation updates
+
+Translation updates
+
 v1.6
 ====
 

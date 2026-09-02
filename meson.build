@@ -1,5 +1,5 @@
 project('gcab', 'c',
-  version : '1.6',
+  version : '1.7',
   license : 'LGPL-2.1+',
   meson_version : '>=0.56.0',
   default_options : ['warning_level=2', 'c_std=c99'],
@@ -12,9 +12,9 @@ if git.found()
 endif
 
 # libtool versioning
-lt_current = 3
+lt_current = 4
 lt_revision = 0
-lt_age = 3
+lt_age = 4
 lt_version = '@0@.@1@.@2@'.format(lt_current - lt_age, lt_age, lt_revision)
 darwin_versions = [lt_current + 1, '@0@.@1@.0'.format(lt_current + 1, lt_revision)]
 
@@ -94,7 +94,7 @@ add_project_link_arguments(
   language: 'c'
 )
 
-gio = dependency('gio-2.0', version : '>= 2.62.0')
+gio = dependency('gio-2.0', version : '>= 2.88.0')
 libz = dependency('zlib')
 
 gcab_deps = [
