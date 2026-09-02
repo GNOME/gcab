@@ -737,7 +737,7 @@ gcab_cabinet_extract (GCabCabinet *self,
 
         if (i == self->folders->len - 1 && next != NULL && next_data != NULL) {
             GPtrArray *next_folders = gcab_cabinet_get_folders (next);
-            if (next_folders->len > 0) {
+            if (next_folders != NULL && next_folders->len > 0) {
                 GCabFolder *next_folder = g_ptr_array_index (next_folders, 0);
                 cfolder_t *next_cfolder = gcab_folder_get_cfolder (next_folder);
                 if (next_cfolder != NULL) {
