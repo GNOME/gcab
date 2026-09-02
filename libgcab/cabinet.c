@@ -436,17 +436,21 @@ compute_checksum (guint8 *in, guint16 ncbytes, guint32 seed)
 }
 
 static guint32
-cdata_compute_checksum (guint8 *buf, guint16 ncbytes, guint16 nubytes)
+cdata_compute_checksum (guint8 *buf, guint16 ncbytes, guint16 nubytes,
+                        guint8 *reserved, guint8 res_data)
 {
-    guint32 datacsum = compute_checksum (buf, ncbytes, 0);
+    guint32 csum;
     guint8 sizecsum[4];
     guint16 nbytes_le;
+
+    csum = compute_checksum (reserved, res_data, 0);
+    csum = compute_checksum (buf, ncbytes, csum);
 
     nbytes_le = GUINT16_TO_LE (ncbytes);
     memcpy (&sizecsum[0], &nbytes_le, 2);
     nbytes_le = GUINT16_TO_LE (nubytes);
     memcpy (&sizecsum[2], &nbytes_le, 2);
-    return compute_checksum (sizecsum, sizeof (sizecsum), datacsum);
+    return compute_checksum (sizecsum, sizeof (sizecsum), csum);
 }
 
 static gboolean
@@ -515,7 +519,8 @@ cdata_write (cdata_t *cd, GDataOutputStream *out, int type,
         return FALSE;
     }
 
-    cd->checksum = cdata_compute_checksum (cd->in, cd->ncbytes, cd->nubytes);
+    cd->checksum = cdata_compute_checksum (cd->in, cd->ncbytes, cd->nubytes,
+                                           NULL, 0);
     GOutputStream *stream = g_filter_output_stream_get_base_stream (G_FILTER_OUTPUT_STREAM (out));
 
     *bytes_written = 0;
@@ -702,7 +707,8 @@ cdata_read (cdata_t *cd, guint8 res_data, gint comptype,
     RN (cd->reserved, res_data);
     RN (buf, cd->ncbytes);
 
-    checksum_tmp = cdata_compute_checksum (buf, cd->ncbytes, cd->nubytes);
+    checksum_tmp = cdata_compute_checksum (buf, cd->ncbytes, cd->nubytes,
+                                           cd->reserved, res_data);
     if (cd->checksum != checksum_tmp) {
         if (_enforce_checksum ()) {
             g_set_error_literal (error, GCAB_ERROR, GCAB_ERROR_INVALID_DATA,
@@ -733,13 +739,12 @@ static gboolean
 read_raw_cfdata (GDataInputStream *in, guint8 res_data,
                  guint8 *buf, gsize buf_sz,
                  guint16 *out_ncbytes, guint16 *out_nubytes,
-                 guint32 *out_checksum,
+                 guint32 *out_checksum, guint8 *out_reserved,
                  GCancellable *cancellable, GError **error)
 {
     gboolean success = FALSE;
     guint32 checksum;
     guint16 ncbytes, nubytes;
-    guint8 reserved_tmp[256];
 
     R4 (checksum);
     R2 (ncbytes);
@@ -749,7 +754,7 @@ read_raw_cfdata (GDataInputStream *in, guint8 res_data,
         goto end;
     }
     R2 (nubytes);
-    RN (reserved_tmp, res_data);
+    RN (out_reserved, res_data);
     RN (buf, ncbytes);
 
     *out_ncbytes = ncbytes;
@@ -775,6 +780,7 @@ cdata_read_split (cdata_t *cd, gint comptype,
     guint16 ncbytes_b = 0, nubytes_b = 0;
     guint32 checksum_a = 0, checksum_b = 0;
     guint32 checksum_tmp;
+    guint8 reserved_a[256], reserved_b[256];
 
     g_return_val_if_fail (is_split != NULL, FALSE);
 
@@ -785,10 +791,11 @@ cdata_read_split (cdata_t *cd, gint comptype,
 
     if (!read_raw_cfdata (in_a, res_data_a, buf, buf_sz,
                           &ncbytes_a, &nubytes_a, &checksum_a,
-                          cancellable, error))
+                          reserved_a, cancellable, error))
         return FALSE;
 
-    checksum_tmp = cdata_compute_checksum (buf, ncbytes_a, nubytes_a);
+    checksum_tmp = cdata_compute_checksum (buf, ncbytes_a, nubytes_a,
+                                           reserved_a, res_data_a);
     if (checksum_a != checksum_tmp) {
         if (_enforce_checksum ()) {
             g_set_error_literal (error, GCAB_ERROR, GCAB_ERROR_INVALID_DATA,
@@ -820,10 +827,11 @@ cdata_read_split (cdata_t *cd, gint comptype,
     if (!read_raw_cfdata (in_b, res_data_b, buf + ncbytes_a,
                           buf_sz - ncbytes_a,
                           &ncbytes_b, &nubytes_b, &checksum_b,
-                          cancellable, error))
+                          reserved_b, cancellable, error))
         return FALSE;
 
-    checksum_tmp = cdata_compute_checksum (buf + ncbytes_a, ncbytes_b, nubytes_b);
+    checksum_tmp = cdata_compute_checksum (buf + ncbytes_a, ncbytes_b, nubytes_b,
+                                           reserved_b, res_data_b);
     if (checksum_b != checksum_tmp) {
         if (_enforce_checksum ()) {
             g_set_error_literal (error, GCAB_ERROR, GCAB_ERROR_INVALID_DATA,
