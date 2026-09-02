@@ -47,6 +47,7 @@ struct _GCabCabinet {
     guint8 allowed_compression;
     gpointer next;
     gpointer prev;
+    GPtrArray *chained;
 };
 
 enum {
@@ -78,6 +79,7 @@ gcab_cabinet_finalize (GObject *object)
 
     g_clear_weak_pointer (&self->next);
     g_clear_weak_pointer (&self->prev);
+    g_clear_pointer (&self->chained, g_ptr_array_unref);
     cheader_free (self->cheader);
     g_ptr_array_unref (self->folders);
     if (self->reserved)
@@ -568,6 +570,113 @@ gcab_cabinet_load (GCabCabinet *self,
     return TRUE;
 }
 
+static gboolean
+cabinet_name_is_valid (const gchar *name)
+{
+    if (name == NULL || name[0] == '\0')
+        return FALSE;
+    if (g_strcmp0 (name, ".") == 0 || g_strcmp0 (name, "..") == 0)
+        return FALSE;
+    if (strchr (name, '/') != NULL || strchr (name, '\\') != NULL)
+        return FALSE;
+    return TRUE;
+}
+
+/**
+ * gcab_cabinet_load_from_file:
+ * @cabinet: a #GCabCabinet
+ * @file: a #GFile to load
+ * @cancellable: (allow-none): optional #GCancellable object,
+ *     %NULL to ignore
+ * @error: (allow-none): #GError to set on error, or %NULL
+ *
+ * Load a cabinet archive from @file. If the cabinet references
+ * adjacent cabinets in a multi-cabinet set, they are automatically
+ * loaded and chained from the same directory.
+ *
+ * Returns: %TRUE on success
+ *
+ * Since: 1.7
+ **/
+gboolean
+gcab_cabinet_load_from_file (GCabCabinet *self,
+                             GFile *file,
+                             GCancellable *cancellable,
+                             GError **error)
+{
+    g_return_val_if_fail (GCAB_IS_CABINET (self), FALSE);
+    g_return_val_if_fail (G_IS_FILE (file), FALSE);
+    g_return_val_if_fail (!cancellable || G_IS_CANCELLABLE (cancellable), FALSE);
+    g_return_val_if_fail (!error || *error == NULL, FALSE);
+
+    g_autoptr(GInputStream) stream = G_INPUT_STREAM (g_file_read (file, cancellable, error));
+    if (stream == NULL)
+        return FALSE;
+
+    if (!gcab_cabinet_load (self, stream, cancellable, error))
+        return FALSE;
+
+    g_autoptr(GFile) parent = g_file_get_parent (file);
+    if (parent == NULL)
+        return TRUE;
+
+    g_autoptr(GHashTable) visited = g_hash_table_new_full (g_file_hash,
+                                                           (GEqualFunc) g_file_equal,
+                                                           g_object_unref, NULL);
+    g_hash_table_add (visited, g_object_ref (file));
+
+    GCabCabinet *cur = self;
+    while (TRUE) {
+        const gchar *next_name = gcab_cabinet_get_next_name (cur);
+        if (next_name == NULL)
+            break;
+
+        if (!cabinet_name_is_valid (next_name)) {
+            g_set_error (error, GCAB_ERROR, GCAB_ERROR_FORMAT,
+                         "Invalid next cabinet name '%s'", next_name);
+            return FALSE;
+        }
+
+        g_autoptr(GFile) next_file = g_file_get_child (parent, next_name);
+        if (!g_file_query_exists (next_file, cancellable))
+            break;
+
+        if (g_hash_table_contains (visited, next_file)) {
+            g_set_error (error, GCAB_ERROR, GCAB_ERROR_FORMAT,
+                         "Cyclic cabinet chain detected at '%s'", next_name);
+            return FALSE;
+        }
+
+        g_autoptr(GCabCabinet) next_cab = gcab_cabinet_new ();
+        g_autoptr(GInputStream) next_stream = G_INPUT_STREAM (g_file_read (next_file, cancellable, error));
+        if (next_stream == NULL)
+            return FALSE;
+
+        if (!gcab_cabinet_load (next_cab, next_stream, cancellable, error))
+            return FALSE;
+
+        if (next_cab->cheader->setID != cur->cheader->setID ||
+            next_cab->cheader->cabID != (guint16) (cur->cheader->cabID + 1)) {
+            g_set_error (error, GCAB_ERROR, GCAB_ERROR_FORMAT,
+                         "Cabinet '%s' is not the next cabinet in the set", next_name);
+            return FALSE;
+        }
+
+        g_hash_table_add (visited, g_object_ref (next_file));
+
+        gcab_cabinet_set_next (cur, next_cab);
+        gcab_cabinet_set_prev (next_cab, cur);
+
+        if (self->chained == NULL)
+            self->chained = g_ptr_array_new_with_free_func (g_object_unref);
+        g_ptr_array_add (self->chained, g_object_ref (next_cab));
+
+        cur = next_cab;
+    }
+
+    return TRUE;
+}
+
 /**
  * gcab_cabinet_extract:
  * @cabinet: a #GCabCabinet
@@ -646,6 +755,16 @@ gcab_cabinet_extract (GCabCabinet *self,
                                   file_callback, progress_callback, user_data,
                                   cancellable, error)) {
             return FALSE;
+        }
+    }
+
+    if (self->chained != NULL) {
+        for (guint c = 0; c < self->chained->len; c++) {
+            GCabCabinet *chained_cab = g_ptr_array_index (self->chained, c);
+            if (!gcab_cabinet_extract (chained_cab, path,
+                                       file_callback, progress_callback,
+                                       user_data, cancellable, error))
+                return FALSE;
         }
     }
 

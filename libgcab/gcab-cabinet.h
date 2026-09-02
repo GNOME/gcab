@@ -70,6 +70,10 @@ gboolean           gcab_cabinet_load          (GCabCabinet *cabinet,
                                                GInputStream *stream,
                                                GCancellable *cancellable,
                                                GError **error);
+gboolean           gcab_cabinet_load_from_file (GCabCabinet *cabinet,
+                                               GFile *file,
+                                               GCancellable *cancellable,
+                                               GError **error);
 
 GPtrArray *        gcab_cabinet_get_folders   (GCabCabinet *cabinet);
 guint32            gcab_cabinet_get_size      (GCabCabinet *cabinet);
