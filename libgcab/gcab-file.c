@@ -54,7 +54,10 @@ typedef enum {
     PROP_NAME = 1,
     PROP_FILE,
     PROP_BYTES,
+    N_PROPS
 } GCabFileProps;
+
+static GParamSpec *props[N_PROPS] = { NULL, };
 
 G_DEFINE_TYPE (GCabFile, gcab_file, G_TYPE_OBJECT);
 
@@ -174,17 +177,16 @@ gcab_file_class_init (GCabFileClass *klass)
     object_class->set_property = gcab_file_set_property;
     object_class->get_property = gcab_file_get_property;
 
-    g_object_class_install_property (object_class, PROP_NAME,
-        g_param_spec_string ("name", NULL, NULL, NULL,
-                             G_PARAM_READWRITE | G_PARAM_STATIC_NAME));
+    props[PROP_NAME] = g_param_spec_string ("name", NULL, NULL, NULL,
+                                            G_PARAM_READWRITE | G_PARAM_STATIC_NAME);
 
-    g_object_class_install_property (object_class, PROP_FILE,
-        g_param_spec_object ("file", NULL, NULL, G_TYPE_FILE,
-                             G_PARAM_READWRITE | G_PARAM_STATIC_NAME));
+    props[PROP_FILE] = g_param_spec_object ("file", NULL, NULL, G_TYPE_FILE,
+                                            G_PARAM_READWRITE | G_PARAM_STATIC_NAME);
 
-    g_object_class_install_property (object_class, PROP_BYTES,
-        g_param_spec_boxed ("bytes", NULL, NULL, G_TYPE_BYTES,
-                            G_PARAM_READWRITE | G_PARAM_STATIC_NAME));
+    props[PROP_BYTES] = g_param_spec_boxed ("bytes", NULL, NULL, G_TYPE_BYTES,
+                                            G_PARAM_READWRITE | G_PARAM_STATIC_NAME);
+
+    g_object_class_install_properties (object_class, N_PROPS, props);
 }
 
 /**
