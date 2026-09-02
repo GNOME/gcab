@@ -140,21 +140,19 @@ gcab_folder_class_init (GCabFolderClass *klass)
     object_class->get_property = gcab_folder_get_property;
 
     g_object_class_install_property (object_class, PROP_COMPRESSION,
-        g_param_spec_enum ("compression", "compression", "compression",
+        g_param_spec_enum ("compression", NULL, NULL,
                            GCAB_TYPE_COMPRESSION, 0,
-                           G_PARAM_READABLE |
-                           G_PARAM_STATIC_STRINGS));
+                           G_PARAM_READABLE | G_PARAM_STATIC_NAME));
 
     g_object_class_install_property (object_class, PROP_COMPTYPE,
-        g_param_spec_int ("comptype", "comptype", "comptype",
+        g_param_spec_int ("comptype", NULL, NULL,
                           0, G_MAXINT, 0,
-                          G_PARAM_CONSTRUCT_ONLY | G_PARAM_READWRITE |
-                          G_PARAM_STATIC_STRINGS));
+                          G_PARAM_CONSTRUCT_ONLY | G_PARAM_READWRITE | G_PARAM_STATIC_NAME));
 
     g_object_class_install_property (object_class, PROP_RESERVED,
-         g_param_spec_boxed ("reserved", "Reserved", "Reserved",
+         g_param_spec_boxed ("reserved", NULL, NULL,
                             G_TYPE_BYTE_ARRAY,
-                            G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
+                            G_PARAM_READWRITE | G_PARAM_STATIC_NAME));
 
 }
 

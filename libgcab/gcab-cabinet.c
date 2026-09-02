@@ -147,14 +147,14 @@ gcab_cabinet_class_init (GCabCabinetClass *klass)
     object_class->get_property = gcab_cabinet_get_property;
 
     g_object_class_install_property (object_class, PROP_RESERVED,
-         g_param_spec_boxed ("reserved", "Reserved", "Reserved",
+         g_param_spec_boxed ("reserved", NULL, NULL,
                             G_TYPE_BYTE_ARRAY,
-                            G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
+                            G_PARAM_READWRITE | G_PARAM_STATIC_NAME));
 
     g_object_class_install_property (object_class, PROP_SIGNATURE,
-         g_param_spec_boxed ("signature", "Signature", "Signature",
+         g_param_spec_boxed ("signature", NULL, NULL,
                             G_TYPE_BYTE_ARRAY,
-                            G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
+                            G_PARAM_READWRITE | G_PARAM_STATIC_NAME));
 }
 
 /**

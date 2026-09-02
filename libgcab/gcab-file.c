@@ -176,19 +176,16 @@ gcab_file_class_init (GCabFileClass *klass)
     object_class->get_property = gcab_file_get_property;
 
     g_object_class_install_property (object_class, PROP_NAME,
-        g_param_spec_string ("name", "name", "name", NULL,
-                             G_PARAM_READWRITE |
-                             G_PARAM_STATIC_STRINGS));
+        g_param_spec_string ("name", NULL, NULL, NULL,
+                             G_PARAM_READWRITE | G_PARAM_STATIC_NAME));
 
     g_object_class_install_property (object_class, PROP_FILE,
-        g_param_spec_object ("file", "file", "file", G_TYPE_FILE,
-                             G_PARAM_READWRITE |
-                             G_PARAM_STATIC_STRINGS));
+        g_param_spec_object ("file", NULL, NULL, G_TYPE_FILE,
+                             G_PARAM_READWRITE | G_PARAM_STATIC_NAME));
 
     g_object_class_install_property (object_class, PROP_BYTES,
-        g_param_spec_boxed ("bytes", "bytes", "bytes", G_TYPE_BYTES,
-                            G_PARAM_READWRITE |
-                            G_PARAM_STATIC_STRINGS));
+        g_param_spec_boxed ("bytes", NULL, NULL, G_TYPE_BYTES,
+                            G_PARAM_READWRITE | G_PARAM_STATIC_NAME));
 }
 
 /**
