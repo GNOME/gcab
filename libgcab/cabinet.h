@@ -158,6 +158,7 @@ gboolean     cdata_read                         (cdata_t *cd,
                                                  GCancellable *cancellable,
                                                  GError **error);
 void         cdata_free                         (cdata_t *cd);
+void         cdata_clear_decomp                 (cdata_t *cd);
 
 G_DEFINE_AUTOPTR_CLEANUP_FUNC(cfolder_t, cfolder_free)
 G_DEFINE_AUTOPTR_CLEANUP_FUNC(cfile_t, cfile_free)

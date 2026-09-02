@@ -440,17 +440,7 @@ gcab_folder_extract (GCabFolder *self,
             if (!g_seekable_seek (G_SEEKABLE (data), self->cfolder->offsetdata,
                                   G_SEEK_SET, cancellable, error))
                 return FALSE;
-            /* clean up decompressor state before wiping cdata to avoid leaking
-             * the LZX window allocation or the zlib inflate stream */
-            if (cdata->decomp.comptype == GCAB_COMPRESSION_LZX)
-                LZXfdi_clear (&cdata->decomp);
-            if (cdata->decomp.comptype == GCAB_COMPRESSION_MSZIP) {
-                z_stream *z = &cdata->z;
-                if (z->opaque) {
-                    inflateEnd (z);
-                    z->opaque = NULL;
-                }
-            }
+            cdata_clear_decomp (cdata);
             memset(cdata, 0x0, sizeof(cdata_t));
             cdata->reserved = reserved;
             nubytes = 0;
