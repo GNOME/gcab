@@ -107,6 +107,9 @@ const GByteArray * gcab_cabinet_get_signature (GCabCabinet *cabinet,
                                                GCancellable *cancellable,
                                                GError **error);
 
+const gchar *      gcab_cabinet_get_next      (GCabCabinet *cabinet);
+const gchar *      gcab_cabinet_get_prev      (GCabCabinet *cabinet);
+
 G_END_DECLS
 
 #endif /* _GCAB_CABINET_H_ */

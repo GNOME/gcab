@@ -79,6 +79,9 @@ void            gcab_file_set_attributes            (GCabFile *file, guint32 att
 GDateTime *     gcab_file_get_date_time             (GCabFile *file);
 void            gcab_file_set_date_time             (GCabFile *file, GDateTime *dt);
 
+gboolean        gcab_file_is_continued_from_prev    (GCabFile *file);
+gboolean        gcab_file_is_continued_to_next      (GCabFile *file);
+
 G_GNUC_BEGIN_IGNORE_DEPRECATIONS
 G_DEPRECATED_FOR(gcab_file_get_date_time)
 gboolean        gcab_file_get_date                  (GCabFile *file, GTimeVal *result);

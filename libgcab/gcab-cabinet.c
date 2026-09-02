@@ -528,13 +528,26 @@ gcab_cabinet_load (GCabCabinet *self,
         if (!cfile_read (cfile, in, cancellable, error))
             return FALSE;
 
-        if (cfile->index >= self->folders->len) {
+        guint16 folder_index = cfile->index;
+        switch (folder_index) {
+        case CFILE_INDEX_CONTINUED_FROM_PREV:
+        case CFILE_INDEX_CONTINUED_PREV_AND_NEXT:
+            folder_index = 0;
+            break;
+        case CFILE_INDEX_CONTINUED_TO_NEXT:
+            folder_index = self->folders->len - 1;
+            break;
+        default:
+            break;
+        }
+
+        if (folder_index >= self->folders->len) {
             g_set_error (error, GCAB_ERROR, GCAB_ERROR_FORMAT,
                          "Invalid folder index");
             return FALSE;
         }
 
-        GCabFolder *folder = g_ptr_array_index (self->folders, cfile->index);
+        GCabFolder *folder = g_ptr_array_index (self->folders, folder_index);
         if (folder == NULL) {
             g_set_error (error, GCAB_ERROR, GCAB_ERROR_FORMAT,
                          "Invalid folder pointer");
@@ -631,6 +644,48 @@ gcab_cabinet_extract_simple (GCabCabinet *cabinet,
                              GError **error)
 {
     return gcab_cabinet_extract (cabinet, path, file_callback, NULL, user_data, cancellable, error);
+}
+
+/**
+ * gcab_cabinet_get_next:
+ * @cabinet: a #GCabCabinet
+ *
+ * Get the name of the next cabinet in a multi-cabinet set, or %NULL if
+ * this is the last cabinet.
+ *
+ * Since: 1.7
+ *
+ * Returns: (nullable): the next cabinet name, or %NULL
+ **/
+const gchar *
+gcab_cabinet_get_next (GCabCabinet *self)
+{
+    g_return_val_if_fail (GCAB_IS_CABINET (self), NULL);
+
+    if (self->cheader == NULL)
+        return NULL;
+    return self->cheader->cab_next;
+}
+
+/**
+ * gcab_cabinet_get_prev:
+ * @cabinet: a #GCabCabinet
+ *
+ * Get the name of the previous cabinet in a multi-cabinet set, or %NULL if
+ * this is the first cabinet.
+ *
+ * Since: 1.7
+ *
+ * Returns: (nullable): the previous cabinet name, or %NULL
+ **/
+const gchar *
+gcab_cabinet_get_prev (GCabCabinet *self)
+{
+    g_return_val_if_fail (GCAB_IS_CABINET (self), NULL);
+
+    if (self->cheader == NULL)
+        return NULL;
+    return self->cheader->cab_prev;
 }
 
 /**

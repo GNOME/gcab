@@ -424,6 +424,9 @@ gcab_folder_extract (GCabFolder *self,
     for (f = files; f != NULL; f = f->next) {
         GCabFile *file = f->data;
 
+        if (gcab_file_is_continued (file))
+            continue;
+
         if (file_callback && !file_callback (file, callback_data))
             continue;
 

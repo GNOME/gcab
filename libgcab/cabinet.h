@@ -48,6 +48,11 @@
 #define CFO_START               0x24    /* folder offset */
 #define CFI_START               0x2C    /* file offset */
 
+/* special cfile_t index values for multi-cabinet spanning */
+#define CFILE_INDEX_CONTINUED_FROM_PREV     0xFFFD
+#define CFILE_INDEX_CONTINUED_TO_NEXT       0xFFFE
+#define CFILE_INDEX_CONTINUED_PREV_AND_NEXT 0xFFFF
+
 typedef struct
 {
     guint32 res1;

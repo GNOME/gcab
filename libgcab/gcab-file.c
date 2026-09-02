@@ -580,6 +580,56 @@ gcab_file_get_output_stream (GCabFile *self,
                                             cancellable, error));
 }
 
+G_GNUC_INTERNAL gboolean
+gcab_file_is_continued (GCabFile *self)
+{
+    g_return_val_if_fail (GCAB_IS_FILE (self), FALSE);
+
+    return self->cfile->index >= CFILE_INDEX_CONTINUED_FROM_PREV;
+}
+
+/**
+ * gcab_file_is_continued_from_prev:
+ * @file: a #GCabFile
+ *
+ * Check whether the file data begins in the previous cabinet of a
+ * multi-cabinet set.  If %TRUE, extracting the file from this cabinet
+ * alone will not yield complete data.
+ *
+ * Since: 1.7
+ *
+ * Returns: %TRUE if the file continues from a previous cabinet
+ **/
+gboolean
+gcab_file_is_continued_from_prev (GCabFile *self)
+{
+    g_return_val_if_fail (GCAB_IS_FILE (self), FALSE);
+
+    return self->cfile->index == CFILE_INDEX_CONTINUED_FROM_PREV ||
+           self->cfile->index == CFILE_INDEX_CONTINUED_PREV_AND_NEXT;
+}
+
+/**
+ * gcab_file_is_continued_to_next:
+ * @file: a #GCabFile
+ *
+ * Check whether the file data continues into the next cabinet of a
+ * multi-cabinet set.  If %TRUE, extracting the file from this cabinet
+ * alone will not yield complete data.
+ *
+ * Since: 1.7
+ *
+ * Returns: %TRUE if the file continues to a next cabinet
+ **/
+gboolean
+gcab_file_is_continued_to_next (GCabFile *self)
+{
+    g_return_val_if_fail (GCAB_IS_FILE (self), FALSE);
+
+    return self->cfile->index == CFILE_INDEX_CONTINUED_TO_NEXT ||
+           self->cfile->index == CFILE_INDEX_CONTINUED_PREV_AND_NEXT;
+}
+
 /**
  * gcab_file_get_extract_name:
  * @file: a #GCabFile
