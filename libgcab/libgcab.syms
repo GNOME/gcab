@@ -67,7 +67,11 @@ LIBGCAB1_1.6 {
 
 LIBGCAB1_1.7 {
         gcab_cabinet_get_next;
+        gcab_cabinet_get_next_name;
         gcab_cabinet_get_prev;
+        gcab_cabinet_get_prev_name;
+        gcab_cabinet_set_next;
+        gcab_cabinet_set_prev;
         gcab_file_is_continued_from_prev;
         gcab_file_is_continued_to_next;
 } LIBGCAB1_1.6;

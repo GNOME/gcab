@@ -704,3 +704,161 @@ end:
 
     return success;
 }
+
+static gboolean
+read_raw_cfdata (GDataInputStream *in, guint8 res_data,
+                 guint8 *buf, gsize buf_sz,
+                 guint16 *out_ncbytes, guint16 *out_nubytes,
+                 GCancellable *cancellable, GError **error)
+{
+    gboolean success = FALSE;
+    guint32 checksum_unused;
+    guint16 ncbytes, nubytes;
+    guint8 reserved_tmp[256];
+
+    R4 (checksum_unused);
+    (void)checksum_unused;
+    R2 (ncbytes);
+    if (ncbytes > buf_sz) {
+        g_set_error (error, GCAB_ERROR, GCAB_ERROR_INVALID_DATA,
+                     "split CDATA part too large: %" G_GUINT16_FORMAT, ncbytes);
+        goto end;
+    }
+    R2 (nubytes);
+    RN (reserved_tmp, res_data);
+    RN (buf, ncbytes);
+
+    *out_ncbytes = ncbytes;
+    *out_nubytes = nubytes;
+    success = TRUE;
+
+end:
+    return success;
+}
+
+G_GNUC_INTERNAL gboolean
+cdata_read_split (cdata_t *cd, gint comptype,
+                  guint8 res_data_a, GDataInputStream *in_a,
+                  guint8 res_data_b, GDataInputStream *in_b,
+                  GCancellable *cancellable, GError **error)
+{
+    gboolean success = FALSE;
+    int ret, zret = Z_OK;
+    gint compression = comptype & GCAB_COMPRESSION_MASK;
+    guint8 *buf = NULL;
+    gsize buf_sz;
+    guint16 ncbytes_a = 0, nubytes_a = 0;
+    guint16 ncbytes_b = 0, nubytes_b = 0;
+
+    switch (compression) {
+    case GCAB_COMPRESSION_NONE:
+        buf = cd->out;
+        buf_sz = sizeof (cd->out);
+        break;
+    case GCAB_COMPRESSION_MSZIP:
+    case GCAB_COMPRESSION_LZX:
+        buf = cd->in;
+        buf_sz = sizeof (cd->in);
+        break;
+    default:
+        g_set_error (error, GCAB_ERROR, GCAB_ERROR_NOT_SUPPORTED,
+                     "unsupported compression method %d", compression);
+        return FALSE;
+    }
+
+    if (!read_raw_cfdata (in_a, res_data_a, buf, buf_sz,
+                          &ncbytes_a, &nubytes_a, cancellable, error))
+        return FALSE;
+
+    if (!read_raw_cfdata (in_b, res_data_b, buf + ncbytes_a,
+                          buf_sz - ncbytes_a,
+                          &ncbytes_b, &nubytes_b, cancellable, error))
+        return FALSE;
+
+    cd->ncbytes = ncbytes_a + ncbytes_b;
+    cd->nubytes = nubytes_b ? nubytes_b : nubytes_a;
+
+    if (cd->nubytes > CAB_MAX_BLOCK_SIZE) {
+        g_set_error (error, GCAB_ERROR, GCAB_ERROR_INVALID_DATA,
+                     "split CDATA block of %" G_GUINT16_FORMAT " bytes "
+                     "exceeds maximum %i", cd->nubytes, CAB_MAX_BLOCK_SIZE);
+        return FALSE;
+    }
+
+    if (compression == GCAB_COMPRESSION_LZX) {
+        if (cd->fdi.alloc == NULL) {
+            cd->fdi.alloc = g_malloc;
+            cd->fdi.free = g_free;
+            cd->decomp.fdi = &cd->fdi;
+            cd->decomp.inbuf = cd->in;
+            cd->decomp.outbuf = cd->out;
+            cd->decomp.comptype = compression;
+
+            ret = LZXfdi_init ((comptype >> 8) & 0x1f, &cd->decomp);
+            if (ret < 0)
+                goto end;
+        }
+
+        ret = LZXfdi_decomp (cd->ncbytes, cd->nubytes, &cd->decomp);
+        if (ret < 0)
+            goto end;
+    }
+
+    if (compression == GCAB_COMPRESSION_MSZIP) {
+        if (cd->in[0] != 'C' || cd->in[1] != 'K')
+            goto end;
+
+        cd->decomp.comptype = compression;
+        z_stream *z = &cd->z;
+
+        z->avail_in = cd->ncbytes - 2;
+        z->next_in = cd->in + 2;
+        z->avail_out = cd->nubytes;
+        z->next_out = cd->out;
+        z->total_out = 0;
+
+        if (!z->opaque) {
+            z->zalloc = zalloc;
+            z->zfree = zfree;
+            z->opaque = cd;
+
+            zret = inflateInit2 (z, -MAX_WBITS);
+            if (zret != Z_OK)
+                goto end;
+        }
+
+        while (1) {
+            zret = inflate (z, Z_BLOCK);
+            if (zret == Z_STREAM_END)
+                break;
+            if (zret != Z_OK)
+                goto end;
+        }
+
+        g_warn_if_fail (z->avail_in == 0);
+        g_warn_if_fail (z->avail_out == 0);
+        if (z->avail_in != 0 || z->avail_out != 0)
+            goto end;
+
+        zret = inflateReset (z);
+        if (zret != Z_OK)
+            goto end;
+
+        zret = inflateSetDictionary (z, cd->out, cd->nubytes);
+        if (zret != Z_OK)
+            goto end;
+    }
+
+    success = TRUE;
+
+end:
+    if (zret != Z_OK)
+        g_set_error (error, GCAB_ERROR, GCAB_ERROR_FAILED,
+                     "zlib failed: %s", zError (zret));
+
+    if (error != NULL && *error == NULL && !success)
+        g_set_error (error, GCAB_ERROR, GCAB_ERROR_FAILED,
+                     "Invalid split cabinet chunk");
+
+    return success;
+}

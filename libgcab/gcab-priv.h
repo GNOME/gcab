@@ -53,10 +53,20 @@ void             gcab_file_add_attribute             (GCabFile *file, guint32 at
 
 gboolean         gcab_file_is_continued              (GCabFile *file);
 
+typedef struct {
+    GDataInputStream *data;
+    guint32 offsetdata;
+    guint8 res_data;
+    gboolean is_split;
+} GCabFolderContinuation;
+
+cfolder_t       *gcab_folder_get_cfolder             (GCabFolder *folder);
+
 gboolean         gcab_folder_extract                 (GCabFolder *self,
                                                       GDataInputStream *data,
                                                       GFile *path,
                                                       guint8 res_data,
+                                                      GCabFolderContinuation *continuation,
                                                       GCabFileCallback file_callback,
                                                       GFileProgressCallback progress_callback,
                                                       gpointer callback_data,

@@ -45,6 +45,8 @@ struct _GCabCabinet {
     GByteArray *signature;
     GInputStream *stream;
     guint8 allowed_compression;
+    gpointer next;
+    gpointer prev;
 };
 
 enum {
@@ -74,6 +76,8 @@ gcab_cabinet_finalize (GObject *object)
 {
     GCabCabinet *self = GCAB_CABINET (object);
 
+    g_clear_weak_pointer (&self->next);
+    g_clear_weak_pointer (&self->prev);
     cheader_free (self->cheader);
     g_ptr_array_unref (self->folders);
     if (self->reserved)
@@ -608,9 +612,37 @@ gcab_cabinet_extract (GCabCabinet *self,
     g_data_input_stream_set_byte_order (data, G_DATA_STREAM_BYTE_ORDER_LITTLE_ENDIAN);
     g_filter_input_stream_set_close_base_stream (G_FILTER_INPUT_STREAM (data), FALSE);
 
+    g_autoptr(GDataInputStream) next_data = NULL;
+    GCabCabinet *next = self->next;
+    if (next != NULL && next->stream != NULL) {
+        next_data = g_data_input_stream_new (next->stream);
+        g_data_input_stream_set_byte_order (next_data, G_DATA_STREAM_BYTE_ORDER_LITTLE_ENDIAN);
+        g_filter_input_stream_set_close_base_stream (G_FILTER_INPUT_STREAM (next_data), FALSE);
+    }
+
     for (guint i = 0; i < self->folders->len; ++i) {
         GCabFolder *folder = g_ptr_array_index (self->folders, i);
+
+        GCabFolderContinuation cont_buf = { 0 };
+        GCabFolderContinuation *cont = NULL;
+
+        if (i == self->folders->len - 1 && next != NULL && next_data != NULL) {
+            GPtrArray *next_folders = gcab_cabinet_get_folders (next);
+            if (next_folders->len > 0) {
+                GCabFolder *next_folder = g_ptr_array_index (next_folders, 0);
+                cfolder_t *next_cfolder = gcab_folder_get_cfolder (next_folder);
+                if (next_cfolder != NULL) {
+                    cont_buf.data = next_data;
+                    cont_buf.offsetdata = next_cfolder->offsetdata;
+                    cont_buf.res_data = next->cheader->res_data;
+                    cont_buf.is_split = (next->cheader->flags & CABINET_HEADER_PREV) != 0;
+                    cont = &cont_buf;
+                }
+            }
+        }
+
         if (!gcab_folder_extract (folder, data, path, self->cheader->res_data,
+                                  cont,
                                   file_callback, progress_callback, user_data,
                                   cancellable, error)) {
             return FALSE;
@@ -647,18 +679,18 @@ gcab_cabinet_extract_simple (GCabCabinet *cabinet,
 }
 
 /**
- * gcab_cabinet_get_next:
+ * gcab_cabinet_get_next_name:
  * @cabinet: a #GCabCabinet
  *
- * Get the name of the next cabinet in a multi-cabinet set, or %NULL if
- * this is the last cabinet.
+ * Get the filename of the next cabinet in a multi-cabinet set, as stored
+ * in the cabinet header, or %NULL if this is the last cabinet.
  *
  * Since: 1.7
  *
- * Returns: (nullable): the next cabinet name, or %NULL
+ * Returns: (nullable): the next cabinet filename, or %NULL
  **/
 const gchar *
-gcab_cabinet_get_next (GCabCabinet *self)
+gcab_cabinet_get_next_name (GCabCabinet *self)
 {
     g_return_val_if_fail (GCAB_IS_CABINET (self), NULL);
 
@@ -668,24 +700,106 @@ gcab_cabinet_get_next (GCabCabinet *self)
 }
 
 /**
- * gcab_cabinet_get_prev:
+ * gcab_cabinet_get_prev_name:
  * @cabinet: a #GCabCabinet
  *
- * Get the name of the previous cabinet in a multi-cabinet set, or %NULL if
- * this is the first cabinet.
+ * Get the filename of the previous cabinet in a multi-cabinet set, as stored
+ * in the cabinet header, or %NULL if this is the first cabinet.
  *
  * Since: 1.7
  *
- * Returns: (nullable): the previous cabinet name, or %NULL
+ * Returns: (nullable): the previous cabinet filename, or %NULL
  **/
 const gchar *
-gcab_cabinet_get_prev (GCabCabinet *self)
+gcab_cabinet_get_prev_name (GCabCabinet *self)
 {
     g_return_val_if_fail (GCAB_IS_CABINET (self), NULL);
 
     if (self->cheader == NULL)
         return NULL;
     return self->cheader->cab_prev;
+}
+
+/**
+ * gcab_cabinet_get_next:
+ * @cabinet: a #GCabCabinet
+ *
+ * Get the next cabinet in a multi-cabinet set, or %NULL if not set.
+ * Use gcab_cabinet_set_next() or gcab_cabinet_load_from_file() to set up
+ * the chain.
+ *
+ * Since: 1.7
+ *
+ * Returns: (transfer none) (nullable): the next #GCabCabinet, or %NULL
+ **/
+GCabCabinet *
+gcab_cabinet_get_next (GCabCabinet *self)
+{
+    g_return_val_if_fail (GCAB_IS_CABINET (self), NULL);
+    return self->next;
+}
+
+/**
+ * gcab_cabinet_get_prev:
+ * @cabinet: a #GCabCabinet
+ *
+ * Get the previous cabinet in a multi-cabinet set, or %NULL if not set.
+ * Use gcab_cabinet_set_prev() or gcab_cabinet_load_from_file() to set up
+ * the chain.
+ *
+ * Since: 1.7
+ *
+ * Returns: (transfer none) (nullable): the previous #GCabCabinet, or %NULL
+ **/
+GCabCabinet *
+gcab_cabinet_get_prev (GCabCabinet *self)
+{
+    g_return_val_if_fail (GCAB_IS_CABINET (self), NULL);
+    return self->prev;
+}
+
+/**
+ * gcab_cabinet_set_next:
+ * @cabinet: a #GCabCabinet
+ * @next: (nullable): the next #GCabCabinet in the set, or %NULL
+ *
+ * Set the next cabinet in a multi-cabinet set.  When set, extraction
+ * of files that span into the next cabinet (CONTINUED_TO_NEXT) will
+ * automatically continue reading data from @next.
+ *
+ * The reference is weak: @next is not kept alive by @cabinet.
+ *
+ * Since: 1.7
+ **/
+void
+gcab_cabinet_set_next (GCabCabinet *self, GCabCabinet *next)
+{
+    g_return_if_fail (GCAB_IS_CABINET (self));
+    g_return_if_fail (next == NULL || GCAB_IS_CABINET (next));
+
+    g_set_weak_pointer (&self->next, next);
+}
+
+/**
+ * gcab_cabinet_set_prev:
+ * @cabinet: a #GCabCabinet
+ * @prev: (nullable): the previous #GCabCabinet in the set, or %NULL
+ *
+ * Set the previous cabinet in a multi-cabinet set.  When set, extraction
+ * of files that span from the previous cabinet (CONTINUED_FROM_PREV)
+ * will automatically start reading data from @prev.
+ *
+ * The reference is weak: @prev is not kept alive by @cabinet.
+ *
+ * Since: 1.7
+ **/
+void
+gcab_cabinet_set_prev (GCabCabinet *self, GCabCabinet *prev)
+{
+    g_return_if_fail (GCAB_IS_CABINET (self));
+    g_return_if_fail (prev == NULL || GCAB_IS_CABINET (prev));
+
+    g_set_weak_pointer (&self->prev, prev);
 }
 
 /**

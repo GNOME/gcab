@@ -162,6 +162,14 @@ gboolean     cdata_read                         (cdata_t *cd,
                                                  GDataInputStream *in,
                                                  GCancellable *cancellable,
                                                  GError **error);
+gboolean     cdata_read_split                   (cdata_t *cd,
+                                                 gint comptype,
+                                                 guint8 res_data_a,
+                                                 GDataInputStream *in_a,
+                                                 guint8 res_data_b,
+                                                 GDataInputStream *in_b,
+                                                 GCancellable *cancellable,
+                                                 GError **error);
 void         cdata_free                         (cdata_t *cd);
 void         cdata_clear_decomp                 (cdata_t *cd);
 
