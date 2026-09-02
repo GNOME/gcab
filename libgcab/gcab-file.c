@@ -58,7 +58,7 @@ typedef enum {
 
 static GParamSpec *props[PROP_BYTES + 1] = { NULL, };
 
-G_DEFINE_TYPE (GCabFile, gcab_file, G_TYPE_OBJECT);
+G_DEFINE_FINAL_TYPE (GCabFile, gcab_file, G_TYPE_OBJECT);
 
 static void
 gcab_file_init (GCabFile *self)

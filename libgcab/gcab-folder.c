@@ -64,7 +64,7 @@ typedef enum {
 
 static GParamSpec *props[PROP_RESERVED + 1] = { NULL, };
 
-G_DEFINE_TYPE (GCabFolder, gcab_folder, G_TYPE_OBJECT);
+G_DEFINE_FINAL_TYPE (GCabFolder, gcab_folder, G_TYPE_OBJECT);
 
 static void
 gcab_folder_init (GCabFolder *self)

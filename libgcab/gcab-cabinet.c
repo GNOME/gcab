@@ -57,7 +57,7 @@ typedef enum {
 
 static GParamSpec *props[PROP_SIGNATURE + 1] = { NULL, };
 
-G_DEFINE_TYPE (GCabCabinet, gcab_cabinet, G_TYPE_OBJECT);
+G_DEFINE_FINAL_TYPE (GCabCabinet, gcab_cabinet, G_TYPE_OBJECT);
 
 GQuark
 gcab_error_quark (void)
