@@ -21,11 +21,12 @@
 
 #include "config.h"
 
-#include <stdlib.h>
-#include <libgcab.h>
-#include <glib/gprintf.h>
 #include <locale.h>
+#include <stdlib.h>
+
 #include <glib/gi18n.h>
+#include <glib/gprintf.h>
+#include <libgcab.h>
 
 gint verbose = 0;
 

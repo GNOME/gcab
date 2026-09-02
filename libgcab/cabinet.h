@@ -21,21 +21,21 @@
 #ifndef CABINET_H
 #define CABINET_H
 
-#include <glib.h>
-#include <gio/gio.h>
-
+#include <dirent.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <sys/stat.h>
 #include <sys/types.h>
-#include <dirent.h>
-#include <unistd.h>
 #include <time.h>
+#include <unistd.h>
+
+#include <gio/gio.h>
+#include <glib.h>
 #include <zlib.h>
 
-#include "gcab-folder.h"
 #include "decomp.h"
+#include "gcab-folder.h"
 
 /* based on the spec
    http://msdn.microsoft.com/en-us/library/bb417343.aspx */

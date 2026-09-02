@@ -26,10 +26,10 @@
 #include <glib-object.h>
 
 #include "cabinet.h"
-#include "gcab-file.h"
-#include "gcab-folder.h"
 #include "gcab-cabinet.h"
 #include "gcab-enums.h"
+#include "gcab-file.h"
+#include "gcab-folder.h"
 
 /* Copied from GStream, FIXME that should be in GLib imho */
 #define _GCAB_GET(__data, __idx, __size, __shift) \

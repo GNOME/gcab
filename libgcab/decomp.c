@@ -22,8 +22,9 @@
 
 #include "config.h"
 
-#include <string.h>
 #include "decomp.h"
+
+#include <string.h>
 
 #ifndef max
 #define max(a,b)   (((a) > (b)) ? (a) : (b))

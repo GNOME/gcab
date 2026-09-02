@@ -24,8 +24,8 @@
 #include <gio/gio.h>
 #include <glib-object.h>
 
-#include "gcab-folder.h"
 #include "gcab-file.h"
+#include "gcab-folder.h"
 
 G_BEGIN_DECLS
 

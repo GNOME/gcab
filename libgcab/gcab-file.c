@@ -21,8 +21,9 @@
 
 #include "config.h"
 
-#include "gcab-priv.h"
 #include "gcab-file.h"
+
+#include "gcab-priv.h"
 
 /**
  * SECTION:gcab-file
