@@ -733,15 +733,15 @@ static gboolean
 read_raw_cfdata (GDataInputStream *in, guint8 res_data,
                  guint8 *buf, gsize buf_sz,
                  guint16 *out_ncbytes, guint16 *out_nubytes,
+                 guint32 *out_checksum,
                  GCancellable *cancellable, GError **error)
 {
     gboolean success = FALSE;
-    guint32 checksum_unused;
+    guint32 checksum;
     guint16 ncbytes, nubytes;
     guint8 reserved_tmp[256];
 
-    R4 (checksum_unused);
-    (void)checksum_unused;
+    R4 (checksum);
     R2 (ncbytes);
     if (ncbytes > buf_sz) {
         g_set_error (error, GCAB_ERROR, GCAB_ERROR_INVALID_DATA,
@@ -754,6 +754,7 @@ read_raw_cfdata (GDataInputStream *in, guint8 res_data,
 
     *out_ncbytes = ncbytes;
     *out_nubytes = nubytes;
+    *out_checksum = checksum;
     success = TRUE;
 
 end:
@@ -764,6 +765,7 @@ G_GNUC_INTERNAL gboolean
 cdata_read_split (cdata_t *cd, gint comptype,
                   guint8 res_data_a, GDataInputStream *in_a,
                   guint8 res_data_b, GDataInputStream *in_b,
+                  gboolean *is_split,
                   GCancellable *cancellable, GError **error)
 {
     gint compression = comptype & GCAB_COMPRESSION_MASK;
@@ -771,18 +773,66 @@ cdata_read_split (cdata_t *cd, gint comptype,
     gsize buf_sz;
     guint16 ncbytes_a = 0, nubytes_a = 0;
     guint16 ncbytes_b = 0, nubytes_b = 0;
+    guint32 checksum_a = 0, checksum_b = 0;
+    guint32 checksum_tmp;
+
+    g_return_val_if_fail (is_split != NULL, FALSE);
+
+    *is_split = FALSE;
 
     if (!cdata_set_read_buf (cd, compression, &buf, &buf_sz, error))
         return FALSE;
 
     if (!read_raw_cfdata (in_a, res_data_a, buf, buf_sz,
-                          &ncbytes_a, &nubytes_a, cancellable, error))
+                          &ncbytes_a, &nubytes_a, &checksum_a,
+                          cancellable, error))
         return FALSE;
+
+    checksum_tmp = cdata_compute_checksum (buf, ncbytes_a, nubytes_a);
+    if (checksum_a != checksum_tmp) {
+        if (_enforce_checksum ()) {
+            g_set_error_literal (error, GCAB_ERROR, GCAB_ERROR_INVALID_DATA,
+                                 nubytes_a == 0 ?
+                                 "incorrect checksum detected in split CDATA part A" :
+                                 "incorrect checksum detected");
+            return FALSE;
+        }
+        if (_gcab_debug ())
+            g_debug ("split CDATA part A checksum 0x%08x", (guint) checksum_tmp);
+    }
+
+    /* a non-zero uncompressed size means this block is not split */
+    if (nubytes_a != 0) {
+        cd->ncbytes = ncbytes_a;
+        cd->nubytes = nubytes_a;
+
+        if (cd->nubytes > CAB_MAX_BLOCK_SIZE) {
+            g_set_error (error, GCAB_ERROR, GCAB_ERROR_INVALID_DATA,
+                         "CDATA block of %" G_GUINT16_FORMAT " bytes "
+                         "was bigger than maximum size %i",
+                         cd->nubytes, CAB_MAX_BLOCK_SIZE);
+            return FALSE;
+        }
+
+        return cdata_decompress (cd, comptype, error);
+    }
 
     if (!read_raw_cfdata (in_b, res_data_b, buf + ncbytes_a,
                           buf_sz - ncbytes_a,
-                          &ncbytes_b, &nubytes_b, cancellable, error))
+                          &ncbytes_b, &nubytes_b, &checksum_b,
+                          cancellable, error))
         return FALSE;
+
+    checksum_tmp = cdata_compute_checksum (buf + ncbytes_a, ncbytes_b, nubytes_b);
+    if (checksum_b != checksum_tmp) {
+        if (_enforce_checksum ()) {
+            g_set_error_literal (error, GCAB_ERROR, GCAB_ERROR_INVALID_DATA,
+                                 "incorrect checksum detected in split CDATA part B");
+            return FALSE;
+        }
+        if (_gcab_debug ())
+            g_debug ("split CDATA part B checksum 0x%08x", (guint) checksum_tmp);
+    }
 
     cd->ncbytes = ncbytes_a + ncbytes_b;
     cd->nubytes = nubytes_b ? nubytes_b : nubytes_a;
@@ -793,6 +843,8 @@ cdata_read_split (cdata_t *cd, gint comptype,
                      "exceeds maximum %i", cd->nubytes, CAB_MAX_BLOCK_SIZE);
         return FALSE;
     }
+
+    *is_split = TRUE;
 
     return cdata_decompress (cd, comptype, error);
 }

@@ -57,7 +57,6 @@ typedef struct {
     GDataInputStream *data;
     guint32 offsetdata;
     guint8 res_data;
-    gboolean is_split;
 } GCabFolderContinuation;
 
 cfolder_t       *gcab_folder_get_cfolder             (GCabFolder *folder);

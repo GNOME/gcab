@@ -486,8 +486,9 @@ gcab_folder_extract (GCabFolder *self,
 
                 if (!switched_to_cont &&
                     continuation != NULL &&
-                    continuation->is_split &&
                     blocks_read == self->cfolder->ndatab - 1) {
+                    gboolean is_split = FALSE;
+
                     if (!g_seekable_seek (G_SEEKABLE (continuation->data),
                                           continuation->offsetdata,
                                           G_SEEK_SET, cancellable, error))
@@ -495,11 +496,13 @@ gcab_folder_extract (GCabFolder *self,
                     if (!cdata_read_split (cdata, self->comptype,
                                            current_res_data, current_data,
                                            continuation->res_data, continuation->data,
-                                           cancellable, error))
+                                           &is_split, cancellable, error))
                         return FALSE;
-                    current_data = continuation->data;
-                    current_res_data = continuation->res_data;
-                    switched_to_cont = TRUE;
+                    if (is_split) {
+                        current_data = continuation->data;
+                        current_res_data = continuation->res_data;
+                        switched_to_cont = TRUE;
+                    }
                 } else {
                     if (!cdata_read (cdata, current_res_data, self->comptype,
                                      current_data, cancellable, error))

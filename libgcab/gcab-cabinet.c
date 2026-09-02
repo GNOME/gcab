@@ -744,7 +744,6 @@ gcab_cabinet_extract (GCabCabinet *self,
                     cont_buf.data = next_data;
                     cont_buf.offsetdata = next_cfolder->offsetdata;
                     cont_buf.res_data = next->cheader->res_data;
-                    cont_buf.is_split = (next->cheader->flags & CABINET_HEADER_PREV) != 0;
                     cont = &cont_buf;
                 }
             }

@@ -168,6 +168,7 @@ gboolean     cdata_read_split                   (cdata_t *cd,
                                                  GDataInputStream *in_a,
                                                  guint8 res_data_b,
                                                  GDataInputStream *in_b,
+                                                 gboolean *is_split,
                                                  GCancellable *cancellable,
                                                  GError **error);
 void         cdata_free                         (cdata_t *cd);
