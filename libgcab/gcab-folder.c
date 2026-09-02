@@ -270,7 +270,7 @@ gcab_folder_add_file (GCabFolder *self, GCabFile *file,
     if (gfile) {
         g_return_val_if_fail (G_IS_FILE (gfile), FALSE);
 
-        g_autoptr(GFileInfo) info = g_file_query_info (gfile, FILE_ATTRS, 0, NULL, error);
+        g_autoptr(GFileInfo) info = g_file_query_info (gfile, FILE_ATTRS, G_FILE_QUERY_INFO_NONE, NULL, error);
         if (info == NULL)
             return FALSE;
 
