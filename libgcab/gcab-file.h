@@ -52,7 +52,7 @@ typedef enum
   GCAB_FILE_ATTRIBUTE_ARCH        = 0x20,
   GCAB_FILE_ATTRIBUTE_EXEC        = 0x40,
   GCAB_FILE_ATTRIBUTE_NAME_IS_UTF = 0x80
-} GCabFileAttribute;
+} G_GNUC_FLAG_ENUM GCabFileAttribute;
 
 /**
  * GCabFileCallback:

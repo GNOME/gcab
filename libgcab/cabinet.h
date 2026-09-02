@@ -80,7 +80,7 @@ typedef enum {
     CABINET_HEADER_PREV = 0x0001,
     CABINET_HEADER_NEXT = 0x0002,
     CABINET_HEADER_RESERVE = 0x0004,
-} CabinetHeaderFlags;
+} G_GNUC_FLAG_ENUM CabinetHeaderFlags;
 
 typedef struct
 {
