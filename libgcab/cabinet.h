@@ -18,8 +18,7 @@
  * MA 02110-1301 USA
  */
 
-#ifndef CABINET_H
-#define CABINET_H
+#pragma once
 
 #include <dirent.h>
 #include <stdio.h>
@@ -178,5 +177,3 @@ G_DEFINE_AUTOPTR_CLEANUP_FUNC(cfolder_t, cfolder_free)
 G_DEFINE_AUTOPTR_CLEANUP_FUNC(cfile_t, cfile_free)
 G_DEFINE_AUTOPTR_CLEANUP_FUNC(cheader_t, cheader_free)
 G_DEFINE_AUTOPTR_CLEANUP_FUNC(cdata_t, cdata_free)
-
-#endif /* CABINET_H */

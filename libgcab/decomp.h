@@ -20,8 +20,7 @@
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301, USA
  */
 
-#ifndef MSZIP_H_
-# define MSZIP_H_
+#pragma once
 
 #include <glib.h>
 
@@ -240,5 +239,3 @@ gint ZIPfdi_decomp(gint inlen, gint outlen, fdi_decomp_state *decomp_state);
 gint LZXfdi_decomp(gint inlen, gint outlen, fdi_decomp_state *decomp_state);
 gint LZXfdi_init(gint window, fdi_decomp_state *decomp_state);
 void LZXfdi_clear(fdi_decomp_state *decomp_state);
-
-#endif

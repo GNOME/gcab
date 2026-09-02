@@ -18,8 +18,7 @@
  * MA 02110-1301 USA
  */
 
-#ifndef _GCAB_FILE_H_
-#define _GCAB_FILE_H_
+#pragma once
 
 #include <gio/gio.h>
 #include <glib-object.h>
@@ -90,5 +89,3 @@ void            gcab_file_set_date                  (GCabFile *file, const GTime
 G_GNUC_END_IGNORE_DEPRECATIONS
 
 G_END_DECLS
-
-#endif /* _GCAB_FILE_H_ */

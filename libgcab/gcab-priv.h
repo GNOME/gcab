@@ -18,8 +18,7 @@
  * MA 02110-1301 USA
  */
 
-#ifndef GCAB_PRIV_H
-#define GCAB_PRIV_H
+#pragma once
 
 #include "config.h"
 
@@ -78,5 +77,3 @@ GOutputStream   *gcab_file_get_output_stream         (GCabFile *cabfile,
                                                       GFile *path_extract,
                                                       GCancellable *cancellable,
                                                       GError **error);
-
-#endif /* GCAB_PRIV_H */

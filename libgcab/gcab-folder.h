@@ -18,8 +18,7 @@
  * MA 02110-1301 USA
  */
 
-#ifndef _GCAB_FOLDER_H_
-#define _GCAB_FOLDER_H_
+#pragma once
 
 #include <gio/gio.h>
 #include <glib-object.h>
@@ -68,5 +67,3 @@ GCabFile *      gcab_folder_get_file_by_name  (GCabFolder *cabfolder,
 gint            gcab_folder_get_comptype      (GCabFolder *cabfolder);
 
 G_END_DECLS
-
-#endif /* _GCAB_FILE_H_ */

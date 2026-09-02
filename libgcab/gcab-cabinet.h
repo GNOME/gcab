@@ -18,8 +18,7 @@
  * MA 02110-1301 USA
  */
 
-#ifndef _GCAB_CABINET_H_
-#define _GCAB_CABINET_H_
+#pragma once
 
 #include <gio/gio.h>
 #include <glib-object.h>
@@ -121,5 +120,3 @@ void               gcab_cabinet_set_prev      (GCabCabinet *cabinet,
                                                GCabCabinet *prev);
 
 G_END_DECLS
-
-#endif /* _GCAB_CABINET_H_ */
