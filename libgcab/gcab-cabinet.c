@@ -53,10 +53,9 @@ struct _GCabCabinet {
 typedef enum {
     PROP_RESERVED = 1,
     PROP_SIGNATURE,
-    N_PROPS
 } GCabCabinetProps;
 
-static GParamSpec *props[N_PROPS] = { NULL, };
+static GParamSpec *props[PROP_SIGNATURE + 1] = { NULL, };
 
 G_DEFINE_TYPE (GCabCabinet, gcab_cabinet, G_TYPE_OBJECT);
 
@@ -155,7 +154,7 @@ gcab_cabinet_class_init (GCabCabinetClass *klass)
                                                 G_TYPE_BYTE_ARRAY,
                                                 G_PARAM_READWRITE | G_PARAM_STATIC_NAME);
 
-    g_object_class_install_properties (object_class, N_PROPS, props);
+    g_object_class_install_properties (object_class, G_N_ELEMENTS (props), props);
 }
 
 /**

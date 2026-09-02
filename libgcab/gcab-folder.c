@@ -60,10 +60,9 @@ typedef enum {
     PROP_COMPRESSION = 1,
     PROP_COMPTYPE,
     PROP_RESERVED,
-    N_PROPS
 } GCabFolderProps;
 
-static GParamSpec *props[N_PROPS] = { NULL, };
+static GParamSpec *props[PROP_RESERVED + 1] = { NULL, };
 
 G_DEFINE_TYPE (GCabFolder, gcab_folder, G_TYPE_OBJECT);
 
@@ -152,7 +151,7 @@ gcab_folder_class_init (GCabFolderClass *klass)
                                                G_TYPE_BYTE_ARRAY,
                                                G_PARAM_READWRITE | G_PARAM_STATIC_NAME);
 
-    g_object_class_install_properties (object_class, N_PROPS, props);
+    g_object_class_install_properties (object_class, G_N_ELEMENTS (props), props);
 
 }
 

@@ -54,10 +54,9 @@ typedef enum {
     PROP_NAME = 1,
     PROP_FILE,
     PROP_BYTES,
-    N_PROPS
 } GCabFileProps;
 
-static GParamSpec *props[N_PROPS] = { NULL, };
+static GParamSpec *props[PROP_BYTES + 1] = { NULL, };
 
 G_DEFINE_TYPE (GCabFile, gcab_file, G_TYPE_OBJECT);
 
@@ -186,7 +185,7 @@ gcab_file_class_init (GCabFileClass *klass)
     props[PROP_BYTES] = g_param_spec_boxed ("bytes", NULL, NULL, G_TYPE_BYTES,
                                             G_PARAM_READWRITE | G_PARAM_STATIC_NAME);
 
-    g_object_class_install_properties (object_class, N_PROPS, props);
+    g_object_class_install_properties (object_class, G_N_ELEMENTS (props), props);
 }
 
 /**
