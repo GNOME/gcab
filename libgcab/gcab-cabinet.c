@@ -50,12 +50,10 @@ struct _GCabCabinet {
     GPtrArray *chained;
 };
 
-enum {
-    PROP_0,
-
-    PROP_RESERVED,
+typedef enum {
+    PROP_RESERVED = 1,
     PROP_SIGNATURE,
-};
+} GCabCabinetProps;
 
 G_DEFINE_TYPE (GCabCabinet, gcab_cabinet, G_TYPE_OBJECT);
 
@@ -98,7 +96,7 @@ gcab_cabinet_set_property (GObject *object, guint prop_id, const GValue *value, 
     g_return_if_fail (GCAB_IS_CABINET (object));
     GCabCabinet *self = GCAB_CABINET (object);
 
-    switch (prop_id) {
+    switch ((GCabCabinetProps) prop_id) {
     case PROP_RESERVED:
         if (self->reserved)
             g_byte_array_unref (self->reserved);
@@ -121,7 +119,7 @@ gcab_cabinet_get_property (GObject *object, guint prop_id, GValue *value, GParam
     g_return_if_fail (GCAB_IS_CABINET (object));
     GCabCabinet *self = GCAB_CABINET (object);
 
-    switch (prop_id) {
+    switch ((GCabCabinetProps) prop_id) {
     case PROP_RESERVED:
         g_value_set_boxed (value, self->reserved);
         break;

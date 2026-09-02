@@ -50,13 +50,11 @@ struct _GCabFile
     cfile_t *cfile;
 };
 
-enum {
-    PROP_0,
-
-    PROP_NAME,
+typedef enum {
+    PROP_NAME = 1,
     PROP_FILE,
     PROP_BYTES,
-};
+} GCabFileProps;
 
 G_DEFINE_TYPE (GCabFile, gcab_file, G_TYPE_OBJECT);
 
@@ -129,7 +127,7 @@ gcab_file_set_property (GObject *object, guint prop_id, const GValue *value, GPa
     g_return_if_fail (GCAB_IS_FILE (object));
     GCabFile *self = GCAB_FILE (object);
 
-    switch (prop_id) {
+    switch ((GCabFileProps) prop_id) {
     case PROP_NAME:
         gcab_file_set_name (self, g_value_get_string (value));
         break;
@@ -151,7 +149,7 @@ gcab_file_get_property (GObject *object, guint prop_id, GValue *value, GParamSpe
     g_return_if_fail (GCAB_IS_FILE (object));
     GCabFile *self = GCAB_FILE(object);
 
-    switch (prop_id) {
+    switch ((GCabFileProps) prop_id) {
     case PROP_NAME:
         g_value_set_string (value, self->cfile->name);
         break;

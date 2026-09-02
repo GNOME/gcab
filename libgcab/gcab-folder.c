@@ -56,13 +56,11 @@ struct _GCabFolder
     cfolder_t *cfolder;
 };
 
-enum {
-    PROP_0,
-
-    PROP_COMPRESSION,
+typedef enum {
+    PROP_COMPRESSION = 1,
     PROP_COMPTYPE,
     PROP_RESERVED
-};
+} GCabFolderProps;
 
 G_DEFINE_TYPE (GCabFolder, gcab_folder, G_TYPE_OBJECT);
 
@@ -93,7 +91,7 @@ gcab_folder_set_property (GObject *object, guint prop_id, const GValue *value, G
     g_return_if_fail (GCAB_IS_FOLDER (object));
     GCabFolder *self = GCAB_FOLDER (object);
 
-    switch (prop_id) {
+    switch ((GCabFolderProps) prop_id) {
     case PROP_COMPTYPE:
         self->comptype = g_value_get_int (value);
         break;
@@ -114,7 +112,7 @@ gcab_folder_get_property (GObject *object, guint prop_id, GValue *value, GParamS
     g_return_if_fail (GCAB_IS_FOLDER (object));
     GCabFolder *self = GCAB_FOLDER (object);
 
-    switch (prop_id) {
+    switch ((GCabFolderProps) prop_id) {
     case PROP_COMPRESSION:
         g_value_set_enum (value, self->comptype & GCAB_COMPRESSION_MASK);
         break;
