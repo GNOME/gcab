@@ -56,8 +56,8 @@ _process_file (GFile *file, GError **error)
     return TRUE;
 }
 
-int
-main (int argc, char *argv[])
+gint
+main (gint argc, gchar *argv[])
 {
     g_autoptr(GError) error = NULL;
 

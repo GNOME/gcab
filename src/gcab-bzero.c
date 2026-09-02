@@ -23,8 +23,8 @@
 #include <stdlib.h>
 #include <libgcab.h>
 
-int
-main (int argc, char *argv[])
+gint
+main (gint argc, gchar *argv[])
 {
     guint64 bufsz = 1024;
     guint64 nfiles = 1;

@@ -27,7 +27,7 @@
 #include <locale.h>
 #include <glib/gi18n.h>
 
-int verbose = 0;
+gint verbose = 0;
 
 static gboolean
 file_callback (GCabFile *cabfile, gpointer data)
@@ -53,7 +53,7 @@ file_callback (GCabFile *cabfile, gpointer data)
 static const gchar *
 remove_leading_path (gchar *name)
 {
-    unsigned i;
+    guint i;
 
     i = 0;
     if (name[0] == G_DIR_SEPARATOR)
@@ -93,8 +93,8 @@ save_array_to_file (const GByteArray *array, const gchar *base, const gchar *suf
     return TRUE;
 }
 
-int
-main (int argc, char *argv[])
+gint
+main (gint argc, gchar *argv[])
 {
     g_autoptr(GError) error = NULL;
     g_autoptr(GOptionContext) context = NULL;

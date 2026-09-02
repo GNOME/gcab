@@ -89,7 +89,7 @@ gcab_file_set_name (GCabFile *self, const gchar *name)
     /* assuming that on win32 we don't get unix paths */
 #ifndef G_OS_WIN32
     if (fname) {
-        int i, len = strlen (fname);
+        gint i, len = strlen (fname);
         for (i = 0; i < len; i++)
             if (fname[i] == '/')
                 fname[i] = '\\';
@@ -555,7 +555,7 @@ gcab_file_get_output_stream (GCabFile *self,
     if (!g_file_has_prefix (file, path_extract)) {
         g_autofree gchar *rawpath = g_file_get_path (file);
         if (rawpath != NULL) {
-            char *newpath = rawpath;
+            gchar *newpath = rawpath;
             while (*newpath != 0 && *newpath == G_DIR_SEPARATOR) {
                 newpath++;
             }

@@ -194,14 +194,14 @@ struct LZXstate {
     cab_ULONG window_posn;     /* current offset within the window        */
     cab_ULONG R0, R1, R2;      /* for the LRU offset system               */
     cab_UWORD main_elements;   /* number of main tree elements            */
-    int   header_read;         /* have we started decoding at all yet?    */
+    gint   header_read;         /* have we started decoding at all yet?    */
     cab_UWORD block_type;      /* type of this block                      */
     cab_ULONG block_length;    /* uncompressed length of this block       */
     cab_ULONG block_remaining; /* uncompressed bytes still left to decode */
     cab_ULONG frames_read;     /* the number of CFDATA blocks processed   */
     cab_LONG  intel_filesize;  /* magic header value used for transform   */
     cab_LONG  intel_curpos;    /* current offset in transform space       */
-    int   intel_started;       /* have we seen any translatable data yet? */
+    gint   intel_started;       /* have we seen any translatable data yet? */
 
     LZX_DECLARE_TABLE(PRETREE);
     LZX_DECLARE_TABLE(MAINTREE);
@@ -211,7 +211,7 @@ struct LZXstate {
 
 struct lzx_bits {
   cab_ULONG bb;
-  int bl;
+  gint bl;
   cab_UBYTE *ip;
 };
 
@@ -233,12 +233,12 @@ typedef struct fdi_cds_fwd {
         struct ZIPstate zip;
         struct LZXstate lzx;
     } methods;
-    int comptype;
+    gint comptype;
 } fdi_decomp_state;
 
-int ZIPfdi_decomp(int inlen, int outlen, fdi_decomp_state *decomp_state);
-int LZXfdi_decomp(int inlen, int outlen, fdi_decomp_state *decomp_state);
-int LZXfdi_init(int window, fdi_decomp_state *decomp_state);
+gint ZIPfdi_decomp(gint inlen, gint outlen, fdi_decomp_state *decomp_state);
+gint LZXfdi_decomp(gint inlen, gint outlen, fdi_decomp_state *decomp_state);
+gint LZXfdi_init(gint window, fdi_decomp_state *decomp_state);
 void LZXfdi_clear(fdi_decomp_state *decomp_state);
 
 #endif

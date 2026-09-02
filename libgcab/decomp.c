@@ -617,7 +617,7 @@ static cab_LONG fdi_Zipinflate_block(cab_LONG *e, fdi_decomp_state *decomp_state
 /****************************************************
  * ZIPfdi_decomp(internal)
  */
-int ZIPfdi_decomp(int inlen, int outlen, fdi_decomp_state *decomp_state)
+gint ZIPfdi_decomp(gint inlen, gint outlen, fdi_decomp_state *decomp_state)
 {
   cab_LONG e;               /* last block flag */
 
@@ -657,7 +657,7 @@ int ZIPfdi_decomp(int inlen, int outlen, fdi_decomp_state *decomp_state)
  *   OK:    0
  *   error: 1
  */
-static int make_decode_table(cab_ULONG nsyms, cab_ULONG nbits,
+static gint make_decode_table(cab_ULONG nsyms, cab_ULONG nbits,
                              const cab_UBYTE *length, cab_UWORD *table) {
   register cab_UWORD sym;
   register cab_ULONG leaf;
@@ -731,10 +731,10 @@ static int make_decode_table(cab_ULONG nsyms, cab_ULONG nbits,
 /************************************************************
  * fdi_lzx_read_lens (internal)
  */
-static int fdi_lzx_read_lens(cab_UBYTE *lens, cab_ULONG first, cab_ULONG last, struct lzx_bits *lb,
+static gint fdi_lzx_read_lens(cab_UBYTE *lens, cab_ULONG first, cab_ULONG last, struct lzx_bits *lb,
                   fdi_decomp_state *decomp_state) {
   cab_ULONG i,j, x,y;
-  int z;
+  gint z;
 
   register cab_ULONG bitbuf = lb->bb;
   register int bitsleft = lb->bl;
@@ -778,7 +778,7 @@ static int fdi_lzx_read_lens(cab_UBYTE *lens, cab_ULONG first, cab_ULONG last, s
 /************************************************************
  * LZXfdi_init (internal)
  */
-int LZXfdi_init(int window, fdi_decomp_state *decomp_state) {
+gint LZXfdi_init(gint window, fdi_decomp_state *decomp_state) {
   static const cab_UBYTE bits[]  =
                         { 0,  0,  0,  0,  1,  1,  2,  2,  3,  3,  4,  4,  5,  5,  6,  6,
                           7,  7,  8,  8,  9,  9, 10, 10, 11, 11, 12, 12, 13, 13, 14, 14,
@@ -793,7 +793,7 @@ int LZXfdi_init(int window, fdi_decomp_state *decomp_state) {
                   786432,  917504, 1048576, 1179648, 1310720, 1441792, 1572864, 1703936,
                  1835008, 1966080, 2097152};
   cab_ULONG wndsize = 1 << window;
-  int posn_slots;
+  gint posn_slots;
 
   /* LZX supports window sizes of 2^15 (32Kb) through 2^21 (2Mb) */
   /* if a previously allocated window is big enough, keep it     */
@@ -844,7 +844,7 @@ void LZXfdi_clear(fdi_decomp_state *decomp_state) {
 /*******************************************************
  * LZXfdi_decomp(internal)
  */
-int LZXfdi_decomp(int inlen, int outlen, fdi_decomp_state *decomp_state) {
+gint LZXfdi_decomp(gint inlen, gint outlen, fdi_decomp_state *decomp_state) {
   cab_UBYTE *inpos  = CAB(inbuf);
   const cab_UBYTE *endinp = inpos + inlen;
   cab_UBYTE *window = LZX(window);
@@ -862,8 +862,8 @@ int LZXfdi_decomp(int inlen, int outlen, fdi_decomp_state *decomp_state) {
   cab_ULONG match_offset, i,j,k; /* ijk used in READ_HUFFSYM macro */
   struct lzx_bits lb; /* used in READ_LENGTHS macro */
 
-  int togo = outlen, this_run, main_element, aligned_bits;
-  int match_length, copy_length, length_footer, extra, verbatim_bits;
+  gint togo = outlen, this_run, main_element, aligned_bits;
+  gint match_length, copy_length, length_footer, extra, verbatim_bits;
 
   INIT_BITSTREAM;
 

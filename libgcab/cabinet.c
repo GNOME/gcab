@@ -34,7 +34,7 @@ zfree (voidpf opaque, voidpf address)
     g_free (address);
 }
 
-static char *
+static gchar *
 _data_input_stream_read_until (GDataInputStream  *stream,
                                const gchar        *stop_chars,
                                gsize              stop_len,
@@ -403,7 +403,7 @@ cfile_free (cfile_t *cf)
 static guint32
 compute_checksum (guint8 *in, guint16 ncbytes, guint32 seed)
 {
-    int no_ulongs;
+    gint no_ulongs;
     guint32 csum=0;
     guint32 temp;
 
@@ -454,11 +454,11 @@ cdata_compute_checksum (guint8 *buf, guint16 ncbytes, guint16 nubytes,
 }
 
 static gboolean
-cdata_deflate_block (cdata_t *cd, guint8 *data, size_t size, int level,
+cdata_deflate_block (cdata_t *cd, guint8 *data, gsize size, gint level,
                      GError **error)
 {
     z_stream deflate_stream = { 0, };
-    int zret;
+    gint zret;
 
     deflate_stream.zalloc = zalloc;
     deflate_stream.zfree = zfree;
@@ -491,8 +491,8 @@ cdata_deflate_block (cdata_t *cd, guint8 *data, size_t size, int level,
 }
 
 G_GNUC_INTERNAL gboolean
-cdata_write (cdata_t *cd, GDataOutputStream *out, int type,
-             guint8 *data, size_t size, gsize *bytes_written,
+cdata_write (cdata_t *cd, GDataOutputStream *out, gint type,
+             guint8 *data, gsize size, gsize *bytes_written,
              GCancellable *cancellable, GError **error)
 {
     switch (type) {
@@ -592,7 +592,7 @@ static gboolean
 cdata_decompress (cdata_t *cd, gint comptype, GError **error)
 {
     gboolean success = FALSE;
-    int ret, zret = Z_OK;
+    gint ret, zret = Z_OK;
     gint compression = comptype & GCAB_COMPRESSION_MASK;
 
     if (compression == GCAB_COMPRESSION_LZX) {

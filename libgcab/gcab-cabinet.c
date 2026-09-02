@@ -284,7 +284,7 @@ gcab_cabinet_write (GCabCabinet *self,
     cdata_t block = { 0, };
     guint8 data[CAB_MAX_BLOCK_SIZE];
     gsize written;
-    size_t sumstr = 0;
+    gsize sumstr = 0;
     g_autoptr(GSList) files = NULL;
     GCabFile *prevf = NULL;
 

@@ -606,8 +606,8 @@ gcab_test_cabinet_write_func (void)
     }
 }
 
-int
-main (int argc, char **argv)
+gint
+main (gint argc, gchar **argv)
 {
     g_test_init (&argc, &argv, NULL);
 

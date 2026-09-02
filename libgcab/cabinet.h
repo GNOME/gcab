@@ -150,9 +150,9 @@ void         cfile_free                         (cfile_t *cf);
 
 gboolean     cdata_write                        (cdata_t *cd,
                                                  GDataOutputStream *out,
-                                                 int type,
+                                                 gint type,
                                                  guint8 *data,
-                                                 size_t size,
+                                                 gsize size,
                                                  gsize *bytes_written,
                                                  GCancellable *cancellable,
                                                  GError **error);
