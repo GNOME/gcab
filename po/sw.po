@@ -1,0 +1,145 @@
+# Swahili translation for gcab.
+# Copyright (C) 2026 gcab's COPYRIGHT HOLDER
+# This file is distributed under the same license as the gcab package.
+# Wycliffe A. Onyango <wycliffealphus7@gmail.com>, 2026.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: gcab master\n"
+"Report-Msgid-Bugs-To: https://gitlab.gnome.org/GNOME/gcab/issues\n"
+"POT-Creation-Date: 2026-06-03 20:50+0000\n"
+"PO-Revision-Date: 2026-08-28 00:00+0000\n"
+"Last-Translator: Wycliffe A. Onyango <wycliffealphus7@gmail.com>\n"
+"Language-Team: Swahili <Swahili>\n"
+"Language: sw\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: src/gcab.c:82
+msgid "Dumping data to:"
+msgstr "Inaandika data kwenye:"
+
+#: src/gcab.c:114
+msgid "Print program version"
+msgstr "Chapisha toleo la programu"
+
+#: src/gcab.c:115
+msgid "Be verbose"
+msgstr "Onyesha maelezo mengi"
+
+#: src/gcab.c:116
+msgid "Create archive"
+msgstr "Unda jalada"
+
+#: src/gcab.c:117
+msgid "Extract all files"
+msgstr "Toa faili zote"
+
+#: src/gcab.c:118
+msgid "Dump reserved and extra data"
+msgstr "Toa data iliyohifadhiwa na ya ziada"
+
+#: src/gcab.c:119
+msgid "List content"
+msgstr "Orodhesha maudhui"
+
+#: src/gcab.c:120
+msgid "List content with file details"
+msgstr "Orodhesha maudhui na maelezo ya faili"
+
+#: src/gcab.c:121
+msgid "Change to directory DIR"
+msgstr "Badilisha hadi saraka DIR"
+
+#: src/gcab.c:121
+msgid "DIR"
+msgstr "DIR"
+
+#: src/gcab.c:122
+msgid "Use zip compression"
+msgstr "Tumia ubana wa zip"
+
+#: src/gcab.c:123
+msgid "Do not include path"
+msgstr "Usijumuishe njia"
+
+#: src/gcab.c:124
+msgid "Reserve space in cabinet for signing (e.g. -s 6144 reserves 6K bytes)"
+msgstr "Hifadhi nafasi kwenye cabinet kwa ajili ya kutia saini (mfano: -s 6144 huhifadhi baiti 6144)"
+
+#: src/gcab.c:125
+msgid "FILE INPUT_FILES..."
+msgstr "FILE INPUT_FILES..."
+
+#: src/gcab.c:139
+msgid "- create a Cabinet file"
+msgstr "- unda faili la Cabinet"
+
+#: src/gcab.c:140
+msgid "Report bugs to:"
+msgstr "Ripoti hitilafu kwa:"
+
+#: src/gcab.c:142
+msgid ""
+"gcab saves many files together into a cabinet archive, and can restore\n"
+"individual files from the archive."
+msgstr ""
+"gcab huhifadhi faili nyingi pamoja kwenye jalada la cabinet, na inaweza kurejesha\n"
+"faili moja moja kutoka kwenye jalada."
+
+#: src/gcab.c:149
+msgid "Option parsing failed"
+msgstr "Uchanganuzi wa chaguzi umeshindwa"
+
+#: src/gcab.c:159
+msgid "Please specify a single operation"
+msgstr "Tafadhali bainisha operesheni moja"
+
+#: src/gcab.c:164
+msgid "Cabinet file must be specified"
+msgstr "Faili la Cabinet lazima libainishwe"
+
+#: src/gcab.c:180
+msgid "Cannot open file for reading"
+msgstr "Haiwezekani kufungua faili kwa usomaji"
+
+#: src/gcab.c:184
+msgid "Error reading"
+msgstr "Hitilafu wakati wa kusoma"
+
+#: src/gcab.c:206
+msgid "<unknown-date>"
+msgstr "<tarehe-haijulikani>"
+
+#: src/gcab.c:219
+msgid "Error during extraction"
+msgstr "Hitilafu wakati wa kutoa faili"
+
+#: src/gcab.c:234
+msgid "Error while reading signature"
+msgstr "Hitilafu wakati wa kusoma saini"
+
+#: src/gcab.c:246
+msgid "No input files specified"
+msgstr "Hakuna faili za ingizo zilizobainishwa"
+
+#: src/gcab.c:265
+msgid "Cannot add file"
+msgstr "Haiwezekani kuongeza faili"
+
+#: src/gcab.c:271
+msgid "No files to be archived"
+msgstr "Hakuna faili za kuweka kwenye jalada"
+
+#: src/gcab.c:279
+msgid "Cannot create cab file"
+msgstr "Haiwezekani kuunda faili la cab"
+
+#: src/gcab.c:285
+msgid "Cannot add folder to cab file"
+msgstr "Haiwezekani kuongeza folda kwenye faili la cab"
+
+#: src/gcab.c:295
+msgid "Cannot write cab file"
+msgstr "Haiwezekani kuandika faili la cab"
