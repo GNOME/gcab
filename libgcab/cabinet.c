@@ -53,11 +53,21 @@ _data_input_stream_read_until (GDataInputStream  *stream,
   /* If we're not at end of stream then we have a stop_char to consume. */
   if (result != NULL && g_buffered_input_stream_get_available (bstream) > 0)
     {
-      gsize res;
+      gssize res;
       gchar b;
 
-      res = g_input_stream_read (G_INPUT_STREAM (stream), &b, 1, NULL, NULL);
-      g_assert (res == 1);
+      res = g_input_stream_read (G_INPUT_STREAM (stream), &b, 1,
+                                 cancellable, error);
+      if (res < 0) {
+        g_free (result);
+        return NULL;
+      }
+      if (res != 1) {
+        g_set_error (error, GCAB_ERROR, GCAB_ERROR_FORMAT,
+                     "Expected stop character, got end of stream");
+        g_free (result);
+        return NULL;
+      }
     }
 
   return result;
