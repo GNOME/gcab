@@ -161,14 +161,22 @@ gboolean     cdata_read                         (cdata_t *cd,
                                                  GDataInputStream *in,
                                                  GCancellable *cancellable,
                                                  GError **error);
-gboolean     cdata_read_split                   (cdata_t *cd,
-                                                 gint comptype,
-                                                 guint8 res_data_a,
-                                                 GDataInputStream *in_a,
-                                                 guint8 res_data_b,
-                                                 GDataInputStream *in_b,
-                                                 gboolean *is_split,
+gboolean     cdata_read_part                    (cdata_t *cd,
+                                                 guint8 res_data,
+                                                 GDataInputStream *in,
+                                                 guint8 *buf,
+                                                 gsize buf_sz,
+                                                 guint16 *ncbytes,
+                                                 guint16 *nubytes,
                                                  GCancellable *cancellable,
+                                                 GError **error);
+gboolean     cdata_get_read_buf                  (cdata_t *cd,
+                                                 gint compression,
+                                                 guint8 **buf,
+                                                 gsize *buf_sz,
+                                                 GError **error);
+gboolean     cdata_decompress                    (cdata_t *cd,
+                                                 gint comptype,
                                                  GError **error);
 void         cdata_free                         (cdata_t *cd);
 void         cdata_clear_decomp                 (cdata_t *cd);

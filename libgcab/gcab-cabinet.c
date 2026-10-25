@@ -537,10 +537,10 @@ gcab_cabinet_load (GCabCabinet *self,
         guint16 folder_index = cfile->index;
         switch (folder_index) {
         case CFILE_INDEX_CONTINUED_FROM_PREV:
-        case CFILE_INDEX_CONTINUED_PREV_AND_NEXT:
             folder_index = 0;
             break;
         case CFILE_INDEX_CONTINUED_TO_NEXT:
+        case CFILE_INDEX_CONTINUED_PREV_AND_NEXT:
             folder_index = self->folders->len - 1;
             break;
         default:
@@ -677,6 +677,56 @@ gcab_cabinet_load_from_file (GCabCabinet *self,
     return TRUE;
 }
 
+static void
+folder_fragment_free (GCabFolderFragment *fragment)
+{
+    g_object_unref (fragment->data);
+    g_free (fragment);
+}
+
+static GPtrArray *
+gcab_cabinet_get_continuations (GCabCabinet *self)
+{
+    GPtrArray *fragments = g_ptr_array_new_with_free_func ((GDestroyNotify) folder_fragment_free);
+    GCabCabinet *cab = self->next;
+
+    while (cab != NULL && cab->stream != NULL && cab->cheader != NULL &&
+           (cab->cheader->flags & CABINET_HEADER_PREV)) {
+        GPtrArray *folders = cab->folders;
+        GCabFolder *folder;
+        cfolder_t *cfolder;
+        GDataInputStream *data;
+        GCabFolderFragment *fragment;
+
+        if (folders->len == 0)
+            break;
+
+        folder = g_ptr_array_index (folders, 0);
+        cfolder = gcab_folder_get_cfolder (folder);
+        if (cfolder == NULL)
+            break;
+
+        data = g_data_input_stream_new (cab->stream);
+        g_data_input_stream_set_byte_order (data, G_DATA_STREAM_BYTE_ORDER_LITTLE_ENDIAN);
+        g_filter_input_stream_set_close_base_stream (G_FILTER_INPUT_STREAM (data), FALSE);
+
+        fragment = g_new0 (GCabFolderFragment, 1);
+        fragment->data = data;
+        fragment->offsetdata = cfolder->offsetdata;
+        fragment->ndatab = cfolder->ndatab;
+        fragment->res_data = cab->cheader->res_data;
+        g_ptr_array_add (fragments, fragment);
+
+        /* Only the last folder of a cabinet can continue into the next one. */
+        if (folders->len != 1)
+            break;
+
+        cab = gcab_cabinet_get_next (cab);
+    }
+
+    return fragments;
+}
+
 /**
  * gcab_cabinet_extract:
  * @cabinet: a #GCabCabinet
@@ -721,36 +771,15 @@ gcab_cabinet_extract (GCabCabinet *self,
     g_data_input_stream_set_byte_order (data, G_DATA_STREAM_BYTE_ORDER_LITTLE_ENDIAN);
     g_filter_input_stream_set_close_base_stream (G_FILTER_INPUT_STREAM (data), FALSE);
 
-    g_autoptr(GDataInputStream) next_data = NULL;
-    GCabCabinet *next = self->next;
-    if (next != NULL && next->stream != NULL) {
-        next_data = g_data_input_stream_new (next->stream);
-        g_data_input_stream_set_byte_order (next_data, G_DATA_STREAM_BYTE_ORDER_LITTLE_ENDIAN);
-        g_filter_input_stream_set_close_base_stream (G_FILTER_INPUT_STREAM (next_data), FALSE);
-    }
-
     for (guint i = 0; i < self->folders->len; ++i) {
         GCabFolder *folder = g_ptr_array_index (self->folders, i);
+        g_autoptr(GPtrArray) continuations = NULL;
 
-        GCabFolderContinuation cont_buf = { 0 };
-        GCabFolderContinuation *cont = NULL;
-
-        if (i == self->folders->len - 1 && next != NULL && next_data != NULL) {
-            GPtrArray *next_folders = gcab_cabinet_get_folders (next);
-            if (next_folders != NULL && next_folders->len > 0) {
-                GCabFolder *next_folder = g_ptr_array_index (next_folders, 0);
-                cfolder_t *next_cfolder = gcab_folder_get_cfolder (next_folder);
-                if (next_cfolder != NULL) {
-                    cont_buf.data = next_data;
-                    cont_buf.offsetdata = next_cfolder->offsetdata;
-                    cont_buf.res_data = next->cheader->res_data;
-                    cont = &cont_buf;
-                }
-            }
-        }
+        if (i == self->folders->len - 1)
+            continuations = gcab_cabinet_get_continuations (self);
 
         if (!gcab_folder_extract (folder, data, path, self->cheader->res_data,
-                                  cont,
+                                  continuations,
                                   file_callback, progress_callback, user_data,
                                   cancellable, error)) {
             return FALSE;

@@ -397,12 +397,116 @@ sort_by_offset (GCabFile *a, GCabFile *b)
     return (gint64) gcab_file_get_uoffset (a) - (gint64) gcab_file_get_uoffset (b);
 }
 
+typedef struct {
+    GPtrArray *continuations;
+    guint next_continuation;
+    GDataInputStream *data;
+    guint8 res_data;
+    guint32 offsetdata;
+    guint16 blocks_left;
+} GCabFolderReader;
+
+static void
+folder_reader_init (GCabFolderReader *reader,
+                    GCabFolder *folder,
+                    GDataInputStream *data,
+                    guint8 res_data,
+                    GPtrArray *continuations)
+{
+    reader->continuations = continuations;
+    reader->next_continuation = 0;
+    reader->data = data;
+    reader->res_data = res_data;
+    reader->offsetdata = folder->cfolder->offsetdata;
+    reader->blocks_left = folder->cfolder->ndatab;
+}
+
+static gboolean
+folder_reader_ensure_fragment (GCabFolderReader *reader,
+                               GCancellable *cancellable,
+                               GError **error)
+{
+    while (reader->blocks_left == 0) {
+        GCabFolderFragment *fragment;
+
+        if (reader->continuations == NULL ||
+            reader->next_continuation >= reader->continuations->len) {
+            g_set_error (error, GCAB_ERROR, GCAB_ERROR_INVALID_DATA,
+                         "Cabinet set ended in the middle of a folder");
+            return FALSE;
+        }
+
+        fragment = g_ptr_array_index (reader->continuations,
+                                      reader->next_continuation++);
+        reader->data = fragment->data;
+        reader->res_data = fragment->res_data;
+        reader->offsetdata = fragment->offsetdata;
+        reader->blocks_left = fragment->ndatab;
+
+        if (!g_seekable_seek (G_SEEKABLE (reader->data), reader->offsetdata,
+                              G_SEEK_SET, cancellable, error))
+            return FALSE;
+    }
+
+    return TRUE;
+}
+
+static gboolean
+folder_reader_read_cdata (GCabFolderReader *reader,
+                          GCabFolder *folder,
+                          cdata_t *cdata,
+                          GCancellable *cancellable,
+                          GError **error)
+{
+    guint8 *buf = NULL;
+    gsize buf_sz = 0;
+    gsize total_ncbytes = 0;
+    guint16 total_nubytes = 0;
+
+    if (!cdata_get_read_buf (cdata, folder->comptype & GCAB_COMPRESSION_MASK,
+                             &buf, &buf_sz, error))
+        return FALSE;
+
+    while (TRUE) {
+        guint16 ncbytes = 0, nubytes = 0;
+
+        if (!folder_reader_ensure_fragment (reader, cancellable, error))
+            return FALSE;
+
+        if (!cdata_read_part (cdata, reader->res_data, reader->data,
+                              buf + total_ncbytes, buf_sz - total_ncbytes,
+                              &ncbytes, &nubytes, cancellable, error))
+            return FALSE;
+
+        total_ncbytes += ncbytes;
+        reader->blocks_left--;
+
+        if (nubytes != 0) {
+            total_nubytes = nubytes;
+            break;
+        }
+    }
+
+    if (total_nubytes > CAB_MAX_BLOCK_SIZE) {
+        g_set_error (error, GCAB_ERROR, GCAB_ERROR_INVALID_DATA,
+                     "CDATA block of %" G_GUINT16_FORMAT " bytes "
+                     "was bigger than maximum size %i",
+                     total_nubytes, CAB_MAX_BLOCK_SIZE);
+        return FALSE;
+    }
+
+    cdata->ncbytes = (guint16) total_ncbytes;
+    cdata->nubytes = total_nubytes;
+
+    return cdata_decompress (cdata, folder->comptype, error);
+}
+
 G_GNUC_INTERNAL gboolean
 gcab_folder_extract (GCabFolder *self,
                      GDataInputStream *data,
                      GFile *path_extract,
                      guint8 res_data,
-                     GCabFolderContinuation *continuation,
+                     GPtrArray *continuations,
                      GCabFileCallback file_callback,
                      GFileProgressCallback progress_callback,
                      gpointer callback_data,
@@ -412,12 +516,8 @@ gcab_folder_extract (GCabFolder *self,
     GSList *f = NULL;
     g_autoptr(GSList) files = NULL;
     g_autoptr(cdata_t) cdata = g_new0 (cdata_t, 1);
+    GCabFolderReader reader;
     guint32 nubytes = 0;
-    guint16 blocks_read = 0;
-    GDataInputStream *current_data = data;
-    guint8 current_res_data = res_data;
-    gboolean switched_to_cont = FALSE;
-    guint8 *reserved;
 
     /* never loaded from a stream */
     g_assert (self->cfolder != NULL);
@@ -425,10 +525,9 @@ gcab_folder_extract (GCabFolder *self,
     if (!g_seekable_seek (G_SEEKABLE (data), self->cfolder->offsetdata, G_SEEK_SET, cancellable, error))
         return FALSE;
 
-    files = g_slist_sort (g_slist_copy (self->files), (GCompareFunc)sort_by_offset);
+    folder_reader_init (&reader, self, data, res_data, continuations);
 
-    /* this is allocated for every block, but currently unused */
-    cdata->reserved = reserved = g_malloc (res_data);
+    files = g_slist_sort (g_slist_copy (self->files), (GCompareFunc)sort_by_offset);
 
     for (f = files; f != NULL; f = f->next) {
         GCabFile *file = f->data;
@@ -436,7 +535,8 @@ gcab_folder_extract (GCabFolder *self,
         if (gcab_file_is_continued_from_prev (file))
             continue;
 
-        if (gcab_file_is_continued_to_next (file) && continuation == NULL)
+        if (gcab_file_is_continued_to_next (file) &&
+            (continuations == NULL || continuations->len == 0))
             continue;
 
         if (file_callback && !file_callback (file, callback_data))
@@ -456,56 +556,17 @@ gcab_folder_extract (GCabFolder *self,
                                   G_SEEK_SET, cancellable, error))
                 return FALSE;
             cdata_clear_decomp (cdata);
-            memset(cdata, 0x0, sizeof(cdata_t));
-            cdata->reserved = reserved;
+            memset (cdata, 0x0, sizeof(cdata_t));
             nubytes = 0;
-            blocks_read = 0;
-            current_data = data;
-            current_res_data = res_data;
-            switched_to_cont = FALSE;
+            folder_reader_init (&reader, self, data, res_data, continuations);
         }
 
         while (usize > 0) {
             if ((nubytes + cdata->nubytes) <= uoffset) {
                 nubytes += cdata->nubytes;
-
-                if (!switched_to_cont &&
-                    blocks_read >= self->cfolder->ndatab &&
-                    continuation != NULL) {
-                    if (!g_seekable_seek (G_SEEKABLE (continuation->data),
-                                          continuation->offsetdata,
-                                          G_SEEK_SET, cancellable, error))
-                        return FALSE;
-                    current_data = continuation->data;
-                    current_res_data = continuation->res_data;
-                    switched_to_cont = TRUE;
-                }
-
-                if (!switched_to_cont &&
-                    continuation != NULL &&
-                    blocks_read == self->cfolder->ndatab - 1) {
-                    gboolean is_split = FALSE;
-
-                    if (!g_seekable_seek (G_SEEKABLE (continuation->data),
-                                          continuation->offsetdata,
-                                          G_SEEK_SET, cancellable, error))
-                        return FALSE;
-                    if (!cdata_read_split (cdata, self->comptype,
-                                           current_res_data, current_data,
-                                           continuation->res_data, continuation->data,
-                                           &is_split, cancellable, error))
-                        return FALSE;
-                    if (is_split) {
-                        current_data = continuation->data;
-                        current_res_data = continuation->res_data;
-                        switched_to_cont = TRUE;
-                    }
-                } else {
-                    if (!cdata_read (cdata, current_res_data, self->comptype,
-                                     current_data, cancellable, error))
-                        return FALSE;
-                }
-                blocks_read++;
+                if (!folder_reader_read_cdata (&reader, self, cdata,
+                                               cancellable, error))
+                    return FALSE;
                 continue;
             } else {
                 gsize offset = gcab_file_get_uoffset (file) > nubytes ?

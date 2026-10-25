@@ -567,8 +567,8 @@ _enforce_checksum (void)
     return enforce;
 }
 
-static gboolean
-cdata_set_read_buf (cdata_t *cd, gint compression,
+G_GNUC_INTERNAL gboolean
+cdata_get_read_buf (cdata_t *cd, gint compression,
                     guint8 **buf, gsize *buf_sz, GError **error)
 {
     switch (compression) {
@@ -588,7 +588,7 @@ cdata_set_read_buf (cdata_t *cd, gint compression,
     }
 }
 
-static gboolean
+G_GNUC_INTERNAL gboolean
 cdata_decompress (cdata_t *cd, gint comptype, GError **error)
 {
     gboolean success = FALSE;
@@ -684,7 +684,7 @@ cdata_read (cdata_t *cd, guint8 res_data, gint comptype,
     guint32 checksum_tmp;
     gboolean success = FALSE;
 
-    if (!cdata_set_read_buf (cd, compression, &buf, &buf_sz, error))
+    if (!cdata_get_read_buf (cd, compression, &buf, &buf_sz, error))
         return FALSE;
 
     R4 (cd->checksum);
@@ -767,92 +767,33 @@ end:
 }
 
 G_GNUC_INTERNAL gboolean
-cdata_read_split (cdata_t *cd, gint comptype,
-                  guint8 res_data_a, GDataInputStream *in_a,
-                  guint8 res_data_b, GDataInputStream *in_b,
-                  gboolean *is_split,
-                  GCancellable *cancellable, GError **error)
+cdata_read_part (cdata_t *cd, guint8 res_data, GDataInputStream *in,
+                 guint8 *buf, gsize buf_sz,
+                 guint16 *out_ncbytes, guint16 *out_nubytes,
+                 GCancellable *cancellable, GError **error)
 {
-    gint compression = comptype & GCAB_COMPRESSION_MASK;
-    guint8 *buf = NULL;
-    gsize buf_sz;
-    guint16 ncbytes_a = 0, nubytes_a = 0;
-    guint16 ncbytes_b = 0, nubytes_b = 0;
-    guint32 checksum_a = 0, checksum_b = 0;
-    guint32 checksum_tmp;
-    guint8 reserved_a[256], reserved_b[256];
+    guint32 checksum, checksum_tmp;
+    guint16 ncbytes, nubytes;
+    guint8 reserved[256];
 
-    g_return_val_if_fail (is_split != NULL, FALSE);
-
-    *is_split = FALSE;
-
-    if (!cdata_set_read_buf (cd, compression, &buf, &buf_sz, error))
+    if (!read_raw_cfdata (in, res_data, buf, buf_sz,
+                          &ncbytes, &nubytes, &checksum,
+                          reserved, cancellable, error))
         return FALSE;
 
-    if (!read_raw_cfdata (in_a, res_data_a, buf, buf_sz,
-                          &ncbytes_a, &nubytes_a, &checksum_a,
-                          reserved_a, cancellable, error))
-        return FALSE;
-
-    checksum_tmp = cdata_compute_checksum (buf, ncbytes_a, nubytes_a,
-                                           reserved_a, res_data_a);
-    if (checksum_a != checksum_tmp) {
+    checksum_tmp = cdata_compute_checksum (buf, ncbytes, nubytes,
+                                           reserved, res_data);
+    if (checksum != checksum_tmp) {
         if (_enforce_checksum ()) {
             g_set_error_literal (error, GCAB_ERROR, GCAB_ERROR_INVALID_DATA,
-                                 nubytes_a == 0 ?
-                                 "incorrect checksum detected in split CDATA part A" :
-                                 "incorrect checksum detected");
+                                 "incorrect checksum detected in continued CDATA part");
             return FALSE;
         }
         if (_gcab_debug ())
-            g_debug ("split CDATA part A checksum 0x%08x", (guint) checksum_tmp);
+            g_debug ("continued CDATA part checksum 0x%08x", (guint) checksum_tmp);
     }
 
-    /* a non-zero uncompressed size means this block is not split */
-    if (nubytes_a != 0) {
-        cd->ncbytes = ncbytes_a;
-        cd->nubytes = nubytes_a;
-
-        if (cd->nubytes > CAB_MAX_BLOCK_SIZE) {
-            g_set_error (error, GCAB_ERROR, GCAB_ERROR_INVALID_DATA,
-                         "CDATA block of %" G_GUINT16_FORMAT " bytes "
-                         "was bigger than maximum size %i",
-                         cd->nubytes, CAB_MAX_BLOCK_SIZE);
-            return FALSE;
-        }
-
-        return cdata_decompress (cd, comptype, error);
-    }
-
-    if (!read_raw_cfdata (in_b, res_data_b, buf + ncbytes_a,
-                          buf_sz - ncbytes_a,
-                          &ncbytes_b, &nubytes_b, &checksum_b,
-                          reserved_b, cancellable, error))
-        return FALSE;
-
-    checksum_tmp = cdata_compute_checksum (buf + ncbytes_a, ncbytes_b, nubytes_b,
-                                           reserved_b, res_data_b);
-    if (checksum_b != checksum_tmp) {
-        if (_enforce_checksum ()) {
-            g_set_error_literal (error, GCAB_ERROR, GCAB_ERROR_INVALID_DATA,
-                                 "incorrect checksum detected in split CDATA part B");
-            return FALSE;
-        }
-        if (_gcab_debug ())
-            g_debug ("split CDATA part B checksum 0x%08x", (guint) checksum_tmp);
-    }
-
-    cd->ncbytes = ncbytes_a + ncbytes_b;
-    cd->nubytes = nubytes_b ? nubytes_b : nubytes_a;
-
-    if (cd->nubytes > CAB_MAX_BLOCK_SIZE) {
-        g_set_error (error, GCAB_ERROR, GCAB_ERROR_INVALID_DATA,
-                     "split CDATA block of %" G_GUINT16_FORMAT " bytes "
-                     "exceeds maximum %i", cd->nubytes, CAB_MAX_BLOCK_SIZE);
-        return FALSE;
-    }
-
-    *is_split = TRUE;
-
-    return cdata_decompress (cd, comptype, error);
+    *out_ncbytes = ncbytes;
+    *out_nubytes = nubytes;
+    return TRUE;
 }
