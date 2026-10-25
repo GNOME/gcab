@@ -24,7 +24,7 @@ fuzz-asan-ubsan:
     CXXFLAGS: "$CFLAGS"
     GIO_USE_VFS: "local"
   script:
-    - meson setup _build_fuzz -Db_sanitize=address,undefined -Ddocs=false -Dintrospection=false -Dvapi=false -Dnls=false -Dtests=false
+    - meson setup _build_fuzz -Db_sanitize=address,undefined -Ddocs=false -Dintrospection=false -Dvapi=false -Dnls=false -Dtests=false -Dtest-env=true
     - meson compile -C _build_fuzz
     - |
       for cab in tests/*.cab; do

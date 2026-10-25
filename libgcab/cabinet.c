@@ -561,10 +561,14 @@ cdata_free (cdata_t *cd)
 static gint
 _enforce_checksum (void)
 {
+#ifdef GCAB_ENABLE_TEST_ENV
     static gint enforce = -1;
     if (enforce == -1)
         enforce = g_getenv ("GCAB_SKIP_CHECKSUM") == NULL ? 1 : 0;
     return enforce;
+#else
+    return 1;
+#endif
 }
 
 G_GNUC_INTERNAL gboolean

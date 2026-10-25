@@ -1,6 +1,9 @@
 cargs = [
   '-DG_LOG_DOMAIN="gcab"',
 ]
+if get_option('test-env')
+  cargs += ['-DGCAB_ENABLE_TEST_ENV']
+endif
 
 enum_headers = ['gcab-folder.h', 'gcab-file.h']
 enums = gnome.mkenums(

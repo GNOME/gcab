@@ -458,8 +458,11 @@ gcab_cabinet_add_allowed_compression (GCabCabinet *self, GCabCompression compres
         self->allowed_compression = 0x0;
 
     /* enable this */
-    if (g_getenv ("GCAB_SKIP_COMPRESSION_CHECK") == NULL)
-        self->allowed_compression |= 1ull << compression;
+#ifdef GCAB_ENABLE_TEST_ENV
+    if (g_getenv ("GCAB_SKIP_COMPRESSION_CHECK") != NULL)
+        return;
+#endif
+    self->allowed_compression |= 1ull << compression;
 }
 
 /**

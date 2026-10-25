@@ -425,8 +425,6 @@ gcab_test_cabinet_error_cves_func (void)
             "CVE-2015-4470.cab",
             "CVE-2015-4471.cab",
             NULL };
-    (void)g_setenv ("GCAB_SKIP_CHECKSUM", "1", TRUE);
-    (void)g_setenv ("GCAB_SKIP_COMPRESSION_CHECK", "1", TRUE);
     for (guint i = 0; tests[i] != NULL; i++) {
         gboolean ret;
         g_autofree gchar *fn = NULL;
@@ -445,7 +443,6 @@ gcab_test_cabinet_error_cves_func (void)
         g_assert_no_error (error);
         g_assert (in != NULL);
         cabinet = gcab_cabinet_new ();
-        gcab_cabinet_add_allowed_compression (cabinet, GCAB_COMPRESSION_NONE);
         ret = gcab_cabinet_load (cabinet, in, NULL, &error);
         g_assert_no_error (error);
         g_assert (ret);
@@ -454,8 +451,6 @@ gcab_test_cabinet_error_cves_func (void)
         g_assert (error != NULL);
         g_assert (!ret);
     }
-    g_unsetenv ("GCAB_SKIP_CHECKSUM");
-    g_unsetenv ("GCAB_SKIP_COMPRESSION_CHECK");
 }
 
 static void
