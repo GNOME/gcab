@@ -708,6 +708,34 @@ gcab_test_cabinet_multicab_prev_func (void)
                      expected, sizeof (expected) - 1);
 }
 
+static void
+gcab_test_cabinet_lzx_overrun_func (void)
+{
+    gboolean ret;
+    g_autofree gchar *fn = NULL;
+    g_autoptr(GCabCabinet) cabinet = NULL;
+    g_autoptr(GError) error = NULL;
+    g_autoptr(GFile) file = NULL;
+    g_autoptr(GInputStream) in = NULL;
+
+    /* a match at the end of the 32K window makes the decompressor write
+     * beyond the end of the allocated window buffer */
+    fn = gcab_test_get_filename ("test-lzx-overrun.cab");
+    g_assert_nonnull (fn);
+    file = g_file_new_for_path (fn);
+    in = G_INPUT_STREAM (g_file_read (file, NULL, &error));
+    g_assert_no_error (error);
+    g_assert_nonnull (in);
+    cabinet = gcab_cabinet_new ();
+    ret = gcab_cabinet_load (cabinet, in, NULL, &error);
+    g_assert_no_error (error);
+    g_assert_true (ret);
+
+    ret = gcab_cabinet_extract_simple (cabinet, NULL, NULL, NULL, NULL, &error);
+    g_assert_nonnull (error);
+    g_assert_false (ret);
+}
+
 gint
 main (gint argc, gchar **argv)
 {
@@ -726,6 +754,7 @@ main (gint argc, gchar **argv)
     g_test_add_func ("/GCab/cabinet{error-not-loaded}", gcab_test_cabinet_error_not_loaded_func);
     g_test_add_func ("/GCab/cabinet{error-no-folders}", gcab_test_cabinet_error_no_folders_func);
     g_test_add_func ("/GCab/cabinet{error-cves}", gcab_test_cabinet_error_cves_func);
+    g_test_add_func ("/GCab/cabinet{lzx-overrun}", gcab_test_cabinet_lzx_overrun_func);
     g_test_add_func ("/GCab/cabinet{load}", gcab_test_cabinet_load_func);
     g_test_add_func ("/GCab/cabinet{multicab}", gcab_test_cabinet_multicab_func);
     g_test_add_func ("/GCab/cabinet{multicab-prev}", gcab_test_cabinet_multicab_prev_func);

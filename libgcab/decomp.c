@@ -967,6 +967,11 @@ gint LZXfdi_decomp(gint inlen, gint outlen, fdi_decomp_state *decomp_state) {
             }
             match_length += LZX_MIN_MATCH;
 
+            /* a match may extend beyond the current run, but it must not
+             * write past the end of the window */
+            if (window_posn + match_length > window_size)
+              return DECR_DATAFORMAT;
+
             match_offset = main_element >> 3;
 
             if (match_offset > 2) {
@@ -1040,6 +1045,11 @@ gint LZXfdi_decomp(gint inlen, gint outlen, fdi_decomp_state *decomp_state) {
               match_length += length_footer;
             }
             match_length += LZX_MIN_MATCH;
+
+            /* a match may extend beyond the current run, but it must not
+             * write past the end of the window */
+            if (window_posn + match_length > window_size)
+              return DECR_DATAFORMAT;
 
             match_offset = main_element >> 3;
 

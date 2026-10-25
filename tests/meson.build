@@ -15,6 +15,7 @@ if installed_tests_enabled
     'test-multicab-a.cab',
     'test-multicab-b.cab',
     'test-multicab-c.cab',
+    'test-lzx-overrun.cab',
     'test-ncbytes-overflow.cab',
     'test-none.cab',
     'test-signed.cab',
