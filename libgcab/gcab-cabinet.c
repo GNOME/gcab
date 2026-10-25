@@ -296,7 +296,7 @@ gcab_cabinet_write (GCabCabinet *self,
         cheader->res_header = self->reserved->len;
         cheader->res_folder = 0;
         cheader->res_data = 0;
-        cheader->reserved = self->reserved->data;
+        cheader->reserved = g_byte_array_ref (self->reserved);
     }
 
     files = gcab_folder_get_files (cabfolder);
@@ -577,10 +577,8 @@ gcab_cabinet_load (GCabCabinet *self,
         return FALSE;
 
     if (cheader->reserved != NULL) {
-        g_autoptr(GByteArray) blob = NULL;
-        blob = g_byte_array_new_take (cheader->reserved, cheader->res_header);
-        g_object_set (self, "reserved", blob, NULL);
-        cheader->reserved = NULL;
+        g_object_set (self, "reserved", cheader->reserved, NULL);
+        g_clear_pointer (&cheader->reserved, g_byte_array_unref);
     }
 
     for (guint i = 0; i < cheader->nfolders; i++) {

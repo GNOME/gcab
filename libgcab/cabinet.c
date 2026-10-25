@@ -198,7 +198,7 @@ cheader_write (cheader_t *ch, GDataOutputStream *out,
             !W1 (ch->res_folder) ||
             !W1 (ch->res_data))
                 return FALSE;
-        if (g_output_stream_write (stream, ch->reserved, ch->res_header,
+        if (g_output_stream_write (stream, ch->reserved->data, ch->res_header,
                                    cancellable, error) == -1)
             return FALSE;
     }
@@ -241,8 +241,9 @@ cheader_read (cheader_t *ch, GDataInputStream *in,
         R2 (ch->res_header);
         R1 (ch->res_folder);
         R1 (ch->res_data);
-        ch->reserved = g_malloc (ch->res_header);
-        RN (ch->reserved, ch->res_header);
+        ch->reserved = g_byte_array_sized_new (ch->res_header);
+        g_byte_array_set_size (ch->reserved, ch->res_header);
+        RN (ch->reserved->data, ch->res_header);
     }
 
     if (ch->flags & CABINET_HEADER_PREV) {
@@ -274,7 +275,7 @@ cheader_read (cheader_t *ch, GDataInputStream *in,
             P1 (ch, res_folder);
             P1 (ch, res_data);
             if (ch->res_header)
-                PN (ch, reserved, ch->res_header);
+                PN (ch, reserved->data, ch->res_header);
         }
         if (ch->flags & CABINET_HEADER_PREV) {
             PS (ch, cab_prev);
@@ -298,7 +299,7 @@ cheader_free (cheader_t *ch)
 {
     if (ch == NULL)
         return;
-    g_free (ch->reserved);
+    g_clear_pointer (&ch->reserved, g_byte_array_unref);
     g_free (ch->cab_prev);
     g_free (ch->disk_prev);
     g_free (ch->cab_next);

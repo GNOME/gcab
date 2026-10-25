@@ -73,7 +73,7 @@ typedef struct
     guint16 res_header;
     guint8 res_folder;
     guint8 res_data;
-    guint8 *reserved;
+    GByteArray *reserved;
     gchar *cab_prev;
     gchar *disk_prev;
     gchar *cab_next;
