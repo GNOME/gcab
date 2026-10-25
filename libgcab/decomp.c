@@ -829,6 +829,7 @@ gint LZXfdi_init(gint window, fdi_decomp_state *decomp_state) {
   LZX(intel_curpos)    = 0;
   LZX(intel_started)   = 0;
   LZX(window_posn)     = 0;
+  LZX(window_filled)   = 0;
 
   /* initialize tables to 0 (because deltas will be applied to them) */
   memset(LZX(MAINTREE_len), 0, sizeof(LZX(MAINTREE_len)));
@@ -854,6 +855,7 @@ gint LZXfdi_decomp(gint inlen, gint outlen, fdi_decomp_state *decomp_state) {
 
   cab_ULONG window_posn = LZX(window_posn);
   cab_ULONG window_size = LZX(window_size);
+  cab_ULONG window_filled = LZX(window_filled);
   cab_ULONG R0 = LZX(R0);
   cab_ULONG R1 = LZX(R1);
   cab_ULONG R2 = LZX(R2);
@@ -954,6 +956,8 @@ gint LZXfdi_decomp(gint inlen, gint outlen, fdi_decomp_state *decomp_state) {
           if (main_element < LZX_NUM_CHARS) {
             /* literal: 0 to LZX_NUM_CHARS-1 */
             window[window_posn++] = main_element;
+            if (window_filled < window_size)
+              window_filled++;
             this_run--;
           }
           else {
@@ -1001,6 +1005,16 @@ gint LZXfdi_decomp(gint inlen, gint outlen, fdi_decomp_state *decomp_state) {
               R2 = R0; R0 = match_offset;
             }
 
+            /* reject offsets outside the window or beyond decoded history */
+            if (match_offset == 0 ||
+                match_offset > window_size ||
+                match_offset > window_filled)
+              return DECR_DATAFORMAT;
+
+            window_filled += match_length;
+            if (window_filled > window_size)
+              window_filled = window_size;
+
             rundest = window + window_posn;
             this_run -= match_length;
 
@@ -1033,6 +1047,8 @@ gint LZXfdi_decomp(gint inlen, gint outlen, fdi_decomp_state *decomp_state) {
           if (main_element < LZX_NUM_CHARS) {
             /* literal: 0 to LZX_NUM_CHARS-1 */
             window[window_posn++] = main_element;
+            if (window_filled < window_size)
+              window_filled++;
             this_run--;
           }
           else {
@@ -1095,6 +1111,16 @@ gint LZXfdi_decomp(gint inlen, gint outlen, fdi_decomp_state *decomp_state) {
               R2 = R0; R0 = match_offset;
             }
 
+            /* reject offsets outside the window or beyond decoded history */
+            if (match_offset == 0 ||
+                match_offset > window_size ||
+                match_offset > window_filled)
+              return DECR_DATAFORMAT;
+
+            window_filled += match_length;
+            if (window_filled > window_size)
+              window_filled = window_size;
+
             rundest = window + window_posn;
             this_run -= match_length;
 
@@ -1124,6 +1150,9 @@ gint LZXfdi_decomp(gint inlen, gint outlen, fdi_decomp_state *decomp_state) {
         if ((inpos + this_run) > endinp) return DECR_ILLEGALDATA;
         memcpy(window + window_posn, inpos, (size_t) this_run);
         inpos += this_run; window_posn += this_run;
+        window_filled += this_run;
+        if (window_filled > window_size)
+          window_filled = window_size;
         break;
 
       default:
@@ -1138,6 +1167,7 @@ gint LZXfdi_decomp(gint inlen, gint outlen, fdi_decomp_state *decomp_state) {
     outlen, (size_t) outlen);
 
   LZX(window_posn) = window_posn;
+  LZX(window_filled) = window_filled;
   LZX(R0) = R0;
   LZX(R1) = R1;
   LZX(R2) = R2;

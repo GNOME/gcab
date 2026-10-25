@@ -191,6 +191,7 @@ struct LZXstate {
     cab_ULONG window_size;     /* window size (32Kb through 2Mb)          */
     cab_ULONG actual_size;     /* window size when it was first allocated */
     cab_ULONG window_posn;     /* current offset within the window        */
+    cab_ULONG window_filled;   /* valid history in the window, up to its size */
     cab_ULONG R0, R1, R2;      /* for the LRU offset system               */
     cab_UWORD main_elements;   /* number of main tree elements            */
     gint   header_read;         /* have we started decoding at all yet?    */
