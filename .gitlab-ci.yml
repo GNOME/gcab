@@ -7,3 +7,32 @@ include:
  - component: gitlab.gnome.org/GNOME/citemplates/release-service@master
    inputs:
      dist-job-name: "build-gnomeos"
+
+fuzz-asan-ubsan:
+  stage: test
+  image:
+    name: quay.io/gnome_infrastructure/gnome-build-meta:gnomeos-devel-nightly
+    docker:
+      user: "root"
+  tags:
+    - "asan"
+  needs: []
+  variables:
+    ASAN_OPTIONS: "detect_leaks=0:abort_on_error=1"
+    UBSAN_OPTIONS: "print_stacktrace=1:halt_on_error=1:abort_on_error=1"
+    CFLAGS: "-fno-omit-frame-pointer -O1 -g"
+    CXXFLAGS: "$CFLAGS"
+    GIO_USE_VFS: "local"
+  script:
+    - meson setup _build_fuzz -Db_sanitize=address,undefined -Ddocs=false -Dintrospection=false -Dvapi=false -Dnls=false -Dtests=false
+    - meson compile -C _build_fuzz
+    - |
+      for cab in tests/*.cab; do
+        echo "Fuzzing ${cab}"
+        _build_fuzz/src/gcab-fuzz "${cab}"
+      done
+  artifacts:
+    when: on_failure
+    expire_in: "7 days"
+    paths:
+      - "_build_fuzz/meson-logs/"

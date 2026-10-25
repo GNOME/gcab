@@ -72,8 +72,10 @@ main (gint argc, gchar *argv[])
     for (gint i = 1; i < argc; i++) {
         g_autoptr(GFile) file = g_file_new_for_commandline_arg (argv[i]);
         if (!_process_file (file, &error)) {
+            /* malformed input is expected when running a fuzzing corpus;
+             * only crashes and sanitizer failures should fail the process */
             g_printerr ("Failed to read %s: %s\n", argv[i], error->message);
-            return EXIT_FAILURE;
+            g_clear_error (&error);
         }
     }
 
