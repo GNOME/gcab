@@ -40,9 +40,7 @@ fuzz-asan-ubsan:
 fuzz-libfuzzer:
   stage: test
   image:
-    name: quay.io/gnome_infrastructure/gnome-build-meta:gnomeos-devel-nightly
-    docker:
-      user: "root"
+    name: quay.io/fedora/fedora:44
   tags:
     - "asan"
   needs: []
@@ -52,6 +50,10 @@ fuzz-libfuzzer:
     ASAN_OPTIONS: "detect_leaks=0:abort_on_error=1"
     UBSAN_OPTIONS: "print_stacktrace=1:halt_on_error=1:abort_on_error=1"
     GIO_USE_VFS: "local"
+  before_script:
+    # The GNOME build image ships clang without compiler-rt, so its sanitizer
+    # runtimes are unavailable. Use a toolchain image that includes them.
+    - dnf -y --setopt=install_weak_deps=False install meson ninja-build clang compiler-rt glib2-devel zlib-devel pkgconf-pkg-config git
   script:
     - meson setup _build_libfuzzer -Dlibfuzzer=true -Dtest-env=true -Db_sanitize=address,undefined -Db_lundef=false -Ddocs=false -Dintrospection=false -Dvapi=false -Dnls=false -Dtests=false
     - meson compile -C _build_libfuzzer gcab-fuzz-libfuzzer
