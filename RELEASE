@@ -1,36 +1,85 @@
 GCab Release Notes
 
-1. Write NEWS entries for GCab in the same format as usual.
+This document describes the public release workflow. Local development may
+use jj; the release commit, tag and push are done through git.
 
-git shortlog v1.1.. | grep -i -v trivial | grep -v Merge > NEWS.new
+Note: if your working copy is a jj-colocated checkout, do not run git commit
+or git tag against jj's detached HEAD. Use a normal git clone for the release,
+or make sure the final release commit has already been exported to git.
 
 --------------------------------------------------------------------------------
-v1.2
-====
 
-Notes:
+1. Prepare the release
 
-New Features:
+   - Update NEWS at your discretion before making the release commit.
 
-Bugfixes:
---------------------------------------------------------------------------------
+   - Update the project version in meson.build to the new release version.
 
-4. Commit changes:
+   - Make sure the release commit is the intended final commit and that the
+     working tree is clean:
 
-# MAKE SURE THESE ARE CORRECT
-export release_version="1.2"
-export release_tag="v1.2"
+       git status --short
 
-git commit -a -m "Release ${release_version}"
-git tag -s -f -m "Release ${release_version}" "${release_tag}"
-<gpg password>
-git push --tags
-git push
+2. Build and test from a clean tree
 
-5. run 'ninja dist'
+       meson setup _build .
+       meson compile -C _build
+       meson test -C _build --print-errorlogs
 
-6. Upload tarball:
+   Optionally verify the release tarball builds and tests successfully:
 
-scp meson-dist/*.tar.xz rhughes@master.gnome.org:
-ssh rhughes@master.gnome.org
-ftpadmin install gcab-*.tar.xz
+       meson dist -C _build
+       tar -xf _build/meson-dist/gcab-<version>.tar.xz -C /tmp
+       cd /tmp/gcab-<version>
+       meson setup _dist-build .
+       meson compile -C _dist-build
+       meson test -C _dist-build --print-errorlogs
+
+3. Commit and push the release commit
+
+   Set the release version and tag:
+
+       export release_version="1.7"
+       export release_tag="${release_version}"
+
+   The version must match meson.build. The tag must be the bare version
+   number, without a "v" prefix, because GNOME's release service expects the
+   tarball to be named gcab-${release_tag}.tar.xz.
+
+   Stage only the intended release files (include NEWS if you updated it):
+
+       git add meson.build NEWS
+       git commit -m "Release ${release_version}"
+       git push origin HEAD
+
+4. Create and push the signed tag
+
+   Follow the GNOME handbook. Preferred, if git-evtag is available:
+
+       git evtag sign "${release_tag}"
+
+   Fallback:
+
+       git tag -s -m "GCab ${release_version}" "${release_tag}"
+
+   Then push the tag:
+
+       git push origin "${release_tag}"
+
+   Do not use "git tag -f" for a final release tag. Do not prefix the tag with
+   "v": the release tarball must remain gcab-${release_tag}.tar.xz.
+
+5. Release service (normal path)
+
+   The .gitlab-ci.yml pipeline includes the GNOME release-service. On a
+   protected release tag it:
+
+   - uses the tarball produced by the configured dist job ("build-gnomeos"),
+   - uploads the tarball and its sha256sum to download.gnome.org,
+   - creates the GitLab release from the tag message.
+
+   GNOME protects tags in the GNOME group automatically; ensure the tag was
+   accepted as protected, then monitor the pipeline until the release-service
+   job succeeds.
+
+   No manual upload is needed when the release service is available.
