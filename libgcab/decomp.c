@@ -893,7 +893,10 @@ gint LZXfdi_decomp(gint inlen, gint outlen, fdi_decomp_state *decomp_state) {
     /* last block finished, new block expected */
     if (LZX(block_remaining) == 0) {
       if (LZX(block_type) == LZX_BLOCKTYPE_UNCOMPRESSED) {
-        if (LZX(block_length) & 1) inpos++; /* realign bitstream to word */
+        if (LZX(block_length) & 1) { /* realign bitstream to word */
+          if (inpos >= endinp) return DECR_ILLEGALDATA;
+          inpos++;
+        }
         INIT_BITSTREAM;
       }
 
@@ -923,6 +926,7 @@ gint LZXfdi_decomp(gint inlen, gint outlen, fdi_decomp_state *decomp_state) {
         LZX(intel_started) = 1; /* because we can't assume otherwise */
         ENSURE_BITS(16); /* get up to 16 pad bits into the buffer */
         if (bitsleft > 16) inpos -= 2; /* and align the bitstream! */
+        if (endinp - inpos < 12) return DECR_ILLEGALDATA;
         R0 = inpos[0]|(inpos[1]<<8)|(inpos[2]<<16)|(inpos[3]<<24);inpos+=4;
         R1 = inpos[0]|(inpos[1]<<8)|(inpos[2]<<16)|(inpos[3]<<24);inpos+=4;
         R2 = inpos[0]|(inpos[1]<<8)|(inpos[2]<<16)|(inpos[3]<<24);inpos+=4;
