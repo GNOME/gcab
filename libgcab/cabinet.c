@@ -614,6 +614,12 @@ cdata_decompress (cdata_t *cd, gint comptype, GError **error)
             goto end;
     }
 
+    if (compression == GCAB_COMPRESSION_NONE) {
+        /* uncompressed CDATA must not expose stale output buffer contents */
+        if (cd->ncbytes != cd->nubytes)
+            goto end;
+    }
+
     if (compression == GCAB_COMPRESSION_MSZIP) {
         if (cd->ncbytes < 2)
             goto end;
