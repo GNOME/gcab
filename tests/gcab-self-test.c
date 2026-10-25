@@ -38,6 +38,16 @@ gcab_test_get_filename (const gchar *filename)
     return g_test_build_filename (G_TEST_DIST, filename, NULL);
 }
 
+static gboolean
+gcab_test_count_file_callback (GCabFile *file, gpointer user_data)
+{
+    guint *count = user_data;
+
+    (void)file;
+    (*count)++;
+    return TRUE;
+}
+
 static void
 gcab_test_file_func (void)
 {
@@ -76,6 +86,148 @@ gcab_test_file_func (void)
     gcab_file_set_extract_name (cabfile, "new.bin");
     g_assert_cmpstr (gcab_file_get_extract_name (cabfile), ==, "new.bin");
     g_assert_cmpstr (gcab_file_get_name (cabfile), ==, "tæst.bin");
+
+    /* deprecated GTimeVal accessors */
+    G_GNUC_BEGIN_IGNORE_DEPRECATIONS
+    GTimeVal tv = { 0 };
+    GTimeVal tv_new = { 1500000000, 0 };
+    GTimeVal tv_out = { 0 };
+    g_assert_true (gcab_file_get_date (cabfile, &tv));
+    g_assert_cmpint (tv.tv_sec, ==, g_date_time_to_unix (dt_bday));
+    gcab_file_set_date (cabfile, &tv_new);
+    g_assert_true (gcab_file_get_date (cabfile, &tv_out));
+    g_assert_cmpint (tv_out.tv_sec, ==, tv_new.tv_sec);
+    G_GNUC_END_IGNORE_DEPRECATIONS
+}
+
+static void
+_gcab_test_file_properties_func (void)
+{
+    const gchar new_contents[] = "new contents";
+    g_autoptr(GCabFile) cabfile = NULL;
+    g_autoptr(GBytes) bytes = g_bytes_new_static ("contents", 8);
+    g_autoptr(GBytes) bytes_new = g_bytes_new_static (new_contents, sizeof (new_contents) - 1);
+    g_autoptr(GBytes) bytes_out = NULL;
+    g_autoptr(GFile) gfile = g_file_new_for_path ("/tmp/gcab-property-test.bin");
+    g_autoptr(GFile) file_out = NULL;
+    g_autofree gchar *name = NULL;
+
+    /* exercise the GObject properties directly */
+    cabfile = gcab_file_new_with_bytes ("property.bin", bytes);
+    g_assert_nonnull (cabfile);
+
+    /* no date has been set yet */
+    G_GNUC_BEGIN_IGNORE_DEPRECATIONS
+    GTimeVal tv = { 0 };
+    g_assert_false (gcab_file_get_date (cabfile, &tv));
+    G_GNUC_END_IGNORE_DEPRECATIONS
+
+    g_object_get (cabfile,
+                  "name", &name,
+                  "file", &file_out,
+                  "bytes", &bytes_out,
+                  NULL);
+    g_assert_cmpstr (name, ==, "property.bin");
+    g_assert_null (file_out);
+    g_assert_true (bytes_out == bytes);
+
+    g_object_set (cabfile, "name", "renamed.bin", NULL);
+    g_assert_cmpstr (gcab_file_get_name (cabfile), ==, "renamed.bin");
+
+    g_object_set (cabfile, "file", gfile, NULL);
+    g_clear_pointer (&file_out, g_object_unref);
+    g_object_get (cabfile, "file", &file_out, NULL);
+    g_assert_true (file_out == gfile);
+
+    /* replacing an existing GBytes also exercises the old-value cleanup */
+    g_object_set (cabfile, "bytes", bytes_new, NULL);
+    g_clear_pointer (&bytes_out, g_bytes_unref);
+    g_object_get (cabfile, "bytes", &bytes_out, NULL);
+    g_assert_true (bytes_out == bytes_new);
+    g_assert_cmpuint (gcab_file_get_size (cabfile), ==, sizeof (new_contents) - 1);
+}
+
+static void
+_gcab_test_folder_properties_func (void)
+{
+    const guint8 data[] = { 0x01, 0x02, 0x03, 0x04 };
+    g_autoptr(GCabFolder) cabfolder = NULL;
+    g_autoptr(GByteArray) reserved = g_byte_array_new_take (g_memdup2 (data, sizeof (data)), sizeof (data));
+    g_autoptr(GByteArray) reserved_new = g_byte_array_new_take (g_memdup2 (data, 2), 2);
+    g_autoptr(GByteArray) reserved_out = NULL;
+    gint comptype = 0;
+    gint compression = -1;
+
+    /* exercise the GObject properties directly */
+    cabfolder = g_object_new (GCAB_TYPE_FOLDER,
+                              "comptype", GCAB_COMPRESSION_MSZIP | 0x20,
+                              "reserved", reserved,
+                              NULL);
+    g_assert_nonnull (cabfolder);
+
+    g_object_get (cabfolder,
+                  "compression", &compression,
+                  "comptype", &comptype,
+                  "reserved", &reserved_out,
+                  NULL);
+    g_assert_cmpint (compression, ==, GCAB_COMPRESSION_MSZIP);
+    g_assert_cmpint (comptype, ==, GCAB_COMPRESSION_MSZIP | 0x20);
+    g_assert_cmpuint (reserved_out->len, ==, sizeof (data));
+    g_assert_cmpmem (reserved_out->data, reserved_out->len, data, sizeof (data));
+
+    /* replacing the reserved area also exercises the old-value cleanup */
+    g_object_set (cabfolder, "reserved", reserved_new, NULL);
+    g_clear_pointer (&reserved_out, g_byte_array_unref);
+    g_object_get (cabfolder, "reserved", &reserved_out, NULL);
+    g_assert_cmpuint (reserved_out->len, ==, 2);
+    g_assert_cmpmem (reserved_out->data, reserved_out->len, data, 2);
+}
+
+static void
+_gcab_test_cabinet_properties_func (void)
+{
+    const guint8 data[] = { 0x09, 0x08, 0x07, 0x06 };
+    g_autoptr(GCabCabinet) cabinet = gcab_cabinet_new ();
+    g_autoptr(GByteArray) reserved = g_byte_array_new_take (g_memdup2 (data, sizeof (data)), sizeof (data));
+    g_autoptr(GByteArray) reserved_new = g_byte_array_new_take (g_memdup2 (data, 2), 2);
+    g_autoptr(GByteArray) reserved_out = NULL;
+    g_autoptr(GByteArray) signature = g_byte_array_new_take (g_memdup2 (data, sizeof (data)), sizeof (data));
+    g_autoptr(GByteArray) signature_new = g_byte_array_new_take (g_memdup2 (data, 2), 2);
+    g_autoptr(GByteArray) signature_out = NULL;
+
+    g_assert_nonnull (cabinet);
+    g_assert_null (gcab_cabinet_get_next_name (cabinet));
+    g_assert_null (gcab_cabinet_get_prev_name (cabinet));
+    g_assert_null (gcab_cabinet_get_next (cabinet));
+    g_assert_null (gcab_cabinet_get_prev (cabinet));
+
+    g_object_set (cabinet, "reserved", reserved, NULL);
+    g_object_get (cabinet, "reserved", &reserved_out, NULL);
+    g_assert_cmpuint (reserved_out->len, ==, sizeof (data));
+    g_assert_cmpmem (reserved_out->data, reserved_out->len, data, sizeof (data));
+
+    /* replacing the reserved area also exercises the old-value cleanup */
+    g_object_set (cabinet, "reserved", reserved_new, NULL);
+    g_clear_pointer (&reserved_out, g_byte_array_unref);
+    g_object_get (cabinet, "reserved", &reserved_out, NULL);
+    g_assert_cmpuint (reserved_out->len, ==, 2);
+
+    g_object_set (cabinet, "signature", signature, NULL);
+    g_object_get (cabinet, "signature", &signature_out, NULL);
+    g_assert_cmpuint (signature_out->len, ==, sizeof (data));
+    g_assert_cmpmem (signature_out->data, signature_out->len, data, sizeof (data));
+
+    /* replacing the signature also exercises the old-value cleanup */
+    g_object_set (cabinet, "signature", signature_new, NULL);
+    g_clear_pointer (&signature_out, g_byte_array_unref);
+    g_object_get (cabinet, "signature", &signature_out, NULL);
+    g_assert_cmpuint (signature_out->len, ==, 2);
+
+    /* extraction limits have setters and getters */
+    gcab_cabinet_set_extract_size_limit (cabinet, 1234);
+    g_assert_cmpuint (gcab_cabinet_get_extract_size_limit (cabinet), ==, 1234);
+    gcab_cabinet_set_extract_ratio_limit (cabinet, 42);
+    g_assert_cmpuint (gcab_cabinet_get_extract_ratio_limit (cabinet), ==, 42);
 }
 
 static void
@@ -135,6 +287,7 @@ gcab_test_folder_path_func (void)
     g_autofree gchar *fn = NULL;
     g_autoptr(GCabFile) cabfile = NULL;
     g_autoptr(GCabFolder) cabfolder = NULL;
+    g_autoptr(GCabFolder) cabfolder_norecurse = NULL;
     g_autoptr(GError) error = NULL;
     g_autoptr(GFile) gfile = NULL;
     g_autoptr(GSList) cabfiles = NULL;
@@ -156,6 +309,13 @@ gcab_test_folder_path_func (void)
     g_assert (cabfile_tmp != cabfile);
     g_assert_cmpstr (gcab_file_get_name (cabfile_tmp), ==, "dirname\\test.txt");
     g_assert_cmpstr (gcab_file_get_extract_name (cabfile_tmp), ==, "dirname\\test.txt");
+
+    /* a directory with recursion disabled is accepted but adds no files */
+    cabfolder_norecurse = gcab_folder_new (GCAB_COMPRESSION_NONE);
+    ret = gcab_folder_add_file (cabfolder_norecurse, cabfile, FALSE, NULL, &error);
+    g_assert_no_error (error);
+    g_assert_true (ret);
+    g_assert_cmpuint (gcab_folder_get_nfiles (cabfolder_norecurse), ==, 0);
 
     /* add it again */
     ret = gcab_folder_add_file (cabfolder, cabfile, TRUE, NULL, &error);
@@ -226,6 +386,105 @@ gcab_test_cabinet_func (void)
     g_assert_cmpint (cabfolders->len, ==, 1);
 }
 
+static GBytes *
+_gcab_test_write_cabinet (GCabCabinet *cabinet, GCabFileCallback file_callback,
+                          gpointer user_data, GError **error)
+{
+    g_autoptr(GOutputStream) op = g_memory_output_stream_new_resizable ();
+
+    if (!gcab_cabinet_write_simple (cabinet, op, file_callback, user_data,
+                                    NULL, error))
+        return NULL;
+    if (!g_output_stream_close (op, NULL, error))
+        return NULL;
+
+    return g_memory_output_stream_steal_as_bytes (G_MEMORY_OUTPUT_STREAM (op));
+}
+
+static void
+gcab_test_cabinet_error_multiple_folders_func (void)
+{
+    gboolean ret;
+    g_autoptr(GCabCabinet) cabinet = gcab_cabinet_new ();
+    g_autoptr(GCabFolder) folder = gcab_folder_new (GCAB_COMPRESSION_NONE);
+    g_autoptr(GCabFolder) folder2 = gcab_folder_new (GCAB_COMPRESSION_NONE);
+    g_autoptr(GError) error = NULL;
+    g_autoptr(GOutputStream) op = g_memory_output_stream_new_resizable ();
+
+    ret = gcab_cabinet_add_folder (cabinet, folder, &error);
+    g_assert_no_error (error);
+    g_assert_true (ret);
+    ret = gcab_cabinet_add_folder (cabinet, folder2, &error);
+    g_assert_no_error (error);
+    g_assert_true (ret);
+
+    ret = gcab_cabinet_write_simple (cabinet, op, NULL, NULL, NULL, &error);
+    g_assert_error (error, GCAB_ERROR, GCAB_ERROR_NOT_SUPPORTED);
+    g_assert_false (ret);
+}
+
+static void
+gcab_test_cabinet_reserved_func (void)
+{
+    const guint8 bad_magic[20] = { 0, };
+    const guint8 bad_offset[20] = {
+        0x00, 0x00, 0x10, 0x00,
+        0xff, 0xff, 0xff, 0xff,
+        0x04, 0x00, 0x00, 0x00,
+    };
+    const struct {
+        const guint8 *data;
+        GCabError expected;
+    } tests[] = {
+        { bad_magic, GCAB_ERROR_FORMAT },
+        { bad_offset, GCAB_ERROR_INVALID_DATA },
+    };
+
+    for (guint i = 0; i < G_N_ELEMENTS (tests); i++) {
+        gboolean ret;
+        g_autoptr(GCabCabinet) cabinet = gcab_cabinet_new ();
+        g_autoptr(GCabCabinet) loaded = gcab_cabinet_new ();
+        g_autoptr(GCabFolder) folder = gcab_folder_new (GCAB_COMPRESSION_NONE);
+        g_autoptr(GBytes) file_bytes = g_bytes_new_static ("x", 1);
+        g_autoptr(GCabFile) cabfile = gcab_file_new_with_bytes ("test.txt", file_bytes);
+        g_autoptr(GByteArray) reserved = g_byte_array_new_take (g_memdup2 (tests[i].data, 20), 20);
+        g_autoptr(GError) error = NULL;
+
+        ret = gcab_cabinet_add_folder (cabinet, folder, &error);
+        g_assert_no_error (error);
+        g_assert_true (ret);
+        ret = gcab_folder_add_file (folder, cabfile, FALSE, NULL, &error);
+        g_assert_no_error (error);
+        g_assert_true (ret);
+
+        g_object_set (cabinet, "reserved", reserved, NULL);
+        g_autoptr(GBytes) blob = _gcab_test_write_cabinet (cabinet, NULL, NULL, &error);
+        g_assert_no_error (error);
+        g_assert_nonnull (blob);
+
+        g_autoptr(GInputStream) in = g_memory_input_stream_new_from_bytes (blob);
+        ret = gcab_cabinet_load (loaded, in, NULL, &error);
+        g_assert_no_error (error);
+        g_assert_true (ret);
+
+        g_autoptr(GError) signature_error = NULL;
+        g_assert_null (gcab_cabinet_get_signature (loaded, NULL, &signature_error));
+        g_assert_error (signature_error, GCAB_ERROR, (gint) tests[i].expected);
+    }
+
+    /* a cabinet without a reserved area has no signature either */
+    g_autofree gchar *fn = gcab_test_get_filename ("test-none.cab");
+    g_autoptr(GFile) file = g_file_new_for_path (fn);
+    g_autoptr(GCabCabinet) loaded = gcab_cabinet_new ();
+    g_autoptr(GError) error = NULL;
+
+    g_assert_true (gcab_cabinet_load_from_file (loaded, file, NULL, &error));
+    g_assert_no_error (error);
+    g_autoptr(GError) signature_error = NULL;
+    g_assert_null (gcab_cabinet_get_signature (loaded, NULL, &signature_error));
+    g_assert_error (signature_error, GCAB_ERROR, GCAB_ERROR_FAILED);
+}
+
 static void
 gcab_test_cabinet_error_not_seekable_func (void)
 {
@@ -258,6 +517,7 @@ static void
 gcab_test_cabinet_blob_func (void)
 {
     gboolean ret;
+    guint nfiles_cb = 0;
     g_autoptr(GError) error = NULL;
     g_autoptr(GCabCabinet) cabinet = gcab_cabinet_new ();
 
@@ -294,9 +554,11 @@ gcab_test_cabinet_blob_func (void)
 
     /* write to a blob */
     g_autoptr(GOutputStream) op = g_memory_output_stream_new_resizable ();
-    ret = gcab_cabinet_write_simple (cabinet, op, NULL, NULL, NULL, &error);
+    ret = gcab_cabinet_write_simple (cabinet, op, gcab_test_count_file_callback,
+                                     &nfiles_cb, NULL, &error);
     g_assert_no_error (error);
     g_assert (ret);
+    g_assert_cmpuint (nfiles_cb, ==, 2);
 
     /* get what the checksum is supposed to be */
     g_autofree gchar *fn = gcab_test_get_filename ("test-none.cab");
@@ -339,6 +601,7 @@ gcab_test_cabinet_load_func (void)
         GCabFolder *cabfolder_tmp;
         GPtrArray *cabfolders;
         gboolean ret;
+        guint nfiles_cb = 0;
         g_autofree gchar *fn = NULL;
         g_autoptr(GCabCabinet) cabinet = NULL;
         g_autoptr(GError) error = NULL;
@@ -385,9 +648,12 @@ gcab_test_cabinet_load_func (void)
         }
 
         file_tmpdir = g_file_new_for_path ("/tmp");
-        ret = gcab_cabinet_extract_simple (cabinet, file_tmpdir, NULL, NULL, NULL, &error);
+        ret = gcab_cabinet_extract_simple (cabinet, file_tmpdir,
+                                           gcab_test_count_file_callback,
+                                           &nfiles_cb, NULL, &error);
         g_assert_no_error (error);
         g_assert (ret);
+        g_assert_cmpuint (nfiles_cb, ==, 2);
 
         /* check files were decompressed okay */
         for (guint j = 0; files[j].fn != NULL; j++) {
@@ -1101,10 +1367,15 @@ main (gint argc, gchar **argv)
 
     /* tests go here */
     g_test_add_func ("/GCab/file", gcab_test_file_func);
+    g_test_add_func ("/GCab/file{properties}", _gcab_test_file_properties_func);
     g_test_add_func ("/GCab/folder", gcab_test_folder_func);
+    g_test_add_func ("/GCab/folder{properties}", _gcab_test_folder_properties_func);
     g_test_add_func ("/GCab/folder{path}", gcab_test_folder_path_func);
     g_test_add_func ("/GCab/folder{cdata-range}", gcab_test_folder_cdata_range_func);
     g_test_add_func ("/GCab/cabinet", gcab_test_cabinet_func);
+    g_test_add_func ("/GCab/cabinet{properties}", _gcab_test_cabinet_properties_func);
+    g_test_add_func ("/GCab/cabinet{error-multiple-folders}", gcab_test_cabinet_error_multiple_folders_func);
+    g_test_add_func ("/GCab/cabinet{reserved}", gcab_test_cabinet_reserved_func);
     g_test_add_func ("/GCab/cabinet{error-not-seekable}", gcab_test_cabinet_error_not_seekable_func);
     g_test_add_func ("/GCab/cabinet{error-not-loaded}", gcab_test_cabinet_error_not_loaded_func);
     g_test_add_func ("/GCab/cabinet{error-no-folders}", gcab_test_cabinet_error_no_folders_func);
