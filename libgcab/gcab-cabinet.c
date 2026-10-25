@@ -427,6 +427,9 @@ gcab_cabinet_new (void)
 static gboolean
 gcab_cabinet_is_compression_allowed(GCabCabinet *self, GCabCompression compression)
 {
+    /* the cabinet folder stores compression-specific flags in the upper bits */
+    compression &= GCAB_COMPRESSION_MASK;
+
     /* for the fuzzing self tests */
     if (self->allowed_compression == 0)
         return TRUE;
