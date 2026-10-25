@@ -39,6 +39,33 @@
                                           _GCAB_GET (data, 1, 32,  8) |  \
                                           _GCAB_GET (data, 0, 32,  0))
 
+static inline gboolean
+_gcab_folder_get_cdata_range (guint64 nubytes,
+                              guint64 uoffset,
+                              guint64 usize,
+                              guint16 cdata_nubytes,
+                              gsize *offset,
+                              gsize *count)
+{
+    guint64 cdata_offset;
+    guint64 cdata_count;
+
+    if (uoffset < nubytes || cdata_nubytes == 0)
+        return FALSE;
+
+    cdata_offset = uoffset - nubytes;
+    if (cdata_offset >= cdata_nubytes)
+        return FALSE;
+
+    cdata_count = MIN (usize, (guint64) cdata_nubytes - cdata_offset);
+    if (cdata_count == 0)
+        return FALSE;
+
+    *offset = (gsize) cdata_offset;
+    *count = (gsize) cdata_count;
+    return TRUE;
+}
+
 GCabFolder *     gcab_folder_new_steal_cfolder       (cfolder_t **cfolder);
 GCabFile *       gcab_file_new_steal_cfile           (cfile_t   **cfile);
 

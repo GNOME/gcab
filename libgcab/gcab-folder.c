@@ -517,7 +517,7 @@ gcab_folder_extract (GCabFolder *self,
     g_autoptr(GSList) files = NULL;
     g_autoptr(cdata_t) cdata = g_new0 (cdata_t, 1);
     GCabFolderReader reader;
-    guint32 nubytes = 0;
+    guint64 nubytes = 0;
 
     /* never loaded from a stream */
     g_assert (self->cfolder != NULL);
@@ -547,8 +547,8 @@ gcab_folder_extract (GCabFolder *self,
         if (out == NULL)
             return FALSE;
 
-        guint32 usize = gcab_file_get_usize (file);
-        guint32 uoffset = gcab_file_get_uoffset (file);
+        guint64 usize = gcab_file_get_usize (file);
+        guint64 uoffset = gcab_file_get_uoffset (file);
 
         /* let's rewind if need be */
         if (uoffset < nubytes) {
@@ -562,17 +562,25 @@ gcab_folder_extract (GCabFolder *self,
         }
 
         while (usize > 0) {
-            if ((nubytes + cdata->nubytes) <= uoffset) {
+            if (uoffset >= nubytes &&
+                cdata->nubytes <= uoffset - nubytes) {
                 nubytes += cdata->nubytes;
                 if (!folder_reader_read_cdata (&reader, self, cdata,
                                                cancellable, error))
                     return FALSE;
                 continue;
             } else {
-                gsize offset = gcab_file_get_uoffset (file) > nubytes ?
-                    gcab_file_get_uoffset (file) - nubytes : 0;
-                const void *p = &cdata->out[offset];
-                gsize count = MIN (usize, cdata->nubytes - offset);
+                gsize offset, count;
+                const void *p;
+
+                if (!_gcab_folder_get_cdata_range (nubytes, uoffset, usize,
+                                                   cdata->nubytes, &offset, &count)) {
+                    g_set_error (error, GCAB_ERROR, GCAB_ERROR_INVALID_DATA,
+                                 "Invalid file offset in cabinet folder");
+                    return FALSE;
+                }
+
+                p = &cdata->out[offset];
                 if (!g_output_stream_write_all (G_OUTPUT_STREAM (out), p, count,
                                                 NULL, cancellable, error))
                     return FALSE;

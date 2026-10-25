@@ -26,6 +26,8 @@
 
 #include <libgcab.h>
 
+#include "gcab-priv.h"
+
 #ifndef G_OS_WIN32
 #include <unistd.h>
 #endif
@@ -839,6 +841,38 @@ gcab_test_cabinet_lzx_overrun_func (void)
     g_assert_false (ret);
 }
 
+static void
+gcab_test_folder_cdata_range_func (void)
+{
+    gsize offset = 0;
+    gsize count = 0;
+    const guint64 beyond_32bit = (guint64) G_MAXUINT32 + 1;
+
+    /* normal range */
+    g_assert_true (_gcab_folder_get_cdata_range (0, 0, 10, 10, &offset, &count));
+    g_assert_cmpuint (offset, ==, 0);
+    g_assert_cmpuint (count, ==, 10);
+
+    /* file starts partway through the block */
+    g_assert_true (_gcab_folder_get_cdata_range (0, 5, 10, 10, &offset, &count));
+    g_assert_cmpuint (offset, ==, 5);
+    g_assert_cmpuint (count, ==, 5);
+
+    /* counters must not wrap at 32 bits */
+    g_assert_true (_gcab_folder_get_cdata_range (beyond_32bit, beyond_32bit + 2,
+                                                 10, 10, &offset, &count));
+    g_assert_cmpuint (offset, ==, 2);
+    g_assert_cmpuint (count, ==, 8);
+
+    /* offset at or beyond the end of the CDATA block is invalid */
+    g_assert_false (_gcab_folder_get_cdata_range (0, 10, 1, 10, &offset, &count));
+    g_assert_false (_gcab_folder_get_cdata_range (beyond_32bit, beyond_32bit + 10,
+                                                  1, 10, &offset, &count));
+
+    /* offsets before the current block are invalid */
+    g_assert_false (_gcab_folder_get_cdata_range (10, 5, 1, 10, &offset, &count));
+}
+
 #ifndef G_OS_WIN32
 static GCabCabinet *
 _gcab_test_cabinet_new_with_file_name (const gchar *name, GError **error)
@@ -991,6 +1025,7 @@ main (gint argc, gchar **argv)
     g_test_add_func ("/GCab/file", gcab_test_file_func);
     g_test_add_func ("/GCab/folder", gcab_test_folder_func);
     g_test_add_func ("/GCab/folder{path}", gcab_test_folder_path_func);
+    g_test_add_func ("/GCab/folder{cdata-range}", gcab_test_folder_cdata_range_func);
     g_test_add_func ("/GCab/cabinet", gcab_test_cabinet_func);
     g_test_add_func ("/GCab/cabinet{error-not-seekable}", gcab_test_cabinet_error_not_seekable_func);
     g_test_add_func ("/GCab/cabinet{error-not-loaded}", gcab_test_cabinet_error_not_loaded_func);
