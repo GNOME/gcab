@@ -15,6 +15,7 @@ if installed_tests_enabled
     'test-multicab-a.cab',
     'test-multicab-b.cab',
     'test-multicab-c.cab',
+    'test-lzx-frame-wrap.cab',
     'test-lzx-offset-before-data.cab',
     'test-lzx-offset-overflow.cab',
     'test-lzx-overrun.cab',

@@ -856,6 +856,7 @@ gint LZXfdi_decomp(gint inlen, gint outlen, fdi_decomp_state *decomp_state) {
   cab_ULONG window_posn = LZX(window_posn);
   cab_ULONG window_size = LZX(window_size);
   cab_ULONG window_filled = LZX(window_filled);
+  cab_ULONG frame_start = window_posn & (window_size - 1);
   cab_ULONG R0 = LZX(R0);
   cab_ULONG R1 = LZX(R1);
   cab_ULONG R2 = LZX(R2);
@@ -867,6 +868,11 @@ gint LZXfdi_decomp(gint inlen, gint outlen, fdi_decomp_state *decomp_state) {
 
   gint togo = outlen, this_run, main_element, aligned_bits;
   gint match_length, copy_length, length_footer, extra, verbatim_bits;
+
+  /* a frame must fit in one pass through the window; individual runs are
+   * already prevented from crossing the wrap */
+  if ((cab_ULONG) outlen > window_size - frame_start)
+    return DECR_DATAFORMAT;
 
   INIT_BITSTREAM;
 
@@ -1163,8 +1169,7 @@ gint LZXfdi_decomp(gint inlen, gint outlen, fdi_decomp_state *decomp_state) {
   }
 
   if (togo != 0) return DECR_ILLEGALDATA;
-  memcpy(CAB(outbuf), window + ((!window_posn) ? window_size : window_posn) -
-    outlen, (size_t) outlen);
+  memcpy(CAB(outbuf), window + frame_start, (size_t) outlen);
 
   LZX(window_posn) = window_posn;
   LZX(window_filled) = window_filled;
