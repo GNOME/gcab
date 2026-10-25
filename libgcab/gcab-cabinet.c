@@ -1065,7 +1065,9 @@ gcab_cabinet_get_signature (GCabCabinet *self,
                             GError **error)
 {
     const guint8 magic[] = { 0x00, 0x00, 0x10, 0x00 };
+    g_autoptr(GByteArray) signature = NULL;
     gssize sz;
+    goffset end;
     guint8 *reserved;
     guint32 offset;
     guint32 size;
@@ -1101,27 +1103,45 @@ gcab_cabinet_get_signature (GCabCabinet *self,
     if (g_getenv ("GCAB_DEBUG"))
         g_debug ("signature offset: %u size: %u", offset, size);
 
-    self->signature = g_byte_array_sized_new (size);
-    g_byte_array_set_size (self->signature, size);
+    if (!g_seekable_seek (G_SEEKABLE (self->stream), 0, G_SEEK_END,
+                          cancellable, error)) {
+        g_prefix_error (error, "Cannot seek to end of cabinet: ");
+        return NULL;
+    }
+    end = g_seekable_tell (G_SEEKABLE (self->stream));
+    if (end < 0) {
+        g_set_error (error, GCAB_ERROR, GCAB_ERROR_INVALID_DATA,
+                     "Cannot determine cabinet size");
+        return NULL;
+    }
+    if (offset > (guint64) end || size > (guint64) end - offset) {
+        g_set_error (error, GCAB_ERROR, GCAB_ERROR_INVALID_DATA,
+                     "Signature offset and size are outside the cabinet");
+        return NULL;
+    }
 
-    if (!g_seekable_seek (G_SEEKABLE (self->stream), offset, G_SEEK_SET, cancellable, error)) {
+    if (!g_seekable_seek (G_SEEKABLE (self->stream), offset, G_SEEK_SET,
+                          cancellable, error)) {
         g_set_error (error, GCAB_ERROR, GCAB_ERROR_INVALID_DATA,
                      "Cannot seek to reserved area");
         return NULL;
     }
 
-    sz = g_input_stream_read (self->stream,
-                              self->signature->data, self->signature->len,
+    signature = g_byte_array_sized_new (size);
+    g_byte_array_set_size (signature, size);
+
+    sz = g_input_stream_read (self->stream, signature->data, signature->len,
                               cancellable, error);
     if (sz < 0) {
         g_prefix_error (error, "Failed to read signature from stream: ");
         return NULL;
     }
-    if (sz != self->signature->len) {
+    if (sz != signature->len) {
         g_set_error (error, GCAB_ERROR, GCAB_ERROR_FAILED,
                      "Failed to read correct size signature from stream: ");
         return NULL;
     }
 
+    self->signature = g_steal_pointer (&signature);
     return self->signature;
 }
