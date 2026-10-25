@@ -681,68 +681,6 @@ end:
     return success;
 }
 
-G_GNUC_INTERNAL gboolean
-cdata_read (cdata_t *cd, guint8 res_data, gint comptype,
-            GDataInputStream *in, GCancellable *cancellable, GError **error)
-
-{
-    gint compression = comptype & GCAB_COMPRESSION_MASK;
-    gsize buf_sz;
-    guint8 *buf = NULL;
-    guint32 checksum_tmp;
-    gboolean success = FALSE;
-
-    if (!cdata_get_read_buf (cd, compression, &buf, &buf_sz, error))
-        return FALSE;
-
-    R4 (cd->checksum);
-    R2 (cd->ncbytes);
-    if (cd->ncbytes > buf_sz) {
-        g_set_error (error, GCAB_ERROR, GCAB_ERROR_INVALID_DATA,
-                     "tried to decompress %" G_GUINT16_FORMAT " bytes "
-                     "into buffer of size %" G_GSIZE_FORMAT,
-                     cd->ncbytes, buf_sz);
-        goto end;
-    }
-    R2 (cd->nubytes);
-    if (cd->nubytes > CAB_MAX_BLOCK_SIZE) {
-        g_set_error (error, GCAB_ERROR, GCAB_ERROR_INVALID_DATA,
-                     "CDATA block of %" G_GUINT16_FORMAT " bytes "
-                     "was bigger than maximum size %i",
-                     cd->nubytes, CAB_MAX_BLOCK_SIZE);
-        goto end;
-    }
-    RN (cd->reserved, res_data);
-    RN (buf, cd->ncbytes);
-
-    checksum_tmp = cdata_compute_checksum (buf, cd->ncbytes, cd->nubytes,
-                                           cd->reserved, res_data);
-    if (cd->checksum != checksum_tmp) {
-        if (_enforce_checksum ()) {
-            g_set_error_literal (error, GCAB_ERROR, GCAB_ERROR_INVALID_DATA,
-                                 "incorrect checksum detected");
-            goto end;
-        }
-        if (_gcab_debug ())
-            g_debug ("CDATA checksum 0x%08x", (guint) checksum_tmp);
-    }
-
-    if (_gcab_debug ()) {
-        g_debug ("CDATA");
-        P4 (cd, checksum);
-        P2 (cd, ncbytes);
-        P2 (cd, nubytes);
-        if (res_data)
-            PN (cd, reserved, res_data);
-        PND (cd, buf, 64);
-    }
-
-    success = cdata_decompress (cd, comptype, error);
-
-end:
-    return success;
-}
-
 static gboolean
 read_raw_cfdata (GDataInputStream *in, guint8 res_data,
                  guint8 *buf, gsize buf_sz,

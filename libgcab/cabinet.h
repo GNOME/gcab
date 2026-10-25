@@ -155,12 +155,6 @@ gboolean     cdata_write                        (cdata_t *cd,
                                                  gsize *bytes_written,
                                                  GCancellable *cancellable,
                                                  GError **error);
-gboolean     cdata_read                         (cdata_t *cd,
-                                                 guint8 res_data,
-                                                 gint comptype,
-                                                 GDataInputStream *in,
-                                                 GCancellable *cancellable,
-                                                 GError **error);
 gboolean     cdata_read_part                    (cdata_t *cd,
                                                  guint8 res_data,
                                                  GDataInputStream *in,
