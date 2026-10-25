@@ -26,7 +26,8 @@
 static voidpf
 zalloc (voidpf opaque, uInt items, uInt size)
 {
-    return g_malloc (items *size);
+    (void) opaque;
+    return (voidpf) g_malloc_n (items, size);
 }
 static void
 zfree (voidpf opaque, voidpf address)
