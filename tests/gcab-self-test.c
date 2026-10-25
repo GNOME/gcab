@@ -835,6 +835,61 @@ gcab_test_cabinet_lzx_overrun_func (void)
     g_assert_false (ret);
 }
 
+static void
+gcab_test_cabinet_path_traversal_func (void)
+{
+    const gchar *tests[] = {
+        "C:\\evil.txt",
+        "\\\\server\\share\\evil.txt",
+        "\\\\?\\C:\\evil.txt",
+        NULL
+    };
+    g_autoptr(GError) error = NULL;
+    g_autofree gchar *tmpdir = g_dir_make_tmp ("gcab-test-XXXXXX", &error);
+    g_assert_no_error (error);
+    g_assert_nonnull (tmpdir);
+    g_autoptr(GFile) path_extract = g_file_new_for_path (tmpdir);
+
+    for (guint i = 0; tests[i] != NULL; i++) {
+        gboolean ret;
+        g_autoptr(GCabCabinet) cabinet = gcab_cabinet_new ();
+        g_autoptr(GCabCabinet) loaded = gcab_cabinet_new ();
+        g_autoptr(GCabFolder) folder = gcab_folder_new (GCAB_COMPRESSION_NONE);
+        g_autoptr(GBytes) bytes = g_bytes_new_static ("x", 1);
+        g_autoptr(GCabFile) cabfile = gcab_file_new_with_bytes (tests[i], bytes);
+        g_autoptr(GOutputStream) op = g_memory_output_stream_new_resizable ();
+
+        ret = gcab_cabinet_add_folder (cabinet, folder, &error);
+        g_assert_no_error (error);
+        g_assert_true (ret);
+        ret = gcab_folder_add_file (folder, cabfile, FALSE, NULL, &error);
+        g_assert_no_error (error);
+        g_assert_true (ret);
+
+        ret = gcab_cabinet_write_simple (cabinet, op, NULL, NULL, NULL, &error);
+        g_assert_no_error (error);
+        g_assert_true (ret);
+        ret = g_output_stream_close (op, NULL, &error);
+        g_assert_no_error (error);
+        g_assert_true (ret);
+
+        g_autoptr(GBytes) blob =
+            g_memory_output_stream_steal_as_bytes (G_MEMORY_OUTPUT_STREAM (op));
+        g_autoptr(GInputStream) in = g_memory_input_stream_new_from_bytes (blob);
+        ret = gcab_cabinet_load (loaded, in, NULL, &error);
+        g_assert_no_error (error);
+        g_assert_true (ret);
+
+        ret = gcab_cabinet_extract_simple (loaded, path_extract, NULL, NULL,
+                                           NULL, &error);
+        g_assert_nonnull (error);
+        g_assert_false (ret);
+        g_clear_error (&error);
+    }
+
+    g_file_delete (path_extract, NULL, NULL);
+}
+
 gint
 main (gint argc, gchar **argv)
 {
@@ -864,5 +919,6 @@ main (gint argc, gchar **argv)
     g_test_add_func ("/GCab/cabinet{blob}", gcab_test_cabinet_blob_func);
     g_test_add_func ("/GCab/cabinet{signature}", gcab_test_cabinet_signature_func);
     g_test_add_func ("/GCab/cabinet{allowed-compression}", gcab_test_cabinet_allowed_compression_func);
+    g_test_add_func ("/GCab/cabinet{path-traversal}", gcab_test_cabinet_path_traversal_func);
     return g_test_run ();
 }

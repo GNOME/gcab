@@ -533,6 +533,21 @@ gcab_file_get_input_stream (GCabFile *self, GCancellable *cancellable, GError **
     return NULL;
 }
 
+static gboolean
+_gcab_file_name_is_unsafe (const gchar *name)
+{
+    const gchar *p = name;
+
+    /* UNC paths */
+    if (p[0] == '/' && p[1] == '/')
+        return TRUE;
+
+    /* drive-letter paths, including drive-relative ones */
+    while (*p == '/')
+        p++;
+    return g_ascii_isalpha (p[0]) && p[1] == ':';
+}
+
 G_GNUC_INTERNAL GOutputStream *
 gcab_file_get_output_stream (GCabFile *self,
                              GFile *path_extract,
@@ -547,6 +562,13 @@ gcab_file_get_output_stream (GCabFile *self,
     g_autofree gchar *fname = g_strdup (gcab_file_get_extract_name (self));
     g_strdelimit (fname, "\\", '/');
 
+    /* these are interpreted as absolute paths on Windows */
+    if (_gcab_file_name_is_unsafe (fname)) {
+        g_set_error (error, GCAB_ERROR, GCAB_ERROR_INVALID_DATA,
+                     "Invalid file path '%s'", fname);
+        return NULL;
+    }
+
     /* "Rebase" the file in the given path, to ensure we never escape it */
     g_autoptr(GFile) file = g_file_resolve_relative_path (path_extract, fname);
     if (!g_file_has_prefix (file, path_extract)) {
@@ -559,6 +581,13 @@ gcab_file_get_output_stream (GCabFile *self,
             g_autoptr(GFile) newfile = g_file_resolve_relative_path (path_extract, newpath);
             g_set_object (&file, newfile);
         }
+    }
+
+    /* verify that the relative path could not escape the extraction directory */
+    if (!g_file_has_prefix (file, path_extract)) {
+        g_set_error (error, GCAB_ERROR, GCAB_ERROR_INVALID_DATA,
+                     "File path '%s' is outside the extraction directory", fname);
+        return NULL;
     }
 
     /* create parent directories */
