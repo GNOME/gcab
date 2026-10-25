@@ -50,6 +50,7 @@ e = executable(
   'gcab-self-test',
   sources : [
     'gcab-self-test.c',
+    enums[1],
   ],
   include_directories : [
     include_directories('..'),
