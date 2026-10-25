@@ -52,8 +52,18 @@
 /* Quantum reads bytes in normal order; LZX is little-endian order */
 #define ENSURE_BITS(n)                                                    \
   while (bitsleft < (n)) {                                                \
-    bitbuf |= ((inpos[1]<<8)|inpos[0]) << (CAB_ULONG_BITS-16 - bitsleft); \
-    bitsleft += 16; inpos+=2;                                             \
+    cab_ULONG word = 0;                                                   \
+    if (inpos < endinp) {                                                 \
+      word = *inpos++;                                                    \
+      if (inpos < endinp)                                                 \
+        word |= (cab_ULONG)*inpos++ << 8;                                 \
+    }                                                                     \
+    else {                                                                \
+      if (pad_words++ > 0)                                                \
+        return DECR_ILLEGALDATA;                                          \
+    }                                                                     \
+    bitbuf |= word << (CAB_ULONG_BITS-16 - bitsleft);                     \
+    bitsleft += 16;                                                       \
   }
 
 #define PEEK_BITS(n)   (bitbuf >> (CAB_ULONG_BITS - (n)))
@@ -109,11 +119,12 @@
  * own special LZX way.
  */
 #define READ_LENGTHS(tbl,first,last,fn) do { \
-  lb.bb = bitbuf; lb.bl = bitsleft; lb.ip = inpos; \
+  lb.bb = bitbuf; lb.bl = bitsleft; lb.ip = inpos; lb.end = endinp; \
+  lb.pad_words = pad_words; \
   if (fn(LENTABLE(tbl),(first),(last),&lb,decomp_state)) { \
     return DECR_ILLEGALDATA; \
   } \
-  bitbuf = lb.bb; bitsleft = lb.bl; inpos = lb.ip; \
+  bitbuf = lb.bb; bitsleft = lb.bl; inpos = lb.ip; pad_words = lb.pad_words; \
 } while (0)
 
 typedef guint8        cab_UBYTE; /* 8 bits  */
@@ -213,6 +224,8 @@ struct lzx_bits {
   cab_ULONG bb;
   gint bl;
   cab_UBYTE *ip;
+  const cab_UBYTE *end;
+  gint pad_words;
 };
 
 typedef struct

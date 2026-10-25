@@ -20,6 +20,7 @@ if installed_tests_enabled
     'test-lzx-offset-before-data.cab',
     'test-lzx-offset-overflow.cab',
     'test-lzx-overrun.cab',
+    'test-lzx-truncated.cab',
     'test-ncbytes-overflow.cab',
     'test-none-size-mismatch.cab',
     'test-none.cab',

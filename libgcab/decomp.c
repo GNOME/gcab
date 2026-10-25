@@ -740,6 +740,8 @@ static gint fdi_lzx_read_lens(cab_UBYTE *lens, cab_ULONG first, cab_ULONG last, 
   register cab_ULONG bitbuf = lb->bb;
   register int bitsleft = lb->bl;
   cab_UBYTE *inpos = lb->ip;
+  const cab_UBYTE *endinp = lb->end;
+  gint pad_words = lb->pad_words;
   cab_UWORD *hufftbl;
 
   for (x = 0; x < 20; x++) {
@@ -773,6 +775,7 @@ static gint fdi_lzx_read_lens(cab_UBYTE *lens, cab_ULONG first, cab_ULONG last, 
   lb->bb = bitbuf;
   lb->bl = bitsleft;
   lb->ip = inpos;
+  lb->pad_words = pad_words;
   return 0;
 }
 
@@ -863,6 +866,7 @@ gint LZXfdi_decomp(gint inlen, gint outlen, fdi_decomp_state *decomp_state) {
 
   register cab_ULONG bitbuf;
   register int bitsleft;
+  gint pad_words = 0;
   cab_ULONG match_offset, i,j,k; /* ijk used in READ_HUFFSYM macro */
   struct lzx_bits lb; /* used in READ_LENGTHS macro */
 
@@ -929,18 +933,10 @@ gint LZXfdi_decomp(gint inlen, gint outlen, fdi_decomp_state *decomp_state) {
       }
     }
 
-    /* buffer exhaustion check */
-    if (inpos > endinp) {
-      /* it's possible to have a file where the next run is less than
-       * 16 bits in size. In this case, the READ_HUFFSYM() macro used
-       * in building the tables will exhaust the buffer, so we should
-       * allow for this, but not allow those accidentally read bits to
-       * be used (so we check that there are at least 16 bits
-       * remaining - in this boundary case they aren't really part of
-       * the compressed data)
-       */
-      if (inpos > (endinp+2) || bitsleft < 16) return DECR_ILLEGALDATA;
-    }
+    /* buffer exhaustion check: a synthesized padding word may be used for
+     * Huffman look-ahead, but its bits must not have been consumed */
+    if (pad_words > 0 && bitsleft < 16)
+      return DECR_ILLEGALDATA;
 
     while ((this_run = LZX(block_remaining)) > 0 && togo > 0) {
       if (this_run > togo) this_run = togo;
@@ -1153,7 +1149,7 @@ gint LZXfdi_decomp(gint inlen, gint outlen, fdi_decomp_state *decomp_state) {
         break;
 
       case LZX_BLOCKTYPE_UNCOMPRESSED:
-        if ((inpos + this_run) > endinp) return DECR_ILLEGALDATA;
+        if (this_run > endinp - inpos) return DECR_ILLEGALDATA;
         memcpy(window + window_posn, inpos, (size_t) this_run);
         inpos += this_run; window_posn += this_run;
         window_filled += this_run;
