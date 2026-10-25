@@ -509,6 +509,7 @@ gcab_folder_extract (GCabFolder *self,
                      GPtrArray *continuations,
                      GCabFileCallback file_callback,
                      GFileProgressCallback progress_callback,
+                     GCabExtractContext *extract_ctx,
                      gpointer callback_data,
                      GCancellable *cancellable,
                      GError **error)
@@ -518,6 +519,8 @@ gcab_folder_extract (GCabFolder *self,
     g_autoptr(cdata_t) cdata = g_new0 (cdata_t, 1);
     GCabFolderReader reader;
     guint64 nubytes = 0;
+    guint64 previous_end = 0;
+    gboolean have_previous = FALSE;
 
     /* never loaded from a stream */
     g_assert (self->cfolder != NULL);
@@ -543,12 +546,25 @@ gcab_folder_extract (GCabFolder *self,
             continue;
 
         g_autoptr(GOutputStream) out = NULL;
+        guint64 usize = gcab_file_get_usize (file);
+        guint64 uoffset = gcab_file_get_uoffset (file);
+
+        /* Sorted, non-overlapping ranges are expected.  Allowing a file to
+         * overlap a previous one lets a tiny archive decompress the same data
+         * over and over again. */
+        if (usize > 0) {
+            if (have_previous && uoffset < previous_end) {
+                g_set_error (error, GCAB_ERROR, GCAB_ERROR_INVALID_DATA,
+                             "Overlapping file data in cabinet folder");
+                return FALSE;
+            }
+            previous_end = uoffset + usize;
+            have_previous = TRUE;
+        }
+
         out = gcab_file_get_output_stream (file, path_extract, cancellable, error);
         if (out == NULL)
             return FALSE;
-
-        guint64 usize = gcab_file_get_usize (file);
-        guint64 uoffset = gcab_file_get_uoffset (file);
 
         /* let's rewind if need be */
         if (uoffset < nubytes) {
@@ -581,9 +597,12 @@ gcab_folder_extract (GCabFolder *self,
                 }
 
                 p = &cdata->out[offset];
+                if (!gcab_extract_check_limits (extract_ctx, count, error))
+                    return FALSE;
                 if (!g_output_stream_write_all (G_OUTPUT_STREAM (out), p, count,
                                                 NULL, cancellable, error))
                     return FALSE;
+                extract_ctx->written += count;
                 usize -= count;
                 uoffset += count;
             }

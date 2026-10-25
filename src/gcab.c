@@ -111,11 +111,14 @@ main (gint argc, gchar *argv[])
     gboolean create = FALSE;
     gboolean extract = FALSE;
     gboolean dump_reserved = FALSE;
+    gint64 max_extract_size = (gint64) 4 << 30;
     GOptionEntry entries[] = {
         { "version", 0, 0, G_OPTION_ARG_NONE, &version, N_("Print program version"), NULL },
         { "verbose", 'v', 0, G_OPTION_ARG_NONE, &verbose, N_("Be verbose"), NULL },
         { "create", 'c', 0, G_OPTION_ARG_NONE, &create, N_("Create archive"), NULL },
         { "extract", 'x', 0, G_OPTION_ARG_NONE, &extract, N_("Extract all files"), NULL },
+        { "max-extract-size", 0, 0, G_OPTION_ARG_INT64, &max_extract_size,
+          N_("Refuse to extract more than N bytes (0 for unlimited)"), N_("N") },
         { "dump-reserved", 'D', 0, G_OPTION_ARG_NONE, &dump_reserved, N_("Dump reserved and extra data"), NULL },
         { "list", 't', 0, G_OPTION_ARG_NONE, &list, N_("List content"), NULL },
         { "list-details", 'l', 0, G_OPTION_ARG_NONE, &list_details, N_("List content with file details"), NULL },
@@ -158,6 +161,11 @@ individual files from the archive.\
 
     if ((list + extract + create + dump_reserved + list_details) != 1) {
         g_printerr ("%s\n", _("Please specify a single operation"));
+        return EXIT_FAILURE;
+    }
+
+    if (max_extract_size < 0) {
+        g_printerr ("%s\n", _("Extraction size limit must not be negative"));
         return EXIT_FAILURE;
     }
 
@@ -220,6 +228,7 @@ individual files from the archive.\
             if (change == NULL)
                 change = g_get_current_dir ();
             file2 = g_file_new_for_path (change);
+            gcab_cabinet_set_extract_size_limit (cabinet, (guint64) max_extract_size);
             if (!gcab_cabinet_extract (cabinet, file2, file_callback, NULL, NULL, cancellable, &error)) {
                 g_printerr ("%s: %s\n", _("Error during extraction"), error->message);
                 return EXIT_FAILURE;

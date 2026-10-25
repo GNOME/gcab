@@ -11,8 +11,14 @@ New Features:
     cabinet set linkage
   - New gcab_file_is_continued_from_prev(), gcab_file_is_continued_to_next()
     to identify files spanning multiple cabinets
+  - New gcab_cabinet_set_extract_size_limit(),
+    gcab_cabinet_set_extract_ratio_limit() and getters to control extraction
+    limits
+  - New gcab --max-extract-size option
 
 Bugfixes:
+  - Limit extraction output and compression ratio to prevent decompression
+    bombs, and reject overlapping file data
   - Fix memory leak of LZX/zlib state on folder rewind
   - Fix checksum calculation to include per-CFDATA reserved bytes
   - Fix g-ir-scanner warnings in gcab-cabinet.c

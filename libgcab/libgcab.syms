@@ -75,4 +75,8 @@ LIBGCAB1_1.7 {
         gcab_cabinet_set_prev;
         gcab_file_is_continued_from_prev;
         gcab_file_is_continued_to_next;
+        gcab_cabinet_set_extract_size_limit;
+        gcab_cabinet_get_extract_size_limit;
+        gcab_cabinet_set_extract_ratio_limit;
+        gcab_cabinet_get_extract_ratio_limit;
 } LIBGCAB1_1.6;

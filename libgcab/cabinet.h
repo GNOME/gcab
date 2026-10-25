@@ -44,6 +44,10 @@
 #define CAB_MAX_LZX_BLOCK_SIZE            (32768 + 6144)
 #define CAB_MAX_COMPRESSED_BLOCK_SIZE     (CAB_MAX_LZX_BLOCK_SIZE)
 
+/* extraction safeguards against decompression amplification */
+#define CAB_DEFAULT_MAX_EXTRACT_SIZE      ((guint64) 4 << 30)
+#define CAB_DEFAULT_MAX_EXTRACT_RATIO     1024
+
 #define CFO_START               0x24    /* folder offset */
 #define CFI_START               0x2C    /* file offset */
 

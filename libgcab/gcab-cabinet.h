@@ -106,6 +106,12 @@ gboolean           gcab_cabinet_extract_simple(GCabCabinet *cabinet,
                                                gpointer user_data,
                                                GCancellable *cancellable,
                                                GError **error);
+void               gcab_cabinet_set_extract_size_limit(GCabCabinet *cabinet,
+                                                       guint64 limit);
+guint64            gcab_cabinet_get_extract_size_limit(GCabCabinet *cabinet);
+void               gcab_cabinet_set_extract_ratio_limit(GCabCabinet *cabinet,
+                                                        guint64 limit);
+guint64            gcab_cabinet_get_extract_ratio_limit(GCabCabinet *cabinet);
 const GByteArray * gcab_cabinet_get_signature (GCabCabinet *cabinet,
                                                GCancellable *cancellable,
                                                GError **error);

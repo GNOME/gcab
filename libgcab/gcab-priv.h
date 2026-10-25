@@ -86,7 +86,17 @@ typedef struct {
     guint8 res_data;
 } GCabFolderFragment;
 
+typedef struct {
+    guint64 max_size;
+    guint64 max_ratio;
+    guint64 input_size;
+    guint64 written;
+} GCabExtractContext;
+
 cfolder_t       *gcab_folder_get_cfolder             (GCabFolder *folder);
+gboolean         gcab_extract_check_limits           (GCabExtractContext *ctx,
+                                                      guint64 count,
+                                                      GError **error);
 
 gboolean         gcab_folder_extract                 (GCabFolder *self,
                                                       GDataInputStream *data,
@@ -95,6 +105,7 @@ gboolean         gcab_folder_extract                 (GCabFolder *self,
                                                       GPtrArray *continuations,
                                                       GCabFileCallback file_callback,
                                                       GFileProgressCallback progress_callback,
+                                                      GCabExtractContext *extract_ctx,
                                                       gpointer callback_data,
                                                       GCancellable *cancellable,
                                                       GError **error);

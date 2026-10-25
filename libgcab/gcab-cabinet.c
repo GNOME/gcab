@@ -44,6 +44,9 @@ struct _GCabCabinet {
     cheader_t *cheader;
     GByteArray *signature;
     GInputStream *stream;
+    guint64 stream_size;
+    guint64 extract_size_limit;
+    guint64 extract_ratio_limit;
     guint8 allowed_compression;
     gpointer next;
     gpointer prev;
@@ -69,6 +72,8 @@ static void
 gcab_cabinet_init (GCabCabinet *self)
 {
     self->allowed_compression = GCAB_COMPRESSION_MASK;
+    self->extract_size_limit = CAB_DEFAULT_MAX_EXTRACT_SIZE;
+    self->extract_ratio_limit = CAB_DEFAULT_MAX_EXTRACT_RATIO;
     self->folders = g_ptr_array_new_with_free_func (g_object_unref);
 }
 
@@ -466,6 +471,84 @@ gcab_cabinet_add_allowed_compression (GCabCabinet *self, GCabCompression compres
 }
 
 /**
+ * gcab_cabinet_set_extract_size_limit:
+ * @cabinet: a #GCabCabinet
+ * @limit: maximum number of bytes to write while extracting, or 0 for no limit
+ *
+ * Set an upper bound on the total number of uncompressed bytes written by
+ * gcab_cabinet_extract().  The default is 4 GiB.  This limits decompression
+ * bombs and runaway extraction into memory or disk.  Set @limit to 0 to
+ * disable the absolute limit and rely only on the ratio limit.
+ *
+ * Since: 1.7
+ **/
+void
+gcab_cabinet_set_extract_size_limit (GCabCabinet *self,
+                                     guint64 limit)
+{
+    g_return_if_fail (GCAB_IS_CABINET (self));
+
+    self->extract_size_limit = limit;
+}
+
+/**
+ * gcab_cabinet_get_extract_size_limit:
+ * @cabinet: a #GCabCabinet
+ *
+ * Get the maximum number of bytes written during extraction.
+ *
+ * Returns: the limit in bytes, or 0 if unlimited
+ *
+ * Since: 1.7
+ **/
+guint64
+gcab_cabinet_get_extract_size_limit (GCabCabinet *self)
+{
+    g_return_val_if_fail (GCAB_IS_CABINET (self), 0);
+
+    return self->extract_size_limit;
+}
+
+/**
+ * gcab_cabinet_set_extract_ratio_limit:
+ * @cabinet: a #GCabCabinet
+ * @limit: maximum uncompressed-to-compressed ratio, or 0 for no limit
+ *
+ * Set an upper bound on the ratio between bytes written during extraction
+ * and the size of the cabinet set.  The default is 1024.  A low ratio
+ * catches archives that expand far beyond their on-disk size.  Set @limit
+ * to 0 to disable the ratio limit.
+ *
+ * Since: 1.7
+ **/
+void
+gcab_cabinet_set_extract_ratio_limit (GCabCabinet *self,
+                                      guint64 limit)
+{
+    g_return_if_fail (GCAB_IS_CABINET (self));
+
+    self->extract_ratio_limit = limit;
+}
+
+/**
+ * gcab_cabinet_get_extract_ratio_limit:
+ * @cabinet: a #GCabCabinet
+ *
+ * Get the maximum uncompressed-to-compressed extraction ratio.
+ *
+ * Returns: the ratio limit, or 0 if unlimited
+ *
+ * Since: 1.7
+ **/
+guint64
+gcab_cabinet_get_extract_ratio_limit (GCabCabinet *self)
+{
+    g_return_val_if_fail (GCAB_IS_CABINET (self), 0);
+
+    return self->extract_ratio_limit;
+}
+
+/**
  * gcab_cabinet_load:
  * @cabinet: a #GCabCabinet
  * @stream: a #GInputStream
@@ -573,6 +656,21 @@ gcab_cabinet_load (GCabCabinet *self,
 
     self->stream = g_object_ref (stream);
     self->cheader = g_steal_pointer (&cheader);
+
+    if (G_IS_SEEKABLE (stream)) {
+        GSeekable *seekable = G_SEEKABLE (stream);
+        goffset position = g_seekable_tell (seekable);
+
+        if (position >= 0 &&
+            g_seekable_seek (seekable, 0, G_SEEK_END, NULL, NULL)) {
+            goffset end = g_seekable_tell (seekable);
+
+            if (end >= 0)
+                self->stream_size = end;
+            g_seekable_seek (seekable, position, G_SEEK_SET, NULL, NULL);
+        }
+    }
+
     return TRUE;
 }
 
@@ -792,11 +890,105 @@ gcab_cabinet_get_continuations (GCabCabinet *self)
     return fragments;
 }
 
+G_GNUC_INTERNAL gboolean
+gcab_extract_check_limits (GCabExtractContext *ctx,
+                           guint64 count,
+                           GError **error)
+{
+    guint64 total;
+
+    if (count > G_MAXUINT64 - ctx->written) {
+        g_set_error (error, GCAB_ERROR, GCAB_ERROR_INVALID_DATA,
+                     "Extraction size overflow");
+        return FALSE;
+    }
+
+    total = ctx->written + count;
+
+    if (ctx->max_size != 0 && total > ctx->max_size) {
+        g_set_error (error, GCAB_ERROR, GCAB_ERROR_INVALID_DATA,
+                     "Extraction would exceed the configured size limit "
+                     "(%" G_GUINT64_FORMAT " bytes)", ctx->max_size);
+        return FALSE;
+    }
+
+    if (ctx->max_ratio != 0 && ctx->input_size != 0 &&
+        ctx->input_size <= G_MAXUINT64 / ctx->max_ratio &&
+        total > ctx->input_size * ctx->max_ratio) {
+        g_set_error (error, GCAB_ERROR, GCAB_ERROR_INVALID_DATA,
+                     "Extraction would exceed the configured compression "
+                     "ratio limit (%" G_GUINT64_FORMAT ":1)", ctx->max_ratio);
+        return FALSE;
+    }
+
+    return TRUE;
+}
+
+static gboolean
+gcab_cabinet_extract_prepare (GCabCabinet *first,
+                              GCabExtractContext *ctx,
+                              GError **error)
+{
+    guint64 declared = 0;
+    guint64 input_size = 0;
+    g_autoptr(GHashTable) visited = g_hash_table_new (g_direct_hash, g_direct_equal);
+
+    for (GCabCabinet *cab = first; cab != NULL; cab = cab->next) {
+        guint64 cab_size;
+
+        if (!g_hash_table_add (visited, cab)) {
+            g_set_error (error, GCAB_ERROR, GCAB_ERROR_FORMAT,
+                         "Cyclic cabinet chain detected");
+            return FALSE;
+        }
+
+        if (cab->cheader == NULL) {
+            g_set_error (error, GCAB_ERROR, GCAB_ERROR_FAILED,
+                         "Cabinet has not been loaded");
+            return FALSE;
+        }
+
+        cab_size = cab->stream_size != 0 ? cab->stream_size : cab->cheader->size;
+        if (cab_size > G_MAXUINT64 - input_size) {
+            g_set_error (error, GCAB_ERROR, GCAB_ERROR_INVALID_DATA,
+                         "Cabinet set size overflow");
+            return FALSE;
+        }
+        input_size += cab_size;
+
+        for (guint i = 0; i < cab->folders->len; i++) {
+            GCabFolder *folder = g_ptr_array_index (cab->folders, i);
+            g_autoptr(GSList) files = gcab_folder_get_files (folder);
+
+            for (GSList *l = files; l != NULL; l = l->next) {
+                GCabFile *file = GCAB_FILE (l->data);
+                guint64 usize;
+
+                if (gcab_file_is_continued_from_prev (file))
+                    continue;
+
+                usize = gcab_file_get_usize (file);
+                if (usize > G_MAXUINT64 - declared) {
+                    g_set_error (error, GCAB_ERROR, GCAB_ERROR_INVALID_DATA,
+                                 "Extraction size overflow");
+                    return FALSE;
+                }
+                declared += usize;
+            }
+        }
+    }
+
+    ctx->input_size = input_size;
+    ctx->written = 0;
+    return gcab_extract_check_limits (ctx, declared, error);
+}
+
 static gboolean
 gcab_cabinet_extract_one (GCabCabinet *self,
                           GFile *path,
                           GCabFileCallback file_callback,
                           GFileProgressCallback progress_callback,
+                          GCabExtractContext *extract_ctx,
                           gpointer user_data,
                           GCancellable *cancellable,
                           GError **error)
@@ -821,8 +1013,8 @@ gcab_cabinet_extract_one (GCabCabinet *self,
 
         if (!gcab_folder_extract (folder, data, path, self->cheader->res_data,
                                   continuations,
-                                  file_callback, progress_callback, user_data,
-                                  cancellable, error)) {
+                                  file_callback, progress_callback, extract_ctx,
+                                  user_data, cancellable, error)) {
             return FALSE;
         }
     }
@@ -856,6 +1048,11 @@ gcab_cabinet_extract_one (GCabCabinet *self,
  * another process from replacing a component after it has been checked. For
  * hostile archives, extract into a private directory or a sandbox.
  *
+ * Extraction is limited to 4 GiB of output and an uncompressed-to-compressed
+ * ratio of 1024:1 by default, which prevents decompression bombs. Use
+ * gcab_cabinet_set_extract_size_limit() and
+ * gcab_cabinet_set_extract_ratio_limit() to change or disable the limits.
+ *
  * Returns: %TRUE on success.
  **/
 gboolean
@@ -876,6 +1073,14 @@ gcab_cabinet_extract (GCabCabinet *self,
     while (first->prev != NULL)
         first = first->prev;
 
+    GCabExtractContext extract_ctx = {
+        .max_size = self->extract_size_limit,
+        .max_ratio = self->extract_ratio_limit,
+    };
+
+    if (!gcab_cabinet_extract_prepare (first, &extract_ctx, error))
+        return FALSE;
+
     g_autoptr(GHashTable) visited = g_hash_table_new (g_direct_hash, g_direct_equal);
     for (GCabCabinet *cab = first; cab != NULL; cab = cab->next) {
         if (!g_hash_table_add (visited, cab)) {
@@ -885,8 +1090,8 @@ gcab_cabinet_extract (GCabCabinet *self,
         }
 
         if (!gcab_cabinet_extract_one (cab, path, file_callback,
-                                       progress_callback, user_data,
-                                       cancellable, error))
+                                       progress_callback, &extract_ctx,
+                                       user_data, cancellable, error))
             return FALSE;
     }
 
