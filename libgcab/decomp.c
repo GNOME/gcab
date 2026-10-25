@@ -796,12 +796,13 @@ gint LZXfdi_init(gint window, fdi_decomp_state *decomp_state) {
                    65536,   98304,  131072,  196608,  262144,  393216,  524288,  655360,
                   786432,  917504, 1048576, 1179648, 1310720, 1441792, 1572864, 1703936,
                  1835008, 1966080, 2097152};
-  cab_ULONG wndsize = 1 << window;
+  cab_ULONG wndsize;
   gint posn_slots;
 
   /* LZX supports window sizes of 2^15 (32Kb) through 2^21 (2Mb) */
   /* if a previously allocated window is big enough, keep it     */
   if (window < 15 || window > 21) return DECR_DATAFORMAT;
+  wndsize = (cab_ULONG) 1 << window;
   if (LZX(actual_size) < wndsize) {
     if (LZX(window)) CAB(fdi)->free(LZX(window));
     LZX(window) = NULL;
@@ -927,9 +928,9 @@ gint LZXfdi_decomp(gint inlen, gint outlen, fdi_decomp_state *decomp_state) {
         ENSURE_BITS(16); /* get up to 16 pad bits into the buffer */
         if (bitsleft > 16) inpos -= 2; /* and align the bitstream! */
         if (endinp - inpos < 12) return DECR_ILLEGALDATA;
-        R0 = inpos[0]|(inpos[1]<<8)|(inpos[2]<<16)|(inpos[3]<<24);inpos+=4;
-        R1 = inpos[0]|(inpos[1]<<8)|(inpos[2]<<16)|(inpos[3]<<24);inpos+=4;
-        R2 = inpos[0]|(inpos[1]<<8)|(inpos[2]<<16)|(inpos[3]<<24);inpos+=4;
+        R0 = inpos[0]|((cab_ULONG)inpos[1]<<8)|((cab_ULONG)inpos[2]<<16)|((cab_ULONG)inpos[3]<<24);inpos+=4;
+        R1 = inpos[0]|((cab_ULONG)inpos[1]<<8)|((cab_ULONG)inpos[2]<<16)|((cab_ULONG)inpos[3]<<24);inpos+=4;
+        R2 = inpos[0]|((cab_ULONG)inpos[1]<<8)|((cab_ULONG)inpos[2]<<16)|((cab_ULONG)inpos[3]<<24);inpos+=4;
         break;
 
       default:
