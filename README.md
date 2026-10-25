@@ -18,6 +18,28 @@ and fuzzing are compiled out unless the test-env build option is enabled.
 Fuzzing
 -------
 
-    CC=afl-gcc meson -Dtest-env=true --default-library=static ../
-    AFL_HARDEN=1 ninja
-    afl-fuzz -m 300 -i ../tests/fuzzing/ -o findings ./src/gcab-fuzz @@
+The legacy AFL entry point replays a file passed on the command line:
+
+    CC=afl-gcc meson setup _build -Dtest-env=true ../
+    AFL_HARDEN=1 meson compile -C _build
+    mkdir -p corpus && cp tests/*.cab corpus/
+    afl-fuzz -m 300 -i corpus -o findings ./_build/src/gcab-fuzz @@
+
+For coverage-guided fuzzing with libFuzzer, or for OSS-Fuzz, use the
+`gcab-fuzz-libfuzzer` target:
+
+    CC=clang meson setup _build_libfuzzer -Dlibfuzzer=true -Dtest-env=true \
+        -Db_sanitize=address,undefined -Db_lundef=false \
+        -Ddocs=false -Dintrospection=false -Dvapi=false -Dnls=false
+    meson compile -C _build_libfuzzer gcab-fuzz-libfuzzer
+    mkdir -p corpus && cp tests/*.cab corpus/
+    ./_build_libfuzzer/src/gcab-fuzz-libfuzzer corpus
+
+The libFuzzer harness loads cabinets from memory and through a temporary
+cabinet chain, looks up signatures, and extracts both to memory and to a
+temporary directory. This covers chained cabinets, continuation blocks,
+`gcab_cabinet_get_signature()` and the directory extraction path.
+
+OSS-Fuzz builds can pass the engine through
+`-Dfuzzing-engine="$LIB_FUZZING_ENGINE"` instead of using the default
+`-fsanitize=fuzzer` link arguments.

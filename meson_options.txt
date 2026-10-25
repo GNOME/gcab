@@ -5,3 +5,5 @@ option('vapi', type : 'boolean', value : true, description: 'generate Vala bindi
 option('tests', type : 'boolean', value : true, description : 'enable tests')
 option('test-env', type : 'boolean', value : false, description : 'enable test-only environment variable overrides')
 option('installed_tests', type : 'boolean', value : false, description : 'install tests for "as-installed" testing')
+option('libfuzzer', type : 'boolean', value : false, description : 'build the libFuzzer/OSS-Fuzz harness')
+option('fuzzing-engine', type : 'string', value : '', description : 'link arguments for the libFuzzer/OSS-Fuzz engine')

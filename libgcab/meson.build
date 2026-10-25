@@ -32,16 +32,18 @@ install_headers([
 
 mapfile = 'libgcab.syms'
 vflag = '-Wl,--version-script,@0@/@1@'.format(meson.current_source_dir(), mapfile)
-libgcab = shared_library(
+libgcab_sources = [
+  'gcab-cabinet.c',
+  'gcab-folder.c',
+  'gcab-file.c',
+  'cabinet.c',
+  'decomp.c',
+]
+
+libgcab = library(
   'gcab-1.0',
   enums,
-  sources : [
-    'gcab-cabinet.c',
-    'gcab-folder.c',
-    'gcab-file.c',
-    'cabinet.c',
-    'decomp.c',
-  ],
+  sources : libgcab_sources,
   version : lt_version,
   darwin_versions: darwin_versions,
   dependencies : [
@@ -57,6 +59,24 @@ libgcab = shared_library(
   link_depends : mapfile,
   install : true
 )
+
+if get_option('libfuzzer')
+  libgcab_fuzz = static_library(
+    'gcab-fuzz-support',
+    enums,
+    sources : libgcab_sources,
+    dependencies : [
+      gio,
+      libz,
+    ],
+    c_args : cargs + fuzzing_cargs,
+    include_directories : [
+      include_directories('.'),
+      include_directories('..'),
+    ],
+    install : false,
+  )
+endif
 
 gcab_dep = declare_dependency(
   link_with : libgcab,

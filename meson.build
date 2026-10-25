@@ -67,6 +67,10 @@ test_args = [
   '-Wwrite-strings'
 ]
 cc = meson.get_compiler('c')
+fuzzing_cargs = []
+if get_option('libfuzzer') and cc.has_argument('-fsanitize=fuzzer-no-link')
+  fuzzing_cargs += ['-fsanitize=fuzzer-no-link']
+endif
 foreach arg: test_args
   if cc.has_argument(arg)
     add_project_arguments(arg, language : 'c')

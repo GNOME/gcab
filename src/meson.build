@@ -45,6 +45,36 @@ executable(
   c_args : cargs,
 )
 
+if get_option('libfuzzer')
+  fuzzing_engine = get_option('fuzzing-engine')
+  if fuzzing_engine == ''
+    if not cc.has_argument('-fsanitize=fuzzer')
+      error('libFuzzer is not supported by this compiler; use -Dfuzzing-engine with an OSS-Fuzz engine')
+    endif
+    fuzzing_engine = '-fsanitize=fuzzer'
+  endif
+
+  executable(
+    'gcab-fuzz-libfuzzer',
+    sources : [
+      'gcab-fuzz-libfuzzer.c',
+    ],
+    include_directories : [
+      include_directories('..'),
+      include_directories('../libgcab'),
+    ],
+    dependencies : [
+      gio,
+      libz,
+    ],
+    link_with : [
+      libgcab_fuzz,
+    ],
+    c_args : cargs + fuzzing_cargs,
+    link_args : fuzzing_engine.split(),
+  )
+endif
+
 executable(
   'gcab-bzero',
   sources : [

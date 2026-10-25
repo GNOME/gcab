@@ -36,3 +36,33 @@ fuzz-asan-ubsan:
     expire_in: "7 days"
     paths:
       - "_build_fuzz/meson-logs/"
+
+fuzz-libfuzzer:
+  stage: test
+  image:
+    name: quay.io/gnome_infrastructure/gnome-build-meta:gnomeos-devel-nightly
+    docker:
+      user: "root"
+  tags:
+    - "asan"
+  needs: []
+  variables:
+    CC: "clang"
+    CXX: "clang++"
+    ASAN_OPTIONS: "detect_leaks=0:abort_on_error=1"
+    UBSAN_OPTIONS: "print_stacktrace=1:halt_on_error=1:abort_on_error=1"
+    GIO_USE_VFS: "local"
+  script:
+    - meson setup _build_libfuzzer -Dlibfuzzer=true -Dtest-env=true -Db_sanitize=address,undefined -Db_lundef=false -Ddocs=false -Dintrospection=false -Dvapi=false -Dnls=false -Dtests=false
+    - meson compile -C _build_libfuzzer gcab-fuzz-libfuzzer
+    - mkdir corpus
+    - cp tests/*.cab corpus/
+    - _build_libfuzzer/src/gcab-fuzz-libfuzzer -max_total_time=60 -timeout=10 -rss_limit_mb=2048 corpus
+  artifacts:
+    when: on_failure
+    expire_in: "7 days"
+    paths:
+      - "crash-*"
+      - "timeout-*"
+      - "oom-*"
+      - "_build_libfuzzer/meson-logs/"
