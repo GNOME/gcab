@@ -139,9 +139,6 @@ gcab_file_set_property (GObject *object, guint prop_id, const GValue *value, GPa
     case PROP_BYTES:
         gcab_file_set_bytes (self, g_value_get_boxed (value));
         break;
-    default:
-        G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
-        break;
     }
 }
 
@@ -160,9 +157,6 @@ gcab_file_get_property (GObject *object, guint prop_id, GValue *value, GParamSpe
         break;
     case PROP_BYTES:
         g_value_set_boxed (value, self->bytes);
-        break;
-    default:
-        G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
         break;
     }
 }
