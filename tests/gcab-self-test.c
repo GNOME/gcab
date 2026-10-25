@@ -709,6 +709,41 @@ gcab_test_cabinet_multicab_prev_func (void)
 }
 
 static void
+gcab_test_cabinet_mszip_short_cdata_func (void)
+{
+    gboolean ret;
+    GLogLevelFlags old_mask;
+    g_autofree gchar *fn = NULL;
+    g_autoptr(GCabCabinet) cabinet = NULL;
+    g_autoptr(GError) error = NULL;
+    g_autoptr(GFile) file = NULL;
+    g_autoptr(GInputStream) in = NULL;
+
+    /* a one-byte CDATA part leaves the CK bytes from the previous block in
+     * place and must not underflow the MSZIP input size */
+    fn = gcab_test_get_filename ("test-mszip-short-cdata.cab");
+    g_assert_nonnull (fn);
+    file = g_file_new_for_path (fn);
+    in = G_INPUT_STREAM (g_file_read (file, NULL, &error));
+    g_assert_no_error (error);
+    g_assert_nonnull (in);
+    cabinet = gcab_cabinet_new ();
+    ret = gcab_cabinet_load (cabinet, in, NULL, &error);
+    g_assert_no_error (error);
+    g_assert_true (ret);
+
+    /* the rejected block must not reach the avail_in underflow warning */
+    old_mask = g_log_set_fatal_mask ("gcab",
+                                     G_LOG_LEVEL_ERROR |
+                                     G_LOG_LEVEL_CRITICAL |
+                                     G_LOG_LEVEL_WARNING);
+    ret = gcab_cabinet_extract_simple (cabinet, NULL, NULL, NULL, NULL, &error);
+    g_log_set_fatal_mask ("gcab", old_mask);
+    g_assert_nonnull (error);
+    g_assert_false (ret);
+}
+
+static void
 gcab_test_cabinet_lzx_frame_wrap_func (void)
 {
     gboolean ret;
@@ -821,6 +856,7 @@ main (gint argc, gchar **argv)
     g_test_add_func ("/GCab/cabinet{lzx-overrun}", gcab_test_cabinet_lzx_overrun_func);
     g_test_add_func ("/GCab/cabinet{lzx-offsets}", gcab_test_cabinet_lzx_offset_func);
     g_test_add_func ("/GCab/cabinet{lzx-frame-wrap}", gcab_test_cabinet_lzx_frame_wrap_func);
+    g_test_add_func ("/GCab/cabinet{mszip-short-cdata}", gcab_test_cabinet_mszip_short_cdata_func);
     g_test_add_func ("/GCab/cabinet{load}", gcab_test_cabinet_load_func);
     g_test_add_func ("/GCab/cabinet{multicab}", gcab_test_cabinet_multicab_func);
     g_test_add_func ("/GCab/cabinet{multicab-prev}", gcab_test_cabinet_multicab_prev_func);

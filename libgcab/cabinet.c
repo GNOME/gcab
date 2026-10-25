@@ -615,6 +615,8 @@ cdata_decompress (cdata_t *cd, gint comptype, GError **error)
     }
 
     if (compression == GCAB_COMPRESSION_MSZIP) {
+        if (cd->ncbytes < 2)
+            goto end;
         if (cd->in[0] != 'C' || cd->in[1] != 'K')
             goto end;
 

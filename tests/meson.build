@@ -11,6 +11,7 @@ if installed_tests_enabled
     'CVE-2015-4470.cab',
     'CVE-2015-4471.cab',
     'privkey.pem',
+    'test-mszip-short-cdata.cab',
     'test-mszip.cab',
     'test-multicab-a.cab',
     'test-multicab-b.cab',
