@@ -26,6 +26,10 @@
 
 #include <libgcab.h>
 
+#ifndef G_OS_WIN32
+#include <unistd.h>
+#endif
+
 static gchar *
 gcab_test_get_filename (const gchar *filename)
 {
@@ -835,6 +839,42 @@ gcab_test_cabinet_lzx_overrun_func (void)
     g_assert_false (ret);
 }
 
+#ifndef G_OS_WIN32
+static GCabCabinet *
+_gcab_test_cabinet_new_with_file_name (const gchar *name, GError **error)
+{
+    gboolean ret;
+    g_autoptr(GCabCabinet) cabinet = gcab_cabinet_new ();
+    g_autoptr(GCabFolder) folder = gcab_folder_new (GCAB_COMPRESSION_NONE);
+    g_autoptr(GBytes) bytes = g_bytes_new_static ("x", 1);
+    g_autoptr(GCabFile) cabfile = gcab_file_new_with_bytes (name, bytes);
+    g_autoptr(GOutputStream) op = g_memory_output_stream_new_resizable ();
+
+    ret = gcab_cabinet_add_folder (cabinet, folder, error);
+    if (!ret)
+        return NULL;
+    ret = gcab_folder_add_file (folder, cabfile, FALSE, NULL, error);
+    if (!ret)
+        return NULL;
+    ret = gcab_cabinet_write_simple (cabinet, op, NULL, NULL, NULL, error);
+    if (!ret)
+        return NULL;
+    ret = g_output_stream_close (op, NULL, error);
+    if (!ret)
+        return NULL;
+
+    g_autoptr(GBytes) blob =
+        g_memory_output_stream_steal_as_bytes (G_MEMORY_OUTPUT_STREAM (op));
+    g_autoptr(GInputStream) in = g_memory_input_stream_new_from_bytes (blob);
+    GCabCabinet *loaded = gcab_cabinet_new ();
+    if (!gcab_cabinet_load (loaded, in, NULL, error)) {
+        g_object_unref (loaded);
+        return NULL;
+    }
+    return loaded;
+}
+#endif
+
 static void
 gcab_test_cabinet_path_traversal_func (void)
 {
@@ -890,6 +930,54 @@ gcab_test_cabinet_path_traversal_func (void)
     g_file_delete (path_extract, NULL, NULL);
 }
 
+#ifndef G_OS_WIN32
+static void
+gcab_test_cabinet_symlink_func (void)
+{
+    gboolean ret;
+    g_autoptr(GError) error = NULL;
+    g_autofree gchar *root = g_dir_make_tmp ("gcab-root-XXXXXX", &error);
+    g_assert_no_error (error);
+    g_assert_nonnull (root);
+    g_autofree gchar *outside = g_dir_make_tmp ("gcab-outside-XXXXXX", &error);
+    g_assert_no_error (error);
+    g_assert_nonnull (outside);
+    g_autoptr(GFile) path_extract = g_file_new_for_path (root);
+
+    /* a directory component that is a symlink must not be followed */
+    g_autofree gchar *link_path = g_build_filename (root, "link", NULL);
+    g_autofree gchar *outside_file = g_build_filename (outside, "evil.txt", NULL);
+    g_assert_cmpint (symlink (outside, link_path), ==, 0);
+
+    g_autoptr(GCabCabinet) cabinet = _gcab_test_cabinet_new_with_file_name ("link/evil.txt", &error);
+    g_assert_no_error (error);
+    g_assert_nonnull (cabinet);
+    ret = gcab_cabinet_extract_simple (cabinet, path_extract, NULL, NULL, NULL, &error);
+    g_assert_nonnull (error);
+    g_assert_false (ret);
+    g_assert_false (g_file_test (outside_file, G_FILE_TEST_EXISTS));
+    g_clear_error (&error);
+
+    /* a final component that is a symlink must not be replaced */
+    g_autofree gchar *final_path = g_build_filename (root, "final", NULL);
+    g_autofree gchar *outside_target = g_build_filename (outside, "target.txt", NULL);
+    g_assert_cmpint (symlink (outside_target, final_path), ==, 0);
+
+    g_autoptr(GCabCabinet) cabinet_final = _gcab_test_cabinet_new_with_file_name ("final", &error);
+    g_assert_no_error (error);
+    g_assert_nonnull (cabinet_final);
+    ret = gcab_cabinet_extract_simple (cabinet_final, path_extract, NULL, NULL, NULL, &error);
+    g_assert_nonnull (error);
+    g_assert_false (ret);
+    g_assert_false (g_file_test (outside_target, G_FILE_TEST_EXISTS));
+
+    (void)unlink (link_path);
+    (void)unlink (final_path);
+    (void)rmdir (root);
+    (void)rmdir (outside);
+}
+#endif
+
 gint
 main (gint argc, gchar **argv)
 {
@@ -920,5 +1008,8 @@ main (gint argc, gchar **argv)
     g_test_add_func ("/GCab/cabinet{signature}", gcab_test_cabinet_signature_func);
     g_test_add_func ("/GCab/cabinet{allowed-compression}", gcab_test_cabinet_allowed_compression_func);
     g_test_add_func ("/GCab/cabinet{path-traversal}", gcab_test_cabinet_path_traversal_func);
+#ifndef G_OS_WIN32
+    g_test_add_func ("/GCab/cabinet{symlink}", gcab_test_cabinet_symlink_func);
+#endif
     return g_test_run ();
 }

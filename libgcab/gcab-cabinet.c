@@ -847,6 +847,12 @@ gcab_cabinet_extract_one (GCabCabinet *self,
  * If @path is NULL then the files are decompressed to memory blobs stored on
  * each #GCabFile.
  *
+ * When extracting to a directory, @path must be controlled by the caller and
+ * must not be writable by untrusted users. Existing path components are
+ * checked for symbolic links on a best-effort basis, but this cannot prevent
+ * another process from replacing a component after it has been checked. For
+ * hostile archives, extract into a private directory or a sandbox.
+ *
  * Returns: %TRUE on success.
  **/
 gboolean
@@ -896,6 +902,9 @@ gcab_cabinet_extract (GCabCabinet *self,
  * @error: (allow-none): #GError to set on error, or %NULL
  *
  * Extract files to given path.
+ *
+ * See gcab_cabinet_extract() for the security considerations when extracting
+ * to a directory.
  *
  * Returns: %TRUE on success.
  **/

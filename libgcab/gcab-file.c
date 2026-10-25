@@ -534,6 +534,61 @@ gcab_file_get_input_stream (GCabFile *self, GCancellable *cancellable, GError **
 }
 
 static gboolean
+_gcab_file_check_symlinks (GFile *file, GFile *path_extract, GError **error)
+{
+    g_autoptr(GPtrArray) components = g_ptr_array_new_with_free_func (g_object_unref);
+    g_autoptr(GFile) current = g_object_ref (file);
+
+    /* collect the path from the leaf up to, but excluding, the extraction root */
+    while (!g_file_equal (current, path_extract)) {
+        g_autoptr(GFile) parent = g_file_get_parent (current);
+        if (parent == NULL ||
+            (!g_file_equal (parent, path_extract) &&
+             !g_file_has_prefix (parent, path_extract))) {
+            g_set_error (error, GCAB_ERROR, GCAB_ERROR_INVALID_DATA,
+                         "Invalid extraction path");
+            return FALSE;
+        }
+        g_ptr_array_add (components, g_object_ref (current));
+        g_set_object (&current, parent);
+    }
+
+    /* check from the root down, since a missing component hides its children */
+    for (guint i = components->len; i > 0; i--) {
+        GFile *component = g_ptr_array_index (components, i - 1);
+        g_autoptr(GError) error_local = NULL;
+        g_autoptr(GFileInfo) info = g_file_query_info (component,
+                                                       G_FILE_ATTRIBUTE_STANDARD_TYPE ","
+                                                       G_FILE_ATTRIBUTE_STANDARD_IS_SYMLINK,
+                                                       G_FILE_QUERY_INFO_NOFOLLOW_SYMLINKS,
+                                                       NULL, &error_local);
+        if (info == NULL) {
+            if (g_error_matches (error_local, G_IO_ERROR, G_IO_ERROR_NOT_FOUND))
+                break;
+            g_propagate_error (error, g_steal_pointer (&error_local));
+            return FALSE;
+        }
+
+        if (g_file_info_get_is_symlink (info) ||
+            g_file_info_get_file_type (info) == G_FILE_TYPE_SYMBOLIC_LINK) {
+            g_autofree gchar *path = g_file_get_parse_name (component);
+            g_set_error (error, GCAB_ERROR, GCAB_ERROR_INVALID_DATA,
+                         "Refusing to extract through symbolic link '%s'", path);
+            return FALSE;
+        }
+
+        if (i > 1 && g_file_info_get_file_type (info) != G_FILE_TYPE_DIRECTORY) {
+            g_autofree gchar *path = g_file_get_parse_name (component);
+            g_set_error (error, GCAB_ERROR, GCAB_ERROR_INVALID_DATA,
+                         "Extraction path component '%s' is not a directory", path);
+            return FALSE;
+        }
+    }
+
+    return TRUE;
+}
+
+static gboolean
 _gcab_file_name_is_unsafe (const gchar *name)
 {
     const gchar *p = name;
@@ -589,6 +644,10 @@ gcab_file_get_output_stream (GCabFile *self,
                      "File path '%s' is outside the extraction directory", fname);
         return NULL;
     }
+
+    /* best-effort protection against writing through existing symlinks */
+    if (!_gcab_file_check_symlinks (file, path_extract, error))
+        return NULL;
 
     /* create parent directories */
     g_autoptr(GFile) parent = g_file_get_parent (file);
