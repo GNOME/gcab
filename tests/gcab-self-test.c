@@ -651,6 +651,63 @@ gcab_test_cabinet_multicab_func (void)
                      expected, sizeof (expected) - 1);
 }
 
+static void
+gcab_test_cabinet_multicab_prev_func (void)
+{
+    const gchar expected[] =
+        "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+        "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+        "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+    gboolean ret;
+    g_autofree gchar *fn = NULL;
+    g_autoptr(GCabCabinet) cabinet = NULL;
+    g_autoptr(GError) error = NULL;
+    g_autoptr(GFile) file = NULL;
+    GCabCabinet *prev;
+    GCabCabinet *next;
+    GBytes *bytes;
+    GPtrArray *folders;
+    GCabFolder *folder;
+    GCabFile *cabfile;
+
+    fn = gcab_test_get_filename ("test-multicab-b.cab");
+    g_assert_nonnull (fn);
+    file = g_file_new_for_path (fn);
+    cabinet = gcab_cabinet_new ();
+
+    ret = gcab_cabinet_load_from_file (cabinet, file, NULL, &error);
+    g_assert_no_error (error);
+    g_assert_true (ret);
+    g_assert_cmpstr (gcab_cabinet_get_prev_name (cabinet), ==,
+                     "test-multicab-a.cab");
+    g_assert_cmpstr (gcab_cabinet_get_next_name (cabinet), ==,
+                     "test-multicab-c.cab");
+
+    prev = gcab_cabinet_get_prev (cabinet);
+    next = gcab_cabinet_get_next (cabinet);
+    g_assert_nonnull (prev);
+    g_assert_nonnull (next);
+    g_assert_true (gcab_cabinet_get_next (prev) == cabinet);
+    g_assert_true (gcab_cabinet_get_prev (next) == cabinet);
+
+    /* extracting from the middle cabinet should still extract the whole set */
+    ret = gcab_cabinet_extract_simple (cabinet, NULL, NULL, NULL, NULL, &error);
+    g_assert_no_error (error);
+    g_assert_true (ret);
+
+    /* the file begins in the previous cabinet */
+    folders = gcab_cabinet_get_folders (prev);
+    g_assert_cmpuint (folders->len, ==, 1);
+    folder = g_ptr_array_index (folders, 0);
+    cabfile = gcab_folder_get_file_by_name (folder, "file.bin");
+    g_assert_nonnull (cabfile);
+
+    bytes = gcab_file_get_bytes (cabfile);
+    g_assert_nonnull (bytes);
+    g_assert_cmpmem (g_bytes_get_data (bytes, NULL), g_bytes_get_size (bytes),
+                     expected, sizeof (expected) - 1);
+}
+
 gint
 main (gint argc, gchar **argv)
 {
@@ -671,6 +728,7 @@ main (gint argc, gchar **argv)
     g_test_add_func ("/GCab/cabinet{error-cves}", gcab_test_cabinet_error_cves_func);
     g_test_add_func ("/GCab/cabinet{load}", gcab_test_cabinet_load_func);
     g_test_add_func ("/GCab/cabinet{multicab}", gcab_test_cabinet_multicab_func);
+    g_test_add_func ("/GCab/cabinet{multicab-prev}", gcab_test_cabinet_multicab_prev_func);
     g_test_add_func ("/GCab/cabinet{write}", gcab_test_cabinet_write_func);
     g_test_add_func ("/GCab/cabinet{blob}", gcab_test_cabinet_blob_func);
     g_test_add_func ("/GCab/cabinet{signature}", gcab_test_cabinet_signature_func);

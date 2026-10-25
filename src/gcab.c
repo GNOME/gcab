@@ -182,7 +182,11 @@ individual files from the archive.\
         }
 
         if (list || list_details) {
-            for (GCabCabinet *cab = cabinet; cab != NULL; cab = gcab_cabinet_get_next (cab)) {
+            GCabCabinet *first = cabinet;
+            while (gcab_cabinet_get_prev (first) != NULL)
+                first = gcab_cabinet_get_prev (first);
+
+            for (GCabCabinet *cab = first; cab != NULL; cab = gcab_cabinet_get_next (cab)) {
                 GPtrArray *folders = gcab_cabinet_get_folders (cab);
                 for (guint i = 0; i < folders->len; i++) {
                     GSList *l;

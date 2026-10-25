@@ -582,6 +582,24 @@ cabinet_name_is_valid (const gchar *name)
     return TRUE;
 }
 
+static GCabCabinet *
+cabinet_load_from_file (GFile *file,
+                        GCancellable *cancellable,
+                        GError **error)
+{
+    g_autoptr(GInputStream) stream = G_INPUT_STREAM (g_file_read (file, cancellable, error));
+    if (stream == NULL)
+        return NULL;
+
+    GCabCabinet *cabinet = gcab_cabinet_new ();
+    if (!gcab_cabinet_load (cabinet, stream, cancellable, error)) {
+        g_object_unref (cabinet);
+        return NULL;
+    }
+
+    return cabinet;
+}
+
 /**
  * gcab_cabinet_load_from_file:
  * @cabinet: a #GCabCabinet
@@ -647,12 +665,8 @@ gcab_cabinet_load_from_file (GCabCabinet *self,
             return FALSE;
         }
 
-        g_autoptr(GCabCabinet) next_cab = gcab_cabinet_new ();
-        g_autoptr(GInputStream) next_stream = G_INPUT_STREAM (g_file_read (next_file, cancellable, error));
-        if (next_stream == NULL)
-            return FALSE;
-
-        if (!gcab_cabinet_load (next_cab, next_stream, cancellable, error))
+        g_autoptr(GCabCabinet) next_cab = cabinet_load_from_file (next_file, cancellable, error);
+        if (next_cab == NULL)
             return FALSE;
 
         if (next_cab->cheader->setID != cur->cheader->setID ||
@@ -672,6 +686,51 @@ gcab_cabinet_load_from_file (GCabCabinet *self,
         g_ptr_array_add (self->chained, g_object_ref (next_cab));
 
         cur = next_cab;
+    }
+
+    cur = self;
+    while (TRUE) {
+        const gchar *prev_name = gcab_cabinet_get_prev_name (cur);
+        if (prev_name == NULL)
+            break;
+
+        if (!cabinet_name_is_valid (prev_name)) {
+            g_set_error (error, GCAB_ERROR, GCAB_ERROR_FORMAT,
+                         "Invalid previous cabinet name '%s'", prev_name);
+            return FALSE;
+        }
+
+        g_autoptr(GFile) prev_file = g_file_get_child (parent, prev_name);
+        if (!g_file_query_exists (prev_file, cancellable))
+            break;
+
+        if (g_hash_table_contains (visited, prev_file)) {
+            g_set_error (error, GCAB_ERROR, GCAB_ERROR_FORMAT,
+                         "Cyclic cabinet chain detected at '%s'", prev_name);
+            return FALSE;
+        }
+
+        g_autoptr(GCabCabinet) prev_cab = cabinet_load_from_file (prev_file, cancellable, error);
+        if (prev_cab == NULL)
+            return FALSE;
+
+        if (prev_cab->cheader->setID != cur->cheader->setID ||
+            prev_cab->cheader->cabID != (guint16) (cur->cheader->cabID - 1)) {
+            g_set_error (error, GCAB_ERROR, GCAB_ERROR_FORMAT,
+                         "Cabinet '%s' is not the previous cabinet in the set", prev_name);
+            return FALSE;
+        }
+
+        g_hash_table_add (visited, g_object_ref (prev_file));
+
+        gcab_cabinet_set_prev (cur, prev_cab);
+        gcab_cabinet_set_next (prev_cab, cur);
+
+        if (self->chained == NULL)
+            self->chained = g_ptr_array_new_with_free_func (g_object_unref);
+        g_ptr_array_add (self->chained, g_object_ref (prev_cab));
+
+        cur = prev_cab;
     }
 
     return TRUE;
@@ -727,39 +786,15 @@ gcab_cabinet_get_continuations (GCabCabinet *self)
     return fragments;
 }
 
-/**
- * gcab_cabinet_extract:
- * @cabinet: a #GCabCabinet
- * @path: (allow-none): the path to extract files
- * @file_callback: (allow-none) (scope call) (closure user_data): an optional #GCabFile callback,
- *     return %FALSE to filter out or skip files.
- * @progress_callback: (allow-none) (scope call) (closure user_data): a progress callback
- * @user_data: callback data
- * @cancellable: (allow-none): optional #GCancellable object,
- *     %NULL to ignore
- * @error: (allow-none): #GError to set on error, or %NULL
- *
- * Extract files to given path.
- *
- * If @path is NULL then the files are decompressed to memory blobs stored on
- * each #GCabFile.
- *
- * Returns: %TRUE on success.
- **/
-gboolean
-gcab_cabinet_extract (GCabCabinet *self,
-                      GFile *path,
-                      GCabFileCallback file_callback,
-                      GFileProgressCallback progress_callback,
-                      gpointer user_data,
-                      GCancellable *cancellable,
-                      GError **error)
+static gboolean
+gcab_cabinet_extract_one (GCabCabinet *self,
+                          GFile *path,
+                          GCabFileCallback file_callback,
+                          GFileProgressCallback progress_callback,
+                          gpointer user_data,
+                          GCancellable *cancellable,
+                          GError **error)
 {
-    g_return_val_if_fail (GCAB_IS_CABINET (self), FALSE);
-    g_return_val_if_fail (!path || G_IS_FILE (path), FALSE);
-    g_return_val_if_fail (!cancellable || G_IS_CANCELLABLE (cancellable), FALSE);
-    g_return_val_if_fail (!error || *error == NULL, FALSE);
-
     /* never loaded from a stream */
     if (self->cheader == NULL) {
         g_set_error (error, GCAB_ERROR, GCAB_ERROR_FAILED,
@@ -786,14 +821,61 @@ gcab_cabinet_extract (GCabCabinet *self,
         }
     }
 
-    if (self->chained != NULL) {
-        for (guint c = 0; c < self->chained->len; c++) {
-            GCabCabinet *chained_cab = g_ptr_array_index (self->chained, c);
-            if (!gcab_cabinet_extract (chained_cab, path,
-                                       file_callback, progress_callback,
-                                       user_data, cancellable, error))
-                return FALSE;
+    return TRUE;
+}
+
+/**
+ * gcab_cabinet_extract:
+ * @cabinet: a #GCabCabinet
+ * @path: (allow-none): the path to extract files
+ * @file_callback: (allow-none) (scope call) (closure user_data): an optional #GCabFile callback,
+ *     return %FALSE to filter out or skip files.
+ * @progress_callback: (allow-none) (scope call) (closure user_data): a progress callback
+ * @user_data: callback data
+ * @cancellable: (allow-none): optional #GCancellable object,
+ *     %NULL to ignore
+ * @error: (allow-none): #GError to set on error, or %NULL
+ *
+ * Extract files to given path.
+ *
+ * If @cabinet is part of a chained multi-cabinet set, all cabinets in the
+ * set are extracted, starting from the first cabinet.
+ *
+ * If @path is NULL then the files are decompressed to memory blobs stored on
+ * each #GCabFile.
+ *
+ * Returns: %TRUE on success.
+ **/
+gboolean
+gcab_cabinet_extract (GCabCabinet *self,
+                      GFile *path,
+                      GCabFileCallback file_callback,
+                      GFileProgressCallback progress_callback,
+                      gpointer user_data,
+                      GCancellable *cancellable,
+                      GError **error)
+{
+    g_return_val_if_fail (GCAB_IS_CABINET (self), FALSE);
+    g_return_val_if_fail (!path || G_IS_FILE (path), FALSE);
+    g_return_val_if_fail (!cancellable || G_IS_CANCELLABLE (cancellable), FALSE);
+    g_return_val_if_fail (!error || *error == NULL, FALSE);
+
+    GCabCabinet *first = self;
+    while (first->prev != NULL)
+        first = first->prev;
+
+    g_autoptr(GHashTable) visited = g_hash_table_new (g_direct_hash, g_direct_equal);
+    for (GCabCabinet *cab = first; cab != NULL; cab = cab->next) {
+        if (!g_hash_table_add (visited, cab)) {
+            g_set_error (error, GCAB_ERROR, GCAB_ERROR_FORMAT,
+                         "Cyclic cabinet chain detected");
+            return FALSE;
         }
+
+        if (!gcab_cabinet_extract_one (cab, path, file_callback,
+                                       progress_callback, user_data,
+                                       cancellable, error))
+            return FALSE;
     }
 
     return TRUE;
