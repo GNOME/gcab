@@ -138,34 +138,6 @@ typedef gint32        cab_LONG;  /* 32 bits */
 #endif
 #define CAB_ULONG_BITS (sizeof(cab_ULONG) * CHAR_BIT)
 
-/* MSZIP stuff */
-#define ZIPWSIZE 	0x8000  /* window size */
-#define ZIPLBITS	9	/* bits in base literal/length lookup table */
-#define ZIPDBITS	6	/* bits in base distance lookup table */
-#define ZIPBMAX		16      /* maximum bit length of any code */
-#define ZIPN_MAX	288     /* maximum number of codes in any set */
-
-struct Ziphuft {
-    cab_UBYTE e;                /* number of extra bits or operation */
-    cab_UBYTE b;                /* number of bits in this code or subcode */
-    union {
-        cab_UWORD n;              /* literal, length base, or distance base */
-        struct Ziphuft *t;        /* pointer to next level of table */
-    } v;
-};
-struct ZIPstate {
-    cab_ULONG window_posn;      /* current offset within the window        */
-    cab_ULONG bb;               /* bit buffer */
-    cab_ULONG bk;               /* bits in bit buffer */
-    cab_ULONG ll[288+32];       /* literal/length and distance code lengths */
-    cab_ULONG c[ZIPBMAX+1];     /* bit length count table */
-    cab_LONG  lx[ZIPBMAX+1];    /* memory for l[-1..ZIPBMAX-1] */
-    struct Ziphuft *u[ZIPBMAX];	/* table stack */
-    cab_ULONG v[ZIPN_MAX];      /* values in order of bit length */
-    cab_ULONG x[ZIPBMAX+1];     /* bit offsets, then code stack */
-    cab_UBYTE *inpos;
-};
-
 /* LZX stuff */
 
 /* some constants defined by the LZX specification */
@@ -242,14 +214,10 @@ typedef struct fdi_cds_fwd {
     cab_ULONG lzx_position_base[51];
     cab_UBYTE extra_bits[51];
 
-    union {
-        struct ZIPstate zip;
-        struct LZXstate lzx;
-    } methods;
+    struct LZXstate lzx;
     gint comptype;
 } fdi_decomp_state;
 
-gint ZIPfdi_decomp(gint inlen, gint outlen, fdi_decomp_state *decomp_state);
 gint LZXfdi_decomp(gint inlen, gint outlen, fdi_decomp_state *decomp_state);
 gint LZXfdi_init(gint window, fdi_decomp_state *decomp_state);
 void LZXfdi_clear(fdi_decomp_state *decomp_state);
