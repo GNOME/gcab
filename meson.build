@@ -2,7 +2,13 @@ project('gcab', 'c',
   version : '1.7',
   license : 'LGPL-2.1+',
   meson_version : '>=0.56.0',
-  default_options : ['warning_level=2', 'c_std=c99'],
+  default_options : [
+    'warning_level=2',
+    'c_std=c99',
+    # Keep the normal developer build warning-clean. Packagers can opt out
+    # with -Dwerror=false if a new compiler adds diagnostics.
+    'werror=true',
+  ],
 )
 
 git_version = []

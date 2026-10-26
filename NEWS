@@ -36,6 +36,7 @@ Other:
   - Add API roundtrip tests for empty, single-block, and multi-block files
   - Add gcab command line integration tests
   - Add direct LZX decoder unit tests, raising decomp.c line coverage to 98%
+  - Treat compiler warnings as errors by default (use -Dwerror=false to opt out)
   - Run tests in CI under sanitizers and Valgrind, report coverage, run
     clang-tidy, and build and re-test the release tarball
   - translation updates

@@ -18,6 +18,10 @@ Vala bindings:
 meson setup _build -Ddocs=false -Dintrospection=false -Dvapi=false -Dnls=false
 ```
 
+The default build treats compiler warnings as errors. If a compiler version
+adds a diagnostic the project has not handled yet, configure with
+`-Dwerror=false` to continue, and please report the warning.
+
 ## Tests
 
 Run the full suite before submitting a change:

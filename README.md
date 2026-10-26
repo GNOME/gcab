@@ -14,10 +14,12 @@ The test suite contains the GObject API self-tests and command line
 integration tests for the `gcab` tool. See `CONTRIBUTING.md` for sanitizer,
 Valgrind, coverage, and static-analysis builds.
 
-The CI pipeline runs the tests with `-Dwerror=true`, under AddressSanitizer
-and UndefinedBehaviorSanitizer, under Valgrind, with coverage reporting, and
-with clang-tidy. It also builds the release tarball and re-tests it from a
-clean extraction.
+The project treats compiler warnings as errors by default (`-Dwerror=true`).
+Pass `-Dwerror=false` at setup time if a newer compiler emits diagnostics
+outside the project's control. The CI pipeline additionally runs the tests
+under AddressSanitizer and UndefinedBehaviorSanitizer, under Valgrind, with
+coverage reporting, and with clang-tidy. It also builds the release tarball
+and re-tests it from a clean extraction.
 
 Security
 --------
