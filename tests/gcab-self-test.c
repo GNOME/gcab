@@ -38,6 +38,49 @@ gcab_test_get_filename (const gchar *filename)
     return g_test_build_filename (G_TEST_DIST, filename, NULL);
 }
 
+static void
+gcab_test_rm_rf (GFile *file)
+{
+    g_autoptr(GFileEnumerator) children = NULL;
+    GFileInfo *info;
+
+    children = g_file_enumerate_children (file, G_FILE_ATTRIBUTE_STANDARD_NAME,
+                                          G_FILE_QUERY_INFO_NOFOLLOW_SYMLINKS,
+                                          NULL, NULL);
+    while (children != NULL &&
+           (info = g_file_enumerator_next_file (children, NULL, NULL)) != NULL) {
+        g_autoptr(GFile) child = g_file_enumerator_get_child (children, info);
+        gcab_test_rm_rf (child);
+        g_object_unref (info);
+    }
+    (void)g_file_delete (file, NULL, NULL);
+}
+
+/* Returns a unique, writable scratch directory. Never write into the source
+ * tree (G_TEST_DIST is read-only for installed-tests and distcheck builds) and
+ * never use a fixed path in the shared temp directory, which is not portable
+ * to Win32. Pair it with gcab_test_remove_tmpdir(). */
+static gchar *
+gcab_test_make_tmpdir (void)
+{
+    g_autoptr(GError) error = NULL;
+    gchar *tmpdir = g_dir_make_tmp ("gcab-test-XXXXXX", &error);
+    g_assert_no_error (error);
+    g_assert_nonnull (tmpdir);
+    return tmpdir;
+}
+
+static void
+gcab_test_remove_tmpdir (const gchar *tmpdir)
+{
+    g_autoptr(GFile) dir = NULL;
+
+    if (tmpdir == NULL)
+        return;
+    dir = g_file_new_for_path (tmpdir);
+    gcab_test_rm_rf (dir);
+}
+
 static gboolean
 gcab_test_count_file_callback (GCabFile *file, gpointer user_data)
 {
@@ -108,7 +151,8 @@ _gcab_test_file_properties_func (void)
     g_autoptr(GBytes) bytes = g_bytes_new_static ("contents", 8);
     g_autoptr(GBytes) bytes_new = g_bytes_new_static (new_contents, sizeof (new_contents) - 1);
     g_autoptr(GBytes) bytes_out = NULL;
-    g_autoptr(GFile) gfile = g_file_new_for_path ("/tmp/gcab-property-test.bin");
+    /* never opened, only used as an opaque identity */
+    g_autoptr(GFile) gfile = g_file_new_for_path ("gcab-property-test.bin");
     g_autoptr(GFile) file_out = NULL;
     g_autofree gchar *name = NULL;
 
@@ -350,14 +394,16 @@ gcab_test_cabinet_error_not_loaded_func (void)
     gboolean ret;
     g_autoptr(GCabCabinet) cabinet = NULL;
     g_autoptr(GError) error = NULL;
-    g_autoptr(GFile) file = NULL;
+    g_autofree gchar *tmpdir = gcab_test_make_tmpdir ();
+    g_autoptr(GFile) file = g_file_new_for_path (tmpdir);
 
     /* we can't extract before loading */
     cabinet = gcab_cabinet_new ();
-    file = g_file_new_for_path ("/tmp");
     ret = gcab_cabinet_extract_simple(cabinet, file, NULL, NULL, NULL, &error);
     g_assert_error (error, GCAB_ERROR, GCAB_ERROR_FAILED);
     g_assert (!ret);
+
+    gcab_test_remove_tmpdir (tmpdir);
 }
 
 static void
@@ -366,15 +412,11 @@ gcab_test_cabinet_error_no_folders_func (void)
     gboolean ret;
     g_autoptr(GCabCabinet) cabinet = NULL;
     g_autoptr(GError) error = NULL;
-    g_autoptr(GFile) file = NULL;
     g_autoptr(GOutputStream) op = NULL;
 
     /* we can't write with no folders */
     cabinet = gcab_cabinet_new ();
-    file = g_file_new_for_path ("/tmp/foo.cab");
-    op = G_OUTPUT_STREAM (g_file_replace (file, NULL, FALSE, 0, NULL, &error));
-    g_assert_no_error (error);
-    g_assert (op != NULL);
+    op = g_memory_output_stream_new_resizable ();
     ret = gcab_cabinet_write_simple (cabinet, op, NULL, NULL, NULL, &error);
     g_assert_error (error, GCAB_ERROR, GCAB_ERROR_FAILED);
     g_assert (!ret);
@@ -590,14 +632,10 @@ gcab_test_cabinet_blob_func (void)
     g_assert_no_error (error);
     g_assert (checksum != NULL);
 
-    /* write for debugging */
     ret = g_output_stream_close (op, NULL, &error);
     g_assert_no_error (error);
     g_assert (ret);
     g_autoptr(GBytes) blob = g_memory_output_stream_steal_as_bytes (G_MEMORY_OUTPUT_STREAM (op));
-    ret = g_file_set_contents ("/tmp/test-none.cab", g_bytes_get_data (blob, NULL), g_bytes_get_size (blob), &error);
-    g_assert_no_error (error);
-    g_assert (ret);
 
     /* verify the checksum */
     g_autofree gchar *csum = g_compute_checksum_for_bytes (G_CHECKSUM_SHA1, blob);
@@ -626,6 +664,7 @@ gcab_test_cabinet_load_func (void)
         g_autofree gchar *fn = NULL;
         g_autoptr(GCabCabinet) cabinet = NULL;
         g_autoptr(GError) error = NULL;
+        g_autofree gchar *tmpdir = NULL;
         g_autoptr(GFile) file = NULL;
         g_autoptr(GFile) file_tmpdir = NULL;
         g_autoptr(GInputStream) in = NULL;
@@ -668,7 +707,8 @@ gcab_test_cabinet_load_func (void)
             g_assert_cmpint (gcab_file_get_attributes (cabfile), ==, GCAB_FILE_ATTRIBUTE_ARCH);
         }
 
-        file_tmpdir = g_file_new_for_path ("/tmp");
+        tmpdir = gcab_test_make_tmpdir ();
+        file_tmpdir = g_file_new_for_path (tmpdir);
         ret = gcab_cabinet_extract_simple (cabinet, file_tmpdir,
                                            gcab_test_count_file_callback,
                                            &nfiles_cb, NULL, &error);
@@ -678,13 +718,14 @@ gcab_test_cabinet_load_func (void)
 
         /* check files were decompressed okay */
         for (guint j = 0; files[j].fn != NULL; j++) {
-            g_autofree gchar *fn_src = g_build_filename ("/tmp", files[j].fn, NULL);
+            g_autofree gchar *fn_src = g_build_filename (tmpdir, files[j].fn, NULL);
             g_autoptr(GFile) file_dst = g_file_new_for_path (fn_src);
             g_autofree gchar *csum = _compute_checksum_for_file (file_dst, &error);
             g_assert_no_error (error);
             g_assert (csum != NULL);
             g_assert_cmpstr (csum, ==, files[j].checksum);
         }
+        gcab_test_remove_tmpdir (tmpdir);
 
         /* extract again to a memory blob on each GCabFile */
         ret = gcab_cabinet_extract_simple (cabinet, NULL, NULL, NULL, NULL, &error);
@@ -717,6 +758,7 @@ gcab_test_cabinet_error_cves_func (void)
         g_autofree gchar *fn = NULL;
         g_autoptr(GCabCabinet) cabinet = NULL;
         g_autoptr(GError) error = NULL;
+        g_autofree gchar *tmpdir = NULL;
         g_autoptr(GFile) file = NULL;
         g_autoptr(GFile) file_tmpdir = NULL;
         g_autoptr(GInputStream) in = NULL;
@@ -733,10 +775,13 @@ gcab_test_cabinet_error_cves_func (void)
         ret = gcab_cabinet_load (cabinet, in, NULL, &error);
         g_assert_no_error (error);
         g_assert (ret);
-        file_tmpdir = g_file_new_for_path ("/tmp");
+        tmpdir = gcab_test_make_tmpdir ();
+        file_tmpdir = g_file_new_for_path (tmpdir);
         ret = gcab_cabinet_extract_simple (cabinet, file_tmpdir, NULL, NULL, NULL, &error);
         g_assert (error != NULL);
         g_assert (!ret);
+        g_clear_error (&error);
+        gcab_test_remove_tmpdir (tmpdir);
     }
 }
 
@@ -826,13 +871,10 @@ gcab_test_cabinet_write_func (void)
         g_autofree gchar *checksum_in = NULL;
         g_autofree gchar *checksum_out = NULL;
         g_autofree gchar *fn_in = NULL;
-        g_autofree gchar *fn_out = NULL;
         g_autoptr(GCabCabinet) cabinet = NULL;
         g_autoptr(GCabFolder) cabfolder = NULL;
         g_autoptr(GError) error = NULL;
         g_autoptr(GFile) file_in = NULL;
-        g_autoptr(GFile) file_out = NULL;
-        g_autoptr(GOutputStream) op = NULL;
         struct {
             const gchar *fn;
             const gchar *checksum;
@@ -868,14 +910,9 @@ gcab_test_cabinet_write_func (void)
 
         /* write the file */
         g_test_message ("%s... ", tests[i].fn);
-        fn_out = g_build_filename ("/tmp", tests[i].fn, NULL);
-        file_out = g_file_new_for_path (fn_out);
-        op = G_OUTPUT_STREAM (g_file_replace (file_out, NULL, FALSE, 0, NULL, &error));
+        g_autoptr(GBytes) blob = _gcab_test_write_cabinet (cabinet, NULL, NULL, &error);
         g_assert_no_error (error);
-        g_assert (op != NULL);
-        ret = gcab_cabinet_write_simple (cabinet, op, NULL, NULL, NULL, &error);
-        g_assert_no_error (error);
-        g_assert (ret);
+        g_assert_nonnull (blob);
 
         /* check size */
         g_assert_cmpint (gcab_cabinet_get_size (cabinet), ==, tests[i].size);
@@ -887,9 +924,8 @@ gcab_test_cabinet_write_func (void)
         checksum_in = _compute_checksum_for_file (file_in, &error);
         g_assert_no_error (error);
         g_assert (checksum_in != NULL);
-        checksum_out = _compute_checksum_for_file (file_out, &error);
-        g_assert_no_error (error);
-        g_assert (checksum_out != NULL);
+        checksum_out = g_compute_checksum_for_bytes (G_CHECKSUM_SHA1, blob);
+        g_assert_nonnull (checksum_out);
         g_assert_cmpstr (checksum_in, ==, checksum_out);
     }
 }
@@ -1290,9 +1326,7 @@ gcab_test_cabinet_path_traversal_func (void)
         NULL
     };
     g_autoptr(GError) error = NULL;
-    g_autofree gchar *tmpdir = g_dir_make_tmp ("gcab-test-XXXXXX", &error);
-    g_assert_no_error (error);
-    g_assert_nonnull (tmpdir);
+    g_autofree gchar *tmpdir = gcab_test_make_tmpdir ();
     g_autoptr(GFile) path_extract = g_file_new_for_path (tmpdir);
 
     for (guint i = 0; tests[i] != NULL; i++) {
@@ -1332,7 +1366,7 @@ gcab_test_cabinet_path_traversal_func (void)
         g_clear_error (&error);
     }
 
-    g_file_delete (path_extract, NULL, NULL);
+    gcab_test_remove_tmpdir (tmpdir);
 }
 
 #ifndef G_OS_WIN32
@@ -1480,9 +1514,7 @@ gcab_test_cabinet_roundtrip_func (void)
             g_assert_true (g_bytes_equal (bytes_out, bytes));
 
             /* and to a directory, which exercises the path handling too */
-            tmpdir = g_dir_make_tmp ("gcab-roundtrip-XXXXXX", &error);
-            g_assert_no_error (error);
-            g_assert_nonnull (tmpdir);
+            tmpdir = gcab_test_make_tmpdir ();
             path_extract = g_file_new_for_path (tmpdir);
             ret = gcab_cabinet_extract_simple (loaded, path_extract, NULL, NULL, NULL, &error);
             g_assert_no_error (error);
@@ -1494,11 +1526,7 @@ gcab_test_cabinet_roundtrip_func (void)
             g_assert_true (contents_len == 0 ||
                            memcmp (contents, g_bytes_get_data (bytes, NULL), contents_len) == 0);
 
-            g_autoptr(GFile) extracted_file = g_file_new_for_path (extracted);
-            g_assert_true (g_file_delete (extracted_file, NULL, &error));
-            g_assert_no_error (error);
-            g_assert_true (g_file_delete (path_extract, NULL, &error));
-            g_assert_no_error (error);
+            gcab_test_remove_tmpdir (tmpdir);
         }
     }
 }
