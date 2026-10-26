@@ -3,8 +3,26 @@ GCab
 
 A GObject library to create cabinet files
 
+Building and testing
+--------------------
+
+    meson setup _build
+    meson compile -C _build
+    meson test -C _build --print-errorlogs
+
+The test suite contains the GObject API self-tests and command line
+integration tests for the `gcab` tool. See `CONTRIBUTING.md` for sanitizer,
+Valgrind, coverage, and static-analysis builds.
+
+The CI pipeline runs the tests with `-Dwerror=true`, under AddressSanitizer
+and UndefinedBehaviorSanitizer, under Valgrind, with coverage reporting, and
+with clang-tidy. It also builds the release tarball and re-tests it from a
+clean extraction.
+
 Security
 --------
+
+See `SECURITY.md` for how to report vulnerabilities.
 
 When extracting a cabinet to a directory, the destination must be controlled by
 the caller and must not be writable by untrusted users. Existing path

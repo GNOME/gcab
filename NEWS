@@ -22,10 +22,19 @@ Bugfixes:
   - Fix memory leak of LZX/zlib state on folder rewind
   - Fix checksum calculation to include per-CFDATA reserved bytes
   - Fix g-ir-scanner warnings in gcab-cabinet.c
+  - Reject empty and root-only member names explicitly
+  - Allow clearing a GCabFile's GBytes with gcab_file_set_bytes (file, NULL)
+  - Validate arguments in otherwise unchecked public getters
+  - Validate the gcab --space value against the 16-bit cabinet header field
 
 Other:
   - Switch documentation from gtk-doc to gi-docgen
   - Apply gobject-linter code style fixes
+  - Drop legacy GLib version guards from the gcab tool
+  - Add API roundtrip tests for empty, single-block, and multi-block files
+  - Add gcab command line integration tests
+  - Run tests in CI under sanitizers and Valgrind, report coverage, run
+    clang-tidy, and build and re-test the release tarball
   - translation updates
 
 Translation updates
