@@ -98,7 +98,7 @@ test-sanitizers:
     ASAN_OPTIONS: "detect_leaks=1:abort_on_error=1"
     UBSAN_OPTIONS: "print_stacktrace=1:halt_on_error=1:abort_on_error=1"
   before_script:
-    - dnf -y --setopt=install_weak_deps=False install meson ninja-build gcc glib2-devel zlib-devel pkgconf-pkg-config git
+    - dnf -y --setopt=install_weak_deps=False install meson ninja-build gcc libasan libubsan diffutils glib2-devel zlib-devel pkgconf-pkg-config git
   script:
     - meson setup _build_san -Dwerror=true -Db_sanitize=address,undefined -Db_lundef=false -Ddocs=false -Dintrospection=false -Dvapi=false -Dnls=false -Dtest-env=true
     - meson compile -C _build_san
@@ -140,7 +140,7 @@ coverage:
     CC: "gcc"
   coverage: '/^TOTAL.*\s([0-9]+)%$/'
   before_script:
-    - dnf -y --setopt=install_weak_deps=False install meson ninja-build gcc glib2-devel zlib-devel pkgconf-pkg-config git gcovr
+    - dnf -y --setopt=install_weak_deps=False install meson ninja-build gcc diffutils glib2-devel zlib-devel pkgconf-pkg-config git gcovr
   script:
     - meson setup _build_cov -Db_coverage=true -Ddocs=false -Dintrospection=false -Dvapi=false -Dnls=false -Dtest-env=true
     - meson compile -C _build_cov
@@ -175,6 +175,9 @@ clang-tidy:
     - dnf -y --setopt=install_weak_deps=False install meson ninja-build clang clang-tools-extra glib2-devel zlib-devel pkgconf-pkg-config git
   script:
     - meson setup _build_tidy -Ddocs=false -Dintrospection=false -Dvapi=false -Dnls=false -Dtests=false
+    # Generate gcab-enums.[ch] before linting; clang-tidy cannot process
+    # sources that include the generated header until it exists.
+    - meson compile -C _build_tidy
     - run-clang-tidy -p _build_tidy -quiet -warnings-as-errors 'clang-analyzer-*' libgcab src
   artifacts:
     when: on_failure
@@ -190,7 +193,7 @@ dist-check:
   variables:
     CC: "gcc"
   before_script:
-    - dnf -y --setopt=install_weak_deps=False install meson ninja-build gcc glib2-devel zlib-devel pkgconf-pkg-config git xz
+    - dnf -y --setopt=install_weak_deps=False install meson ninja-build gcc diffutils glib2-devel zlib-devel pkgconf-pkg-config git xz
   script:
     - meson setup _build_dist -Ddocs=false -Dintrospection=false -Dvapi=false -Dnls=false -Dtest-env=true
     - meson dist -C _build_dist --no-tests
