@@ -97,8 +97,14 @@ build-mingw-wine:
     WINEDEBUG: "-all"
     WINEDLLOVERRIDES: "mscoree,mshtml="
     WINEARCH: "win64"
+    LC_ALL: "C.UTF-8"
+    LANG: "C.UTF-8"
   before_script:
-    - dnf -y --setopt=install_weak_deps=False install meson ninja-build gcc mingw64-gcc mingw64-glib2 mingw64-zlib wine-core
+    # wine-common provides the winmd files used to initialize the prefix.
+    # Without it, Wine retries copying a missing file forever.
+    - dnf -y --setopt=install_weak_deps=False install meson ninja-build gcc glib2-devel zlib-devel pkgconf-pkg-config mingw64-gcc mingw64-glib2 mingw64-zlib wine-core wine-common
+    # Initialize the prefix before Meson's cross sanity check invokes Wine.
+    - wine wineboot -u
   script:
     - meson setup _build_mingw --cross-file ci/mingw64-cross.ini -Ddocs=false -Dintrospection=false -Dvapi=false -Dnls=false -Dtest-env=true
     - meson compile -C _build_mingw

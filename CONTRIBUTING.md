@@ -39,7 +39,7 @@ CI cross-compiles for 64-bit Windows with MinGW and runs the full test suite
 under Wine. On Fedora, a local build can be done with:
 
 ```sh
-sudo dnf install mingw64-gcc mingw64-glib2 mingw64-zlib wine-core
+sudo dnf install mingw64-gcc mingw64-glib2 mingw64-zlib wine
 meson setup _build_mingw --cross-file ci/mingw64-cross.ini \
     -Ddocs=false -Dintrospection=false -Dvapi=false -Dnls=false
 meson compile -C _build_mingw
