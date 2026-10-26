@@ -91,6 +91,10 @@ save_array_to_file (const GByteArray *array, const gchar *base, const gchar *suf
         g_prefix_error (error, "cannot write %s: ", resname);
         return FALSE;
     }
+    if (!g_output_stream_close (output, NULL, error)) {
+        g_prefix_error (error, "cannot write %s: ", resname);
+        return FALSE;
+    }
     return TRUE;
 }
 
@@ -135,9 +139,6 @@ main (gint argc, gchar *argv[])
     bindtextdomain (GETTEXT_PACKAGE, LOCALEDIR);
     bind_textdomain_codeset (GETTEXT_PACKAGE, "UTF-8");
 
-#if !GLIB_CHECK_VERSION(2,35,1)
-    g_type_init ();
-#endif
     g_set_prgname (PACKAGE_NAME);
 
     context = g_option_context_new (_("- create a Cabinet file"));
@@ -155,7 +156,7 @@ individual files from the archive.\
     }
 
     if (version) {
-        g_printf (PACKAGE_STRING "\n");
+        g_print (PACKAGE_STRING "\n");
         return 0;
     }
 
@@ -166,6 +167,11 @@ individual files from the archive.\
 
     if (max_extract_size < 0) {
         g_printerr ("%s\n", _("Extraction size limit must not be negative"));
+        return EXIT_FAILURE;
+    }
+
+    if (space < 0 || space > G_MAXUINT16) {
+        g_printerr ("%s\n", _("Reserved space must be between 0 and 65535 bytes"));
         return EXIT_FAILURE;
     }
 

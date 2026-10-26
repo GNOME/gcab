@@ -113,6 +113,11 @@ if "$GCAB" --extract --max-extract-size -1 -C out-small archive-none.cab \
     fail "negative max-extract-size accepted"
 fi
 
+if "$GCAB" --create -s 70000 --nopath invalid-space.cab input/hello.txt \
+        >/dev/null 2>&1; then
+    fail "reserved size larger than the header field was accepted"
+fi
+
 if "$GCAB" --create empty.cab missing-input.txt >/dev/null 2>&1; then
     fail "creating from a missing input succeeded"
 fi
