@@ -582,7 +582,10 @@ gint LZXfdi_decomp(gint inlen, gint outlen, fdi_decomp_state *decomp_state) {
 
       while (data < dataend) {
         if (*data++ != 0xE8) { curpos++; continue; }
-        abs_off = data[0] | (data[1]<<8) | (data[2]<<16) | (data[3]<<24);
+        abs_off = (cab_LONG) ((cab_ULONG) data[0] |
+                              ((cab_ULONG) data[1] << 8) |
+                              ((cab_ULONG) data[2] << 16) |
+                              ((cab_ULONG) data[3] << 24));
         if ((abs_off >= -curpos) && (abs_off < filesize)) {
           rel_off = (abs_off >= 0) ? abs_off - curpos : abs_off + filesize;
           data[0] = (cab_UBYTE) rel_off;

@@ -26,6 +26,8 @@ Bugfixes:
   - Allow clearing a GCabFile's GBytes with gcab_file_set_bytes (file, NULL)
   - Validate arguments in otherwise unchecked public getters
   - Validate the gcab --space value against the 16-bit cabinet header field
+  - Fix an undefined left shift in the Intel E8 post-processing path
+  - Fix a leak when dumping the reserved area of an unsigned cabinet
 
 Other:
   - Switch documentation from gtk-doc to gi-docgen
@@ -33,6 +35,7 @@ Other:
   - Drop legacy GLib version guards from the gcab tool
   - Add API roundtrip tests for empty, single-block, and multi-block files
   - Add gcab command line integration tests
+  - Add direct LZX decoder unit tests, raising decomp.c line coverage to 98%
   - Run tests in CI under sanitizers and Valgrind, report coverage, run
     clang-tidy, and build and re-test the release tarball
   - translation updates

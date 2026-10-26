@@ -40,7 +40,7 @@ meson test -C _build_san --print-errorlogs
 
 # Valgrind
 meson setup _build_vg -Ddocs=false -Dintrospection=false -Dvapi=false -Dnls=false
-meson test -C _build_vg gcab-self-test \
+meson test -C _build_vg gcab-self-test gcab-decomp-test \
     --wrapper 'valgrind --leak-check=full --errors-for-leak-kinds=definite --error-exitcode=99'
 
 # Coverage (requires gcovr)

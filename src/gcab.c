@@ -249,12 +249,13 @@ individual files from the archive.\
                 }
             }
 
-            reserved = (GByteArray *)gcab_cabinet_get_signature (cabinet, cancellable, &error);
-            if (reserved == NULL) {
+            const GByteArray *signature =
+                gcab_cabinet_get_signature (cabinet, cancellable, &error);
+            if (signature == NULL) {
                 g_printerr ("%s: %s\n", _("Error while reading signature"), error->message);
                 return EXIT_FAILURE;
             }
-            if (!save_array_to_file (reserved, args[0], "signature", &error)) {
+            if (!save_array_to_file (signature, args[0], "signature", &error)) {
                 g_printerr ("%s\n", error->message);
                 return EXIT_FAILURE;
             }

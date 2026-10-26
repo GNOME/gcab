@@ -122,7 +122,7 @@ test-valgrind:
     - meson setup _build_vg -Dwerror=true -Ddocs=false -Dintrospection=false -Dvapi=false -Dnls=false -Dtest-env=true
     - meson compile -C _build_vg
     - >-
-      meson test -C _build_vg gcab-self-test
+      meson test -C _build_vg gcab-self-test gcab-decomp-test
       --wrapper 'valgrind --leak-check=full --errors-for-leak-kinds=definite --error-exitcode=99'
       --print-errorlogs
   artifacts:
