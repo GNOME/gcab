@@ -220,6 +220,8 @@ gcab_cabinet_get_folders (GCabCabinet *self)
 guint32
 gcab_cabinet_get_size (GCabCabinet *self)
 {
+    g_return_val_if_fail (GCAB_IS_CABINET (self), 0);
+
     if (self->cheader == NULL)
         return 0;
     return self->cheader->size;
@@ -450,7 +452,7 @@ void
 gcab_cabinet_add_allowed_compression (GCabCabinet *self, GCabCompression compression)
 {
     g_return_if_fail (GCAB_IS_CABINET (self));
-    g_return_if_fail (compression < GCAB_COMPRESSION_MASK);
+    g_return_if_fail (compression >= 0 && compression < GCAB_COMPRESSION_MASK);
 
     /* clear all */
     if (self->allowed_compression == GCAB_COMPRESSION_MASK)

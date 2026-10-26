@@ -165,6 +165,8 @@ gcab_folder_class_init (GCabFolderClass *klass)
 gint
 gcab_folder_get_comptype (GCabFolder *self)
 {
+    g_return_val_if_fail (GCAB_IS_FOLDER (self), 0);
+
     return self->comptype;
 }
 

@@ -83,9 +83,13 @@ gcab_file_finalize (GObject *object)
 static void
 gcab_file_set_name (GCabFile *self, const gchar *name)
 {
-    gchar *fname = g_strdup (name);
+    gchar *fname;
 
+    g_return_if_fail (GCAB_IS_FILE (self));
+    g_return_if_fail (name != NULL);
     g_return_if_fail (self->cfile != NULL);
+
+    fname = g_strdup (name);
 
     /* assuming that on win32 we don't get unix paths */
 #ifndef G_OS_WIN32
@@ -104,7 +108,7 @@ gcab_file_set_name (GCabFile *self, const gchar *name)
 /**
  * gcab_file_set_bytes:
  * @file: a #GCabFile
- * @bytes: a #GBytes
+ * @bytes: (nullable): a #GBytes, or %NULL to clear the data
  *
  * Replace the #GBytes associated with @self.
  * This is most usefule when the #GCabFile has been created using
@@ -115,12 +119,16 @@ gcab_file_set_name (GCabFile *self, const gchar *name)
 void
 gcab_file_set_bytes (GCabFile *self, GBytes *bytes)
 {
-    if (self->bytes != NULL)
-        g_bytes_unref (self->bytes);
-    self->bytes = g_bytes_ref (bytes);
+    g_return_if_fail (GCAB_IS_FILE (self));
+    g_return_if_fail (self->cfile != NULL);
+
+    GBytes *new_bytes = bytes != NULL ? g_bytes_ref (bytes) : NULL;
+
+    g_clear_pointer (&self->bytes, g_bytes_unref);
+    self->bytes = new_bytes;
 
     /* this is embedded into the archive */
-    self->cfile->usize = g_bytes_get_size (bytes);
+    self->cfile->usize = bytes != NULL ? g_bytes_get_size (bytes) : 0;
 }
 
 static void
@@ -195,6 +203,7 @@ void
 gcab_file_set_date_time (GCabFile *self, GDateTime *dt)
 {
     g_return_if_fail (GCAB_IS_FILE (self));
+    g_return_if_fail (self->cfile != NULL);
     g_return_if_fail (dt != NULL);
 
     self->cfile->date = ((g_date_time_get_year (dt) - 1980 ) << 9 ) +
@@ -587,6 +596,10 @@ _gcab_file_name_is_unsafe (const gchar *name)
 {
     const gchar *p = name;
 
+    /* an empty name cannot describe a file below the extraction root */
+    if (p[0] == '\0')
+        return TRUE;
+
     /* UNC paths */
     if (p[0] == '/' && p[1] == '/')
         return TRUE;
@@ -594,6 +607,8 @@ _gcab_file_name_is_unsafe (const gchar *name)
     /* drive-letter paths, including drive-relative ones */
     while (*p == '/')
         p++;
+    if (*p == '\0')
+        return TRUE;
     return g_ascii_isalpha (p[0]) && p[1] == ':';
 }
 
@@ -608,7 +623,13 @@ gcab_file_get_output_stream (GCabFile *self,
         return g_memory_output_stream_new_resizable ();
 
     /* make path have UNIX directory slashes */
-    g_autofree gchar *fname = g_strdup (gcab_file_get_extract_name (self));
+    const gchar *extract_name = gcab_file_get_extract_name (self);
+    if (extract_name == NULL) {
+        g_set_error (error, GCAB_ERROR, GCAB_ERROR_INVALID_DATA,
+                     "File has no extraction name");
+        return NULL;
+    }
+    g_autofree gchar *fname = g_strdup (extract_name);
     g_strdelimit (fname, "\\", '/');
 
     /* these are interpreted as absolute paths on Windows */

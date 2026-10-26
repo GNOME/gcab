@@ -148,6 +148,27 @@ _gcab_test_file_properties_func (void)
 }
 
 static void
+_gcab_test_file_clear_bytes_func (void)
+{
+    const gchar contents[] = "payload";
+    g_autoptr(GBytes) bytes = g_bytes_new_static (contents, sizeof (contents) - 1);
+    g_autoptr(GCabFile) cabfile = gcab_file_new_with_bytes ("clear.bin", bytes);
+
+    g_assert_true (gcab_file_get_bytes (cabfile) == bytes);
+    g_assert_cmpuint (gcab_file_get_size (cabfile), ==, sizeof (contents) - 1);
+
+    /* re-setting the same GBytes must not drop the last reference */
+    gcab_file_set_bytes (cabfile, bytes);
+    g_assert_true (gcab_file_get_bytes (cabfile) == bytes);
+    g_assert_cmpuint (gcab_file_get_size (cabfile), ==, sizeof (contents) - 1);
+
+    /* clearing the property is allowed and resets the cached size */
+    g_object_set (cabfile, "bytes", NULL, NULL);
+    g_assert_null (gcab_file_get_bytes (cabfile));
+    g_assert_cmpuint (gcab_file_get_size (cabfile), ==, 0);
+}
+
+static void
 _gcab_test_folder_properties_func (void)
 {
     const guint8 data[] = { 0x01, 0x02, 0x03, 0x04 };
@@ -1260,6 +1281,9 @@ gcab_test_cabinet_path_traversal_func (void)
         "C:\\evil.txt",
         "\\\\server\\share\\evil.txt",
         "\\\\?\\C:\\evil.txt",
+        "",
+        "/",
+        "///",
         NULL
     };
     g_autoptr(GError) error = NULL;
@@ -1356,6 +1380,126 @@ gcab_test_cabinet_symlink_func (void)
 }
 #endif
 
+static GBytes *
+_gcab_test_make_bytes (gsize size, guint seed, gboolean compressible)
+{
+    guint32 state = seed;
+    guint8 *data = g_malloc (size);
+
+    for (gsize i = 0; i < size; i++) {
+        state = state * 1664525u + 1013904223u;
+        if (compressible && (i % 16) < 12)
+            data[i] = "gcab-test"[i % 9];
+        else
+            data[i] = (state >> 24) & 0xff;
+    }
+
+    return g_bytes_new_take (data, size);
+}
+
+static void
+gcab_test_cabinet_roundtrip_func (void)
+{
+    const gsize sizes[] = {
+        0,
+        1,
+        7,
+        CAB_MAX_BLOCK_SIZE - 1,
+        CAB_MAX_BLOCK_SIZE,
+        CAB_MAX_BLOCK_SIZE + 1,
+        2 * CAB_MAX_BLOCK_SIZE + 123,
+    };
+    const gint comptypes[] = {
+        GCAB_COMPRESSION_NONE,
+        GCAB_COMPRESSION_MSZIP,
+    };
+
+    for (guint c = 0; c < G_N_ELEMENTS (comptypes); c++) {
+        for (guint s = 0; s < G_N_ELEMENTS (sizes); s++) {
+            gboolean ret;
+            gsize contents_len = 0;
+            g_autofree gchar *contents = NULL;
+            g_autofree gchar *tmpdir = NULL;
+            g_autofree gchar *extracted = NULL;
+            g_autoptr(GCabCabinet) cabinet = gcab_cabinet_new ();
+            g_autoptr(GCabCabinet) loaded = gcab_cabinet_new ();
+            g_autoptr(GCabFolder) folder = gcab_folder_new (comptypes[c]);
+            g_autoptr(GBytes) bytes = _gcab_test_make_bytes (sizes[s], s + 1, TRUE);
+            g_autoptr(GCabFile) cabfile = gcab_file_new_with_bytes ("roundtrip.bin", bytes);
+            g_autoptr(GDateTime) date = g_date_time_new_utc (2020, 2, 3, 4, 5, 6);
+            g_autoptr(GError) error = NULL;
+            g_autoptr(GFile) path_extract = NULL;
+            g_autoptr(GInputStream) in = NULL;
+
+            g_test_message ("comptype %d, size %" G_GSIZE_FORMAT, comptypes[c], sizes[s]);
+
+            gcab_file_set_date_time (cabfile, date);
+            gcab_file_set_attributes (cabfile, GCAB_FILE_ATTRIBUTE_RDONLY |
+                                               GCAB_FILE_ATTRIBUTE_ARCH);
+
+            ret = gcab_cabinet_add_folder (cabinet, folder, &error);
+            g_assert_no_error (error);
+            g_assert_true (ret);
+            ret = gcab_folder_add_file (folder, cabfile, FALSE, NULL, &error);
+            g_assert_no_error (error);
+            g_assert_true (ret);
+
+            g_autoptr(GBytes) blob = _gcab_test_write_cabinet (cabinet, NULL, NULL, &error);
+            g_assert_no_error (error);
+            g_assert_nonnull (blob);
+            g_assert_cmpuint (gcab_cabinet_get_size (cabinet), ==, g_bytes_get_size (blob));
+
+            in = g_memory_input_stream_new_from_bytes (blob);
+            ret = gcab_cabinet_load (loaded, in, NULL, &error);
+            g_assert_no_error (error);
+            g_assert_true (ret);
+
+            GPtrArray *folders = gcab_cabinet_get_folders (loaded);
+            g_assert_cmpuint (folders->len, ==, 1);
+            g_autoptr(GSList) files = gcab_folder_get_files (g_ptr_array_index (folders, 0));
+            g_assert_cmpuint (g_slist_length (files), ==, 1);
+            GCabFile *file_out = files->data;
+
+            g_assert_cmpstr (gcab_file_get_name (file_out), ==, "roundtrip.bin");
+            g_assert_cmpuint (gcab_file_get_size (file_out), ==, sizes[s]);
+            g_assert_cmpuint (gcab_file_get_attributes (file_out), ==,
+                              GCAB_FILE_ATTRIBUTE_RDONLY | GCAB_FILE_ATTRIBUTE_ARCH);
+            g_autoptr(GDateTime) date_out = gcab_file_get_date_time (file_out);
+            g_assert_nonnull (date_out);
+            g_assert_cmpint (g_date_time_to_unix (date_out), ==, g_date_time_to_unix (date));
+
+            /* decompress to memory */
+            ret = gcab_cabinet_extract_simple (loaded, NULL, NULL, NULL, NULL, &error);
+            g_assert_no_error (error);
+            g_assert_true (ret);
+            GBytes *bytes_out = gcab_file_get_bytes (file_out);
+            g_assert_nonnull (bytes_out);
+            g_assert_true (g_bytes_equal (bytes_out, bytes));
+
+            /* and to a directory, which exercises the path handling too */
+            tmpdir = g_dir_make_tmp ("gcab-roundtrip-XXXXXX", &error);
+            g_assert_no_error (error);
+            g_assert_nonnull (tmpdir);
+            path_extract = g_file_new_for_path (tmpdir);
+            ret = gcab_cabinet_extract_simple (loaded, path_extract, NULL, NULL, NULL, &error);
+            g_assert_no_error (error);
+            g_assert_true (ret);
+            extracted = g_build_filename (tmpdir, "roundtrip.bin", NULL);
+            g_assert_true (g_file_get_contents (extracted, &contents, &contents_len, &error));
+            g_assert_no_error (error);
+            g_assert_cmpuint (contents_len, ==, sizes[s]);
+            g_assert_true (contents_len == 0 ||
+                           memcmp (contents, g_bytes_get_data (bytes, NULL), contents_len) == 0);
+
+            g_autoptr(GFile) extracted_file = g_file_new_for_path (extracted);
+            g_assert_true (g_file_delete (extracted_file, NULL, &error));
+            g_assert_no_error (error);
+            g_assert_true (g_file_delete (path_extract, NULL, &error));
+            g_assert_no_error (error);
+        }
+    }
+}
+
 gint
 main (gint argc, gchar **argv)
 {
@@ -1368,6 +1512,7 @@ main (gint argc, gchar **argv)
     /* tests go here */
     g_test_add_func ("/GCab/file", gcab_test_file_func);
     g_test_add_func ("/GCab/file{properties}", _gcab_test_file_properties_func);
+    g_test_add_func ("/GCab/file{clear-bytes}", _gcab_test_file_clear_bytes_func);
     g_test_add_func ("/GCab/folder", gcab_test_folder_func);
     g_test_add_func ("/GCab/folder{properties}", _gcab_test_folder_properties_func);
     g_test_add_func ("/GCab/folder{path}", gcab_test_folder_path_func);
@@ -1392,6 +1537,7 @@ main (gint argc, gchar **argv)
     g_test_add_func ("/GCab/cabinet{multicab-prev}", gcab_test_cabinet_multicab_prev_func);
     g_test_add_func ("/GCab/cabinet{write}", gcab_test_cabinet_write_func);
     g_test_add_func ("/GCab/cabinet{blob}", gcab_test_cabinet_blob_func);
+    g_test_add_func ("/GCab/cabinet{roundtrip}", gcab_test_cabinet_roundtrip_func);
     g_test_add_func ("/GCab/cabinet{signature}", gcab_test_cabinet_signature_func);
     g_test_add_func ("/GCab/cabinet{allowed-compression}", gcab_test_cabinet_allowed_compression_func);
     g_test_add_func ("/GCab/cabinet{path-traversal}", gcab_test_cabinet_path_traversal_func);

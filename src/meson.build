@@ -92,3 +92,14 @@ executable(
   ],
   c_args : cargs,
 )
+
+if get_option('tests')
+  cli_test_env = environment()
+  cli_test_env.set('GCAB', gcab.full_path())
+  test('gcab-cli',
+    find_program('sh'),
+    args : [files('../tests/test-cli.sh')],
+    env : cli_test_env,
+    depends : gcab,
+  )
+endif
