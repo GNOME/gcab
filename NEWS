@@ -1,3 +1,50 @@
+v1.7
+====
+
+New Features:
+  - Multi-cabinet set support: load, chain, and extract across spanning cabinets
+  - New gcab_cabinet_load_from_file() to load from a GFile and auto-discover
+    adjacent cabinets
+  - New gcab_cabinet_get_next(), gcab_cabinet_get_prev(),
+    gcab_cabinet_set_next(), gcab_cabinet_set_prev() to chain cabinet sets
+  - New gcab_cabinet_get_next_name(), gcab_cabinet_get_prev_name() to query
+    cabinet set linkage
+  - New gcab_file_is_continued_from_prev(), gcab_file_is_continued_to_next()
+    to identify files spanning multiple cabinets
+  - New gcab_cabinet_set_extract_size_limit(),
+    gcab_cabinet_set_extract_ratio_limit() and getters to control extraction
+    limits
+  - New gcab --max-extract-size option
+
+Bugfixes:
+  - Limit extraction output and compression ratio to prevent decompression
+    bombs, and reject overlapping file data
+  - Fix memory leak of LZX/zlib state on folder rewind
+  - Fix checksum calculation to include per-CFDATA reserved bytes
+  - Fix g-ir-scanner warnings in gcab-cabinet.c
+  - Reject empty and root-only member names explicitly
+  - Allow clearing a GCabFile's GBytes with gcab_file_set_bytes (file, NULL)
+  - Validate arguments in otherwise unchecked public getters
+  - Validate the gcab --space value against the 16-bit cabinet header field
+  - On Linux, resolve and create extraction paths with openat2(), removing
+    the check-then-use window for symlink and path replacement attacks
+  - Fix an undefined left shift in the Intel E8 post-processing path
+  - Fix a leak when dumping the reserved area of an unsigned cabinet
+
+Other:
+  - Switch documentation from gtk-doc to gi-docgen
+  - Apply gobject-linter code style fixes
+  - Drop legacy GLib version guards from the gcab tool
+  - Add API roundtrip tests for empty, single-block, and multi-block files
+  - Add gcab command line integration tests
+  - Add direct LZX decoder unit tests, raising decomp.c line coverage to 98%
+  - Treat compiler warnings as errors by default (use -Dwerror=false to opt out)
+  - Run tests in CI under sanitizers and Valgrind, report coverage, run
+    clang-tidy, and build and re-test the release tarball
+  - translation updates
+
+Translation updates
+
 v1.6
 ====
 

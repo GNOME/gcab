@@ -1,0 +1,25 @@
+# Build directories
+/_build*/
+/build/
+/buildcov/
+/builddir/
+/buildfuzz*/
+/buildw/
+/dist/
+/subprojects/packagecache/
+
+# Coverage and test artifacts
+/coverage.xml
+/coverage-report/
+*.gcda
+*.gcno
+*.gcov
+/vgcore.*
+/core
+/core.*
+
+# Editor and OS files
+*~
+*.swp
+*.swo
+.DS_Store

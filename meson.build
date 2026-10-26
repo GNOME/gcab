@@ -1,8 +1,14 @@
 project('gcab', 'c',
-  version : '1.6',
+  version : '1.7',
   license : 'LGPL-2.1+',
   meson_version : '>=0.56.0',
-  default_options : ['warning_level=2', 'c_std=c99'],
+  default_options : [
+    'warning_level=2',
+    'c_std=c99',
+    # Keep the normal developer build warning-clean. Packagers can opt out
+    # with -Dwerror=false if a new compiler adds diagnostics.
+    'werror=true',
+  ],
 )
 
 git_version = []
@@ -12,9 +18,9 @@ if git.found()
 endif
 
 # libtool versioning
-lt_current = 3
+lt_current = 4
 lt_revision = 0
-lt_age = 3
+lt_age = 4
 lt_version = '@0@.@1@.@2@'.format(lt_current - lt_age, lt_age, lt_revision)
 darwin_versions = [lt_current + 1, '@0@.@1@.0'.format(lt_current + 1, lt_revision)]
 
@@ -58,7 +64,6 @@ test_args = [
   '-Wsign-compare',
   '-Wstrict-aliasing',
   '-Wstrict-prototypes',
-  '-Wswitch-default',
   '-Wtype-limits',
   '-Wundef',
   '-Wuninitialized',
@@ -67,6 +72,10 @@ test_args = [
   '-Wwrite-strings'
 ]
 cc = meson.get_compiler('c')
+fuzzing_cargs = []
+if get_option('libfuzzer') and cc.has_argument('-fsanitize=fuzzer-no-link')
+  fuzzing_cargs += ['-fsanitize=fuzzer-no-link']
+endif
 foreach arg: test_args
   if cc.has_argument(arg)
     add_project_arguments(arg, language : 'c')
@@ -94,13 +103,35 @@ add_project_link_arguments(
   language: 'c'
 )
 
-gio = dependency('gio-2.0', version : '>= 2.62.0')
+gio = dependency('gio-2.0', version : '>= 2.88.0')
 libz = dependency('zlib')
+
+have_openat2 = false
+if host_machine.system() == 'linux'
+  have_openat2 = cc.links('''
+    #define _GNU_SOURCE
+    #include <sys/syscall.h>
+    #include <unistd.h>
+    #include <linux/openat2.h>
+    int main (void)
+    {
+      struct open_how how = {
+        .resolve = RESOLVE_BENEATH | RESOLVE_NO_SYMLINKS | RESOLVE_NO_MAGICLINKS,
+      };
+      return syscall (SYS_openat2, -1, ".", &how, sizeof (how)) == 0;
+    }
+  ''', name : 'openat2 syscall')
+endif
+
+gio_unix = []
+if have_openat2
+  gio_unix = [dependency('gio-unix-2.0')]
+endif
 
 gcab_deps = [
   gio,
   libz,
-]
+] + gio_unix
 
 gnome = import('gnome')
 i18n = import('i18n')
@@ -120,6 +151,7 @@ conf.set_quoted('PACKAGE_NAME', meson.project_name())
 conf.set_quoted('PACKAGE_STRING', package_string)
 conf.set_quoted('LOCALEDIR', join_paths(get_option('prefix'), get_option('localedir')))
 conf.set_quoted('PACKAGE_BUGREPORT', 'https://gitlab.gnome.org/GNOME/gcab/issues/new')
+conf.set10('HAVE_OPENAT2', have_openat2)
 configure_file(
   output : 'config.h',
   configuration : conf

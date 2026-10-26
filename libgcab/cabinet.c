@@ -26,7 +26,8 @@
 static voidpf
 zalloc (voidpf opaque, uInt items, uInt size)
 {
-    return g_malloc (items *size);
+    (void) opaque;
+    return (voidpf) g_malloc_n (items, size);
 }
 static void
 zfree (voidpf opaque, voidpf address)
@@ -34,7 +35,7 @@ zfree (voidpf opaque, voidpf address)
     g_free (address);
 }
 
-static char *
+static gchar *
 _data_input_stream_read_until (GDataInputStream  *stream,
                                const gchar        *stop_chars,
                                gsize              stop_len,
@@ -52,11 +53,21 @@ _data_input_stream_read_until (GDataInputStream  *stream,
   /* If we're not at end of stream then we have a stop_char to consume. */
   if (result != NULL && g_buffered_input_stream_get_available (bstream) > 0)
     {
-      gsize res;
+      gssize res;
       gchar b;
 
-      res = g_input_stream_read (G_INPUT_STREAM (stream), &b, 1, NULL, NULL);
-      g_assert (res == 1);
+      res = g_input_stream_read (G_INPUT_STREAM (stream), &b, 1,
+                                 cancellable, error);
+      if (res < 0) {
+        g_free (result);
+        return NULL;
+      }
+      if (res != 1) {
+        g_set_error (error, GCAB_ERROR, GCAB_ERROR_FORMAT,
+                     "Expected stop character, got end of stream");
+        g_free (result);
+        return NULL;
+      }
     }
 
   return result;
@@ -143,6 +154,15 @@ hexdump (guchar *p, gsize s)
 #define PND(p, field, size) \
     g_debug ("%15s:", #field), hexdump (field, size)
 
+static gboolean
+_gcab_debug (void)
+{
+    static gint debug = -1;
+    if (debug == -1)
+        debug = g_getenv ("GCAB_DEBUG") != NULL;
+    return debug;
+}
+
 #define W1(val) \
     g_data_output_stream_put_byte (out, val, cancellable, error)
 #define W2(val) \
@@ -178,7 +198,7 @@ cheader_write (cheader_t *ch, GDataOutputStream *out,
             !W1 (ch->res_folder) ||
             !W1 (ch->res_data))
                 return FALSE;
-        if (g_output_stream_write (stream, ch->reserved, ch->res_header,
+        if (g_output_stream_write (stream, ch->reserved->data, ch->res_header,
                                    cancellable, error) == -1)
             return FALSE;
     }
@@ -221,8 +241,9 @@ cheader_read (cheader_t *ch, GDataInputStream *in,
         R2 (ch->res_header);
         R1 (ch->res_folder);
         R1 (ch->res_data);
-        ch->reserved = g_malloc (ch->res_header);
-        RN (ch->reserved, ch->res_header);
+        ch->reserved = g_byte_array_sized_new (ch->res_header);
+        g_byte_array_set_size (ch->reserved, ch->res_header);
+        RN (ch->reserved->data, ch->res_header);
     }
 
     if (ch->flags & CABINET_HEADER_PREV) {
@@ -235,7 +256,7 @@ cheader_read (cheader_t *ch, GDataInputStream *in,
         RS (ch->disk_next);
     }
 
-    if (g_getenv ("GCAB_DEBUG")) {
+    if (_gcab_debug ()) {
         g_debug ("CFHEADER");
         P4 (ch, res1);
         P4 (ch, size);
@@ -254,7 +275,7 @@ cheader_read (cheader_t *ch, GDataInputStream *in,
             P1 (ch, res_folder);
             P1 (ch, res_data);
             if (ch->res_header)
-                PN (ch, reserved, ch->res_header);
+                PN (ch, reserved->data, ch->res_header);
         }
         if (ch->flags & CABINET_HEADER_PREV) {
             PS (ch, cab_prev);
@@ -278,7 +299,7 @@ cheader_free (cheader_t *ch)
 {
     if (ch == NULL)
         return;
-    g_free (ch->reserved);
+    g_clear_pointer (&ch->reserved, g_byte_array_unref);
     g_free (ch->cab_prev);
     g_free (ch->disk_prev);
     g_free (ch->cab_next);
@@ -310,7 +331,7 @@ cfolder_read (cfolder_t *cf, guint8 res_size, GDataInputStream *in,
     cf->reserved = g_malloc (res_size);
     RN (cf->reserved, res_size);
 
-    if (g_getenv ("GCAB_DEBUG")) {
+    if (_gcab_debug ()) {
         g_debug ("CFOLDER");
         P4 (cf, offsetdata);
         P2 (cf, ndatab);
@@ -365,7 +386,7 @@ cfile_read (cfile_t *cf, GDataInputStream *in,
     R2 (cf->fattr);
     RS (cf->name);
 
-    if (g_getenv ("GCAB_DEBUG")) {
+    if (_gcab_debug ()) {
         g_debug ("CFILE");
         P4 (cf, usize);
         P4 (cf, uoffset);
@@ -394,7 +415,7 @@ cfile_free (cfile_t *cf)
 static guint32
 compute_checksum (guint8 *in, guint16 ncbytes, guint32 seed)
 {
-    int no_ulongs;
+    gint no_ulongs;
     guint32 csum=0;
     guint32 temp;
 
@@ -426,12 +447,30 @@ compute_checksum (guint8 *in, guint16 ncbytes, guint32 seed)
     return csum;
 }
 
+static guint32
+cdata_compute_checksum (guint8 *buf, guint16 ncbytes, guint16 nubytes,
+                        guint8 *reserved, guint8 res_data)
+{
+    guint32 csum;
+    guint8 sizecsum[4];
+    guint16 nbytes_le;
+
+    csum = compute_checksum (reserved, res_data, 0);
+    csum = compute_checksum (buf, ncbytes, csum);
+
+    nbytes_le = GUINT16_TO_LE (ncbytes);
+    memcpy (&sizecsum[0], &nbytes_le, 2);
+    nbytes_le = GUINT16_TO_LE (nubytes);
+    memcpy (&sizecsum[2], &nbytes_le, 2);
+    return compute_checksum (sizecsum, sizeof (sizecsum), csum);
+}
+
 static gboolean
-cdata_deflate_block (cdata_t *cd, guint8 *data, size_t size, int level,
+cdata_deflate_block (cdata_t *cd, guint8 *data, gsize size, gint level,
                      GError **error)
 {
     z_stream deflate_stream = { 0, };
-    int zret;
+    gint zret;
 
     deflate_stream.zalloc = zalloc;
     deflate_stream.zfree = zfree;
@@ -464,8 +503,8 @@ cdata_deflate_block (cdata_t *cd, guint8 *data, size_t size, int level,
 }
 
 G_GNUC_INTERNAL gboolean
-cdata_write (cdata_t *cd, GDataOutputStream *out, int type,
-             guint8 *data, size_t size, gsize *bytes_written,
+cdata_write (cdata_t *cd, GDataOutputStream *out, gint type,
+             guint8 *data, gsize size, gsize *bytes_written,
              GCancellable *cancellable, GError **error)
 {
     switch (type) {
@@ -492,15 +531,8 @@ cdata_write (cdata_t *cd, GDataOutputStream *out, int type,
         return FALSE;
     }
 
-    guint32 datacsum = compute_checksum(cd->in, cd->ncbytes, 0);
-    guint8 sizecsum[4];
-    guint16 nbytes_le;
-
-    nbytes_le = GUINT16_TO_LE (cd->ncbytes);
-    memcpy (&sizecsum[0], &nbytes_le, 2);
-    nbytes_le = GUINT16_TO_LE (cd->nubytes);
-    memcpy (&sizecsum[2], &nbytes_le, 2);
-    cd->checksum = compute_checksum (sizecsum, sizeof(sizecsum), datacsum);
+    cd->checksum = cdata_compute_checksum (cd->in, cd->ncbytes, cd->nubytes,
+                                           NULL, 0);
     GOutputStream *stream = g_filter_output_stream_get_base_stream (G_FILTER_OUTPUT_STREAM (out));
 
     *bytes_written = 0;
@@ -541,91 +573,43 @@ cdata_free (cdata_t *cd)
 static gint
 _enforce_checksum (void)
 {
+#ifdef GCAB_ENABLE_TEST_ENV
     static gint enforce = -1;
     if (enforce == -1)
         enforce = g_getenv ("GCAB_SKIP_CHECKSUM") == NULL ? 1 : 0;
     return enforce;
+#else
+    return 1;
+#endif
 }
 
 G_GNUC_INTERNAL gboolean
-cdata_read (cdata_t *cd, guint8 res_data, gint comptype,
-            GDataInputStream *in, GCancellable *cancellable, GError **error)
-
+cdata_get_read_buf (cdata_t *cd, gint compression,
+                    guint8 **buf, gsize *buf_sz, GError **error)
 {
-    gboolean success = FALSE;
-    int ret, zret = Z_OK;
-    gint compression = comptype & GCAB_COMPRESSION_MASK;
-    gsize buf_sz;
-    guint8 *buf = NULL;
-    guint32 datacsum;
-    guint32 checksum_tmp;
-    guint8 sizecsum[4];
-    guint16 nbytes_le;
-
-    /* decompress directly into ->out for no decompression */
     switch (compression) {
     case GCAB_COMPRESSION_NONE:
-        buf = cd->out;
-        buf_sz = sizeof(cd->out);
-        break;
+        *buf = cd->out;
+        *buf_sz = sizeof(cd->out);
+        return TRUE;
     case GCAB_COMPRESSION_MSZIP:
     case GCAB_COMPRESSION_LZX:
-        buf = cd->in;
-        buf_sz = sizeof(cd->in);
-        break;
+        *buf = cd->in;
+        *buf_sz = sizeof(cd->in);
+        return TRUE;
     default:
         g_set_error (error, GCAB_ERROR, GCAB_ERROR_NOT_SUPPORTED,
                      "unsupported compression method %d", compression);
-        break;
-    }
-    if (buf == NULL)
-        return FALSE;
-
-    R4 (cd->checksum);
-    R2 (cd->ncbytes);
-    if (cd->ncbytes > buf_sz) {
-        g_set_error (error, GCAB_ERROR, GCAB_ERROR_INVALID_DATA,
-                     "tried to decompress %" G_GUINT16_FORMAT " bytes "
-                     "into buffer of size %" G_GSIZE_FORMAT,
-                     cd->ncbytes, buf_sz);
         return FALSE;
     }
-    R2 (cd->nubytes);
-    if (cd->nubytes > CAB_MAX_BLOCK_SIZE) {
-        g_set_error (error, GCAB_ERROR, GCAB_ERROR_INVALID_DATA,
-                     "CDATA block of %" G_GUINT16_FORMAT " bytes "
-                     "was bigger than maximum size %i",
-                     cd->nubytes, CAB_MAX_BLOCK_SIZE);
-        return FALSE;
-    }
-    RN (cd->reserved, res_data);
-    RN (buf, cd->ncbytes);
+}
 
-    datacsum = compute_checksum(buf, cd->ncbytes, 0);
-    nbytes_le = GUINT16_TO_LE (cd->ncbytes);
-    memcpy (&sizecsum[0], &nbytes_le, 2);
-    nbytes_le = GUINT16_TO_LE (cd->nubytes);
-    memcpy (&sizecsum[2], &nbytes_le, 2);
-    checksum_tmp = compute_checksum (sizecsum, sizeof(sizecsum), datacsum);
-    if (cd->checksum != checksum_tmp) {
-        if (_enforce_checksum ()) {
-            g_set_error_literal (error, GCAB_ERROR, GCAB_ERROR_INVALID_DATA,
-                                 "incorrect checksum detected");
-            return FALSE;
-        }
-        if (g_getenv ("GCAB_DEBUG"))
-            g_debug ("CDATA checksum 0x%08x", (guint) checksum_tmp);
-    }
-
-    if (g_getenv ("GCAB_DEBUG")) {
-        g_debug ("CDATA");
-        P4 (cd, checksum);
-        P2 (cd, ncbytes);
-        P2 (cd, nubytes);
-        if (res_data)
-            PN (cd, reserved, res_data);
-        PND (cd, buf, 64);
-    }
+G_GNUC_INTERNAL gboolean
+cdata_decompress (cdata_t *cd, gint comptype, GError **error)
+{
+    gboolean success = FALSE;
+    gint ret, zret = Z_OK;
+    gint compression = comptype & GCAB_COMPRESSION_MASK;
 
     if (compression == GCAB_COMPRESSION_LZX) {
         if (cd->fdi.alloc == NULL) {
@@ -646,7 +630,15 @@ cdata_read (cdata_t *cd, guint8 res_data, gint comptype,
             goto end;
     }
 
+    if (compression == GCAB_COMPRESSION_NONE) {
+        /* uncompressed CDATA must not expose stale output buffer contents */
+        if (cd->ncbytes != cd->nubytes)
+            goto end;
+    }
+
     if (compression == GCAB_COMPRESSION_MSZIP) {
+        if (cd->ncbytes < 2)
+            goto end;
         if (cd->in[0] != 'C' || cd->in[1] != 'K')
             goto end;
 
@@ -703,4 +695,67 @@ end:
                      "Invalid cabinet chunk");
 
     return success;
+}
+
+static gboolean
+read_raw_cfdata (GDataInputStream *in, guint8 res_data,
+                 guint8 *buf, gsize buf_sz,
+                 guint16 *out_ncbytes, guint16 *out_nubytes,
+                 guint32 *out_checksum, guint8 *out_reserved,
+                 GCancellable *cancellable, GError **error)
+{
+    gboolean success = FALSE;
+    guint32 checksum;
+    guint16 ncbytes, nubytes;
+
+    R4 (checksum);
+    R2 (ncbytes);
+    if (ncbytes > buf_sz) {
+        g_set_error (error, GCAB_ERROR, GCAB_ERROR_INVALID_DATA,
+                     "split CDATA part too large: %" G_GUINT16_FORMAT, ncbytes);
+        goto end;
+    }
+    R2 (nubytes);
+    RN (out_reserved, res_data);
+    RN (buf, ncbytes);
+
+    *out_ncbytes = ncbytes;
+    *out_nubytes = nubytes;
+    *out_checksum = checksum;
+    success = TRUE;
+
+end:
+    return success;
+}
+
+G_GNUC_INTERNAL gboolean
+cdata_read_part (cdata_t *cd, guint8 res_data, GDataInputStream *in,
+                 guint8 *buf, gsize buf_sz,
+                 guint16 *out_ncbytes, guint16 *out_nubytes,
+                 GCancellable *cancellable, GError **error)
+{
+    guint32 checksum, checksum_tmp;
+    guint16 ncbytes, nubytes;
+    guint8 reserved[256];
+
+    if (!read_raw_cfdata (in, res_data, buf, buf_sz,
+                          &ncbytes, &nubytes, &checksum,
+                          reserved, cancellable, error))
+        return FALSE;
+
+    checksum_tmp = cdata_compute_checksum (buf, ncbytes, nubytes,
+                                           reserved, res_data);
+    if (checksum != checksum_tmp) {
+        if (_enforce_checksum ()) {
+            g_set_error_literal (error, GCAB_ERROR, GCAB_ERROR_INVALID_DATA,
+                                 "incorrect checksum detected in continued CDATA part");
+            return FALSE;
+        }
+        if (_gcab_debug ())
+            g_debug ("continued CDATA part checksum 0x%08x", (guint) checksum_tmp);
+    }
+
+    *out_ncbytes = ncbytes;
+    *out_nubytes = nubytes;
+    return TRUE;
 }

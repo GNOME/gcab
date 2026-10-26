@@ -1,6 +1,9 @@
 cargs = [
   '-DG_LOG_DOMAIN="gcab"',
 ]
+if get_option('test-env')
+  cargs += ['-DGCAB_ENABLE_TEST_ENV']
+endif
 
 enum_headers = ['gcab-folder.h', 'gcab-file.h']
 enums = gnome.mkenums(
@@ -29,22 +32,27 @@ install_headers([
 
 mapfile = 'libgcab.syms'
 vflag = '-Wl,--version-script,@0@/@1@'.format(meson.current_source_dir(), mapfile)
-libgcab = shared_library(
+libgcab_sources = [
+  'gcab-cabinet.c',
+  'gcab-folder.c',
+  'gcab-file.c',
+  'cabinet.c',
+  'decomp.c',
+]
+if have_openat2
+  libgcab_sources += 'gcab-openat2.c'
+endif
+
+libgcab = library(
   'gcab-1.0',
   enums,
-  sources : [
-    'gcab-cabinet.c',
-    'gcab-folder.c',
-    'gcab-file.c',
-    'cabinet.c',
-    'decomp.c',
-  ],
+  sources : libgcab_sources,
   version : lt_version,
   darwin_versions: darwin_versions,
   dependencies : [
     gio,
     libz,
-  ],
+  ] + gio_unix,
   c_args : cargs,
   include_directories : [
     include_directories('.'),
@@ -54,6 +62,24 @@ libgcab = shared_library(
   link_depends : mapfile,
   install : true
 )
+
+if get_option('libfuzzer')
+  libgcab_fuzz = static_library(
+    'gcab-fuzz-support',
+    enums,
+    sources : libgcab_sources,
+    dependencies : [
+      gio,
+      libz,
+    ] + gio_unix,
+    c_args : cargs + fuzzing_cargs,
+    include_directories : [
+      include_directories('.'),
+      include_directories('..'),
+    ],
+    install : false,
+  )
+endif
 
 gcab_dep = declare_dependency(
   link_with : libgcab,

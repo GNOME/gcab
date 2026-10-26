@@ -20,8 +20,7 @@
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301, USA
  */
 
-#ifndef MSZIP_H_
-# define MSZIP_H_
+#pragma once
 
 #include <glib.h>
 
@@ -53,8 +52,18 @@
 /* Quantum reads bytes in normal order; LZX is little-endian order */
 #define ENSURE_BITS(n)                                                    \
   while (bitsleft < (n)) {                                                \
-    bitbuf |= ((inpos[1]<<8)|inpos[0]) << (CAB_ULONG_BITS-16 - bitsleft); \
-    bitsleft += 16; inpos+=2;                                             \
+    cab_ULONG word = 0;                                                   \
+    if (inpos < endinp) {                                                 \
+      word = *inpos++;                                                    \
+      if (inpos < endinp)                                                 \
+        word |= (cab_ULONG)*inpos++ << 8;                                 \
+    }                                                                     \
+    else {                                                                \
+      if (pad_words++ > 0)                                                \
+        return DECR_ILLEGALDATA;                                          \
+    }                                                                     \
+    bitbuf |= word << (CAB_ULONG_BITS-16 - bitsleft);                     \
+    bitsleft += 16;                                                       \
   }
 
 #define PEEK_BITS(n)   (bitbuf >> (CAB_ULONG_BITS - (n)))
@@ -110,11 +119,12 @@
  * own special LZX way.
  */
 #define READ_LENGTHS(tbl,first,last,fn) do { \
-  lb.bb = bitbuf; lb.bl = bitsleft; lb.ip = inpos; \
+  lb.bb = bitbuf; lb.bl = bitsleft; lb.ip = inpos; lb.end = endinp; \
+  lb.pad_words = pad_words; \
   if (fn(LENTABLE(tbl),(first),(last),&lb,decomp_state)) { \
     return DECR_ILLEGALDATA; \
   } \
-  bitbuf = lb.bb; bitsleft = lb.bl; inpos = lb.ip; \
+  bitbuf = lb.bb; bitsleft = lb.bl; inpos = lb.ip; pad_words = lb.pad_words; \
 } while (0)
 
 typedef guint8        cab_UBYTE; /* 8 bits  */
@@ -127,34 +137,6 @@ typedef gint32        cab_LONG;  /* 32 bits */
 # define CHAR_BIT (8)
 #endif
 #define CAB_ULONG_BITS (sizeof(cab_ULONG) * CHAR_BIT)
-
-/* MSZIP stuff */
-#define ZIPWSIZE 	0x8000  /* window size */
-#define ZIPLBITS	9	/* bits in base literal/length lookup table */
-#define ZIPDBITS	6	/* bits in base distance lookup table */
-#define ZIPBMAX		16      /* maximum bit length of any code */
-#define ZIPN_MAX	288     /* maximum number of codes in any set */
-
-struct Ziphuft {
-    cab_UBYTE e;                /* number of extra bits or operation */
-    cab_UBYTE b;                /* number of bits in this code or subcode */
-    union {
-        cab_UWORD n;              /* literal, length base, or distance base */
-        struct Ziphuft *t;        /* pointer to next level of table */
-    } v;
-};
-struct ZIPstate {
-    cab_ULONG window_posn;      /* current offset within the window        */
-    cab_ULONG bb;               /* bit buffer */
-    cab_ULONG bk;               /* bits in bit buffer */
-    cab_ULONG ll[288+32];       /* literal/length and distance code lengths */
-    cab_ULONG c[ZIPBMAX+1];     /* bit length count table */
-    cab_LONG  lx[ZIPBMAX+1];    /* memory for l[-1..ZIPBMAX-1] */
-    struct Ziphuft *u[ZIPBMAX];	/* table stack */
-    cab_ULONG v[ZIPN_MAX];      /* values in order of bit length */
-    cab_ULONG x[ZIPBMAX+1];     /* bit offsets, then code stack */
-    cab_UBYTE *inpos;
-};
 
 /* LZX stuff */
 
@@ -192,16 +174,17 @@ struct LZXstate {
     cab_ULONG window_size;     /* window size (32Kb through 2Mb)          */
     cab_ULONG actual_size;     /* window size when it was first allocated */
     cab_ULONG window_posn;     /* current offset within the window        */
+    cab_ULONG window_filled;   /* valid history in the window, up to its size */
     cab_ULONG R0, R1, R2;      /* for the LRU offset system               */
     cab_UWORD main_elements;   /* number of main tree elements            */
-    int   header_read;         /* have we started decoding at all yet?    */
+    gint   header_read;         /* have we started decoding at all yet?    */
     cab_UWORD block_type;      /* type of this block                      */
     cab_ULONG block_length;    /* uncompressed length of this block       */
     cab_ULONG block_remaining; /* uncompressed bytes still left to decode */
     cab_ULONG frames_read;     /* the number of CFDATA blocks processed   */
     cab_LONG  intel_filesize;  /* magic header value used for transform   */
     cab_LONG  intel_curpos;    /* current offset in transform space       */
-    int   intel_started;       /* have we seen any translatable data yet? */
+    gint   intel_started;       /* have we seen any translatable data yet? */
 
     LZX_DECLARE_TABLE(PRETREE);
     LZX_DECLARE_TABLE(MAINTREE);
@@ -211,8 +194,10 @@ struct LZXstate {
 
 struct lzx_bits {
   cab_ULONG bb;
-  int bl;
+  gint bl;
   cab_UBYTE *ip;
+  const cab_UBYTE *end;
+  gint pad_words;
 };
 
 typedef struct
@@ -229,16 +214,10 @@ typedef struct fdi_cds_fwd {
     cab_ULONG lzx_position_base[51];
     cab_UBYTE extra_bits[51];
 
-    union {
-        struct ZIPstate zip;
-        struct LZXstate lzx;
-    } methods;
-    int comptype;
+    struct LZXstate lzx;
+    gint comptype;
 } fdi_decomp_state;
 
-int ZIPfdi_decomp(int inlen, int outlen, fdi_decomp_state *decomp_state);
-int LZXfdi_decomp(int inlen, int outlen, fdi_decomp_state *decomp_state);
-int LZXfdi_init(int window, fdi_decomp_state *decomp_state);
+gint LZXfdi_decomp(gint inlen, gint outlen, fdi_decomp_state *decomp_state);
+gint LZXfdi_init(gint window, fdi_decomp_state *decomp_state);
 void LZXfdi_clear(fdi_decomp_state *decomp_state);
-
-#endif

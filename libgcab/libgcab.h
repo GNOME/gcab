@@ -17,11 +17,8 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
  * MA 02110-1301 USA
  */
-#ifndef _LIBGCAB_H_
-#define _LIBGCAB_H_
+#pragma once
 
 #include <libgcab/gcab-cabinet.h>
 #include <libgcab/gcab-file.h>
 #include <libgcab/gcab-folder.h>
-
-#endif /* _LIBGCAB_H_ */

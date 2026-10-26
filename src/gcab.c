@@ -21,13 +21,14 @@
 
 #include "config.h"
 
-#include <stdlib.h>
-#include <libgcab.h>
-#include <glib/gprintf.h>
 #include <locale.h>
-#include <glib/gi18n.h>
+#include <stdlib.h>
 
-int verbose = 0;
+#include <glib/gi18n.h>
+#include <glib/gprintf.h>
+#include <libgcab.h>
+
+gint verbose = 0;
 
 static gboolean
 file_callback (GCabFile *cabfile, gpointer data)
@@ -53,7 +54,7 @@ file_callback (GCabFile *cabfile, gpointer data)
 static const gchar *
 remove_leading_path (gchar *name)
 {
-    unsigned i;
+    guint i;
 
     i = 0;
     if (name[0] == G_DIR_SEPARATOR)
@@ -90,11 +91,15 @@ save_array_to_file (const GByteArray *array, const gchar *base, const gchar *suf
         g_prefix_error (error, "cannot write %s: ", resname);
         return FALSE;
     }
+    if (!g_output_stream_close (output, NULL, error)) {
+        g_prefix_error (error, "cannot write %s: ", resname);
+        return FALSE;
+    }
     return TRUE;
 }
 
-int
-main (int argc, char *argv[])
+gint
+main (gint argc, gchar *argv[])
 {
     g_autoptr(GError) error = NULL;
     g_autoptr(GOptionContext) context = NULL;
@@ -110,11 +115,14 @@ main (int argc, char *argv[])
     gboolean create = FALSE;
     gboolean extract = FALSE;
     gboolean dump_reserved = FALSE;
+    gint64 max_extract_size = (gint64) 4 << 30;
     GOptionEntry entries[] = {
         { "version", 0, 0, G_OPTION_ARG_NONE, &version, N_("Print program version"), NULL },
         { "verbose", 'v', 0, G_OPTION_ARG_NONE, &verbose, N_("Be verbose"), NULL },
         { "create", 'c', 0, G_OPTION_ARG_NONE, &create, N_("Create archive"), NULL },
         { "extract", 'x', 0, G_OPTION_ARG_NONE, &extract, N_("Extract all files"), NULL },
+        { "max-extract-size", 0, 0, G_OPTION_ARG_INT64, &max_extract_size,
+          N_("Refuse to extract more than N bytes (0 for unlimited)"), N_("N") },
         { "dump-reserved", 'D', 0, G_OPTION_ARG_NONE, &dump_reserved, N_("Dump reserved and extra data"), NULL },
         { "list", 't', 0, G_OPTION_ARG_NONE, &list, N_("List content"), NULL },
         { "list-details", 'l', 0, G_OPTION_ARG_NONE, &list_details, N_("List content with file details"), NULL },
@@ -131,9 +139,6 @@ main (int argc, char *argv[])
     bindtextdomain (GETTEXT_PACKAGE, LOCALEDIR);
     bind_textdomain_codeset (GETTEXT_PACKAGE, "UTF-8");
 
-#if !GLIB_CHECK_VERSION(2,35,1)
-    g_type_init ();
-#endif
     g_set_prgname (PACKAGE_NAME);
 
     context = g_option_context_new (_("- create a Cabinet file"));
@@ -151,12 +156,22 @@ individual files from the archive.\
     }
 
     if (version) {
-        g_printf (PACKAGE_STRING "\n");
+        g_print (PACKAGE_STRING "\n");
         return 0;
     }
 
     if ((list + extract + create + dump_reserved + list_details) != 1) {
         g_printerr ("%s\n", _("Please specify a single operation"));
+        return EXIT_FAILURE;
+    }
+
+    if (max_extract_size < 0) {
+        g_printerr ("%s\n", _("Extraction size limit must not be negative"));
+        return EXIT_FAILURE;
+    }
+
+    if (space < 0 || space > G_MAXUINT16) {
+        g_printerr ("%s\n", _("Reserved space must be between 0 and 65535 bytes"));
         return EXIT_FAILURE;
     }
 
@@ -174,39 +189,43 @@ individual files from the archive.\
 
     if (list || list_details || extract || dump_reserved) {
         g_autoptr(GFile) file = g_file_new_for_commandline_arg (args[0]);
-        g_autoptr(GInputStream) in = G_INPUT_STREAM (g_file_read (file, cancellable, &error));
 
-        if (in == NULL) {
-            g_printerr ("%s %s: %s\n", _("Cannot open file for reading"), args[0], error->message);
-            return EXIT_FAILURE;
-        }
-        if (!gcab_cabinet_load (cabinet, in, cancellable, &error)) {
+        if (!gcab_cabinet_load_from_file (cabinet, file, cancellable, &error)) {
             g_printerr ("%s %s: %s\n", _("Error reading"), args[0], error->message);
             return EXIT_FAILURE;
         }
 
         if (list || list_details) {
-            GPtrArray *folders = gcab_cabinet_get_folders (cabinet);
-            for (guint i = 0; i < folders->len; i++) {
-                GSList *l;
-                g_autoptr(GSList) files = gcab_folder_get_files (g_ptr_array_index (folders, i));
+            GCabCabinet *first = cabinet;
+            while (gcab_cabinet_get_prev (first) != NULL)
+                first = gcab_cabinet_get_prev (first);
 
-                for (l = files; l != NULL; l = l->next) {
-                    if (list_details) {
-                        g_autofree char *date = NULL;
-                        g_autoptr(GDateTime) dt = gcab_file_get_date_time (GCAB_FILE (l->data));
-                        if (dt) {
-                            g_autoptr(GDateTime) dtl = g_date_time_to_local (dt);
-                            date = g_date_time_format (dtl, "%Y-%m-%d %H:%M:%S");
+            for (GCabCabinet *cab = first; cab != NULL; cab = gcab_cabinet_get_next (cab)) {
+                GPtrArray *folders = gcab_cabinet_get_folders (cab);
+                for (guint i = 0; i < folders->len; i++) {
+                    GSList *l;
+                    g_autoptr(GSList) files = gcab_folder_get_files (g_ptr_array_index (folders, i));
+
+                    for (l = files; l != NULL; l = l->next) {
+                        if (gcab_file_is_continued_from_prev (GCAB_FILE (l->data)))
+                            continue;
+
+                        if (list_details) {
+                            g_autofree char *date = NULL;
+                            g_autoptr(GDateTime) dt = gcab_file_get_date_time (GCAB_FILE (l->data));
+                            if (dt) {
+                                g_autoptr(GDateTime) dtl = g_date_time_to_local (dt);
+                                date = g_date_time_format (dtl, "%Y-%m-%d %H:%M:%S");
+                            }
+
+                            g_print ("%s %u %s 0x%X\n",
+                                     gcab_file_get_name (GCAB_FILE (l->data)),
+                                     gcab_file_get_size (GCAB_FILE (l->data)),
+                                     date ? date : _("<unknown-date>"),
+                                     gcab_file_get_attributes (GCAB_FILE (l->data)));
+                        } else {
+                            g_print ("%s\n", gcab_file_get_name (GCAB_FILE (l->data)));
                         }
-
-                        g_print ("%s %u %s 0x%X\n",
-                                 gcab_file_get_name (GCAB_FILE (l->data)),
-                                 gcab_file_get_size (GCAB_FILE (l->data)),
-                                 date ? date : _("<unknown-date>"),
-                                 gcab_file_get_attributes (GCAB_FILE (l->data)));
-                    } else {
-                        g_print ("%s\n", gcab_file_get_name (GCAB_FILE (l->data)));
                     }
                 }
             }
@@ -215,6 +234,7 @@ individual files from the archive.\
             if (change == NULL)
                 change = g_get_current_dir ();
             file2 = g_file_new_for_path (change);
+            gcab_cabinet_set_extract_size_limit (cabinet, (guint64) max_extract_size);
             if (!gcab_cabinet_extract (cabinet, file2, file_callback, NULL, NULL, cancellable, &error)) {
                 g_printerr ("%s: %s\n", _("Error during extraction"), error->message);
                 return EXIT_FAILURE;
@@ -229,12 +249,13 @@ individual files from the archive.\
                 }
             }
 
-            reserved = (GByteArray *)gcab_cabinet_get_signature (cabinet, cancellable, &error);
-            if (reserved == NULL) {
+            const GByteArray *signature =
+                gcab_cabinet_get_signature (cabinet, cancellable, &error);
+            if (signature == NULL) {
                 g_printerr ("%s: %s\n", _("Error while reading signature"), error->message);
                 return EXIT_FAILURE;
             }
-            if (!save_array_to_file (reserved, args[0], "signature", &error)) {
+            if (!save_array_to_file (signature, args[0], "signature", &error)) {
                 g_printerr ("%s\n", error->message);
                 return EXIT_FAILURE;
             }

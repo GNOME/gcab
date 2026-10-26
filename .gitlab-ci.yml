@@ -2,6 +2,236 @@ include:
  - project: "GNOME/citemplates"
    file: "templates/default-rules.yml"
  - component: gitlab.gnome.org/GNOME/citemplates/gnomeos-basic-ci@master
+   inputs:
+     gobject-linter: "enabled"
  - component: gitlab.gnome.org/GNOME/citemplates/release-service@master
    inputs:
      dist-job-name: "build-gnomeos"
+
+fuzz-asan-ubsan:
+  stage: test
+  image:
+    name: quay.io/gnome_infrastructure/gnome-build-meta:gnomeos-devel-nightly
+    docker:
+      user: "root"
+  tags:
+    - "asan"
+  needs: []
+  variables:
+    ASAN_OPTIONS: "detect_leaks=0:abort_on_error=1"
+    UBSAN_OPTIONS: "print_stacktrace=1:halt_on_error=1:abort_on_error=1"
+    CFLAGS: "-fno-omit-frame-pointer -O1 -g"
+    CXXFLAGS: "$CFLAGS"
+    GIO_USE_VFS: "local"
+  script:
+    - meson setup _build_fuzz -Db_sanitize=address,undefined -Ddocs=false -Dintrospection=false -Dvapi=false -Dnls=false -Dtests=false -Dtest-env=true
+    - meson compile -C _build_fuzz
+    - |
+      for cab in tests/*.cab; do
+        echo "Fuzzing ${cab}"
+        _build_fuzz/src/gcab-fuzz "${cab}"
+      done
+  artifacts:
+    when: on_failure
+    expire_in: "7 days"
+    paths:
+      - "_build_fuzz/meson-logs/"
+
+fuzz-libfuzzer:
+  stage: test
+  image:
+    name: quay.io/fedora/fedora:44
+  tags:
+    - "asan"
+  needs: []
+  variables:
+    CC: "clang"
+    CXX: "clang++"
+    ASAN_OPTIONS: "detect_leaks=0:abort_on_error=1"
+    UBSAN_OPTIONS: "print_stacktrace=1:halt_on_error=1:abort_on_error=1"
+    GIO_USE_VFS: "local"
+  before_script:
+    # The GNOME build image ships clang without compiler-rt, so its sanitizer
+    # runtimes are unavailable. Use a toolchain image that includes them.
+    - dnf -y --setopt=install_weak_deps=False install meson ninja-build clang compiler-rt glib2-devel zlib-devel pkgconf-pkg-config git
+  script:
+    - meson setup _build_libfuzzer -Dlibfuzzer=true -Dtest-env=true -Db_sanitize=address,undefined -Db_lundef=false -Ddocs=false -Dintrospection=false -Dvapi=false -Dnls=false -Dtests=false
+    - meson compile -C _build_libfuzzer gcab-fuzz-libfuzzer
+    - mkdir corpus
+    - cp tests/*.cab corpus/
+    - _build_libfuzzer/src/gcab-fuzz-libfuzzer -max_total_time=60 -timeout=10 -rss_limit_mb=2048 corpus
+  artifacts:
+    when: on_failure
+    expire_in: "7 days"
+    paths:
+      - "crash-*"
+      - "timeout-*"
+      - "oom-*"
+      - "_build_libfuzzer/meson-logs/"
+
+build-werror:
+  stage: test
+  image:
+    name: quay.io/fedora/fedora:44
+  needs: []
+  variables:
+    CC: "gcc"
+  before_script:
+    - dnf -y --setopt=install_weak_deps=False install meson ninja-build gcc glib2-devel zlib-devel pkgconf-pkg-config git gettext gi-docgen gobject-introspection-devel vala
+  script:
+    - meson setup _build -Dwerror=true -Ddocs=true -Dintrospection=true -Dvapi=true
+    - meson compile -C _build
+    - meson test -C _build --print-errorlogs
+  artifacts:
+    when: on_failure
+    expire_in: "7 days"
+    paths:
+      - "_build/meson-logs/"
+
+build-mingw-wine:
+  stage: test
+  image:
+    name: quay.io/fedora/fedora:44
+  needs: []
+  variables:
+    WINEDEBUG: "-all"
+    WINEDLLOVERRIDES: "mscoree,mshtml="
+    WINEARCH: "win64"
+    LC_ALL: "C.UTF-8"
+    LANG: "C.UTF-8"
+  before_script:
+    # wine-common provides the winmd files used to initialize the prefix.
+    # Without it, Wine retries copying a missing file forever.
+    - dnf -y --setopt=install_weak_deps=False install meson ninja-build gcc glib2-devel zlib-devel pkgconf-pkg-config mingw64-gcc mingw64-glib2 mingw64-zlib wine-core wine-common
+    # Initialize the prefix before Meson's cross sanity check invokes Wine.
+    - wine wineboot -u
+  script:
+    - meson setup _build_mingw --cross-file ci/mingw64-cross.ini -Ddocs=false -Dintrospection=false -Dvapi=false -Dnls=false -Dtest-env=true
+    - meson compile -C _build_mingw
+    - meson test -C _build_mingw --print-errorlogs
+  artifacts:
+    when: on_failure
+    expire_in: "7 days"
+    paths:
+      - "_build_mingw/meson-logs/"
+
+test-sanitizers:
+  stage: test
+  image:
+    name: quay.io/fedora/fedora:44
+  needs: []
+  variables:
+    CC: "gcc"
+    ASAN_OPTIONS: "detect_leaks=1:abort_on_error=1"
+    UBSAN_OPTIONS: "print_stacktrace=1:halt_on_error=1:abort_on_error=1"
+  before_script:
+    - dnf -y --setopt=install_weak_deps=False install meson ninja-build gcc libasan libubsan diffutils glib2-devel zlib-devel pkgconf-pkg-config git
+  script:
+    - meson setup _build_san -Dwerror=true -Db_sanitize=address,undefined -Db_lundef=false -Ddocs=false -Dintrospection=false -Dvapi=false -Dnls=false -Dtest-env=true
+    - meson compile -C _build_san
+    - meson test -C _build_san --print-errorlogs
+  artifacts:
+    when: on_failure
+    expire_in: "7 days"
+    paths:
+      - "_build_san/meson-logs/"
+
+test-valgrind:
+  stage: test
+  image:
+    name: quay.io/fedora/fedora:44
+  needs: []
+  variables:
+    CC: "gcc"
+  before_script:
+    - dnf -y --setopt=install_weak_deps=False install meson ninja-build gcc glib2-devel zlib-devel pkgconf-pkg-config git valgrind
+  script:
+    - meson setup _build_vg -Dwerror=true -Ddocs=false -Dintrospection=false -Dvapi=false -Dnls=false -Dtest-env=true
+    - meson compile -C _build_vg
+    - >-
+      meson test -C _build_vg gcab-self-test gcab-decomp-test
+      --wrapper 'valgrind --leak-check=full --errors-for-leak-kinds=definite --error-exitcode=99'
+      --print-errorlogs
+  artifacts:
+    when: on_failure
+    expire_in: "7 days"
+    paths:
+      - "_build_vg/meson-logs/"
+
+coverage:
+  stage: test
+  image:
+    name: quay.io/fedora/fedora:44
+  needs: []
+  variables:
+    CC: "gcc"
+  coverage: '/^TOTAL.*\s([0-9]+)%$/'
+  before_script:
+    - dnf -y --setopt=install_weak_deps=False install meson ninja-build gcc diffutils glib2-devel zlib-devel pkgconf-pkg-config git gcovr
+  script:
+    - meson setup _build_cov -Db_coverage=true -Ddocs=false -Dintrospection=false -Dvapi=false -Dnls=false -Dtest-env=true
+    - meson compile -C _build_cov
+    - meson test -C _build_cov --print-errorlogs
+    - >-
+      gcovr -r . _build_cov
+      --filter 'libgcab/'
+      --filter 'src/'
+      --exclude 'libgcab/gcab-enums.*'
+      --exclude 'src/gcab-fuzz.*'
+      --exclude 'src/gcab-bzero.*'
+      --merge-mode-functions=merge-use-line-min
+      --xml coverage.xml
+      --html-details coverage-report/
+      --txt
+  artifacts:
+    when: always
+    expire_in: "30 days"
+    paths:
+      - "coverage.xml"
+      - "coverage-report/"
+
+clang-tidy:
+  stage: test
+  image:
+    name: quay.io/fedora/fedora:44
+  needs: []
+  variables:
+    CC: "clang"
+    CXX: "clang++"
+  before_script:
+    - dnf -y --setopt=install_weak_deps=False install meson ninja-build clang clang-tools-extra glib2-devel zlib-devel pkgconf-pkg-config git
+  script:
+    - meson setup _build_tidy -Ddocs=false -Dintrospection=false -Dvapi=false -Dnls=false -Dtests=false
+    # Generate gcab-enums.[ch] before linting; clang-tidy cannot process
+    # sources that include the generated header until it exists.
+    - meson compile -C _build_tidy
+    - run-clang-tidy -p _build_tidy -quiet -warnings-as-errors 'clang-analyzer-*' libgcab src
+  artifacts:
+    when: on_failure
+    expire_in: "7 days"
+    paths:
+      - "_build_tidy/meson-logs/"
+
+dist-check:
+  stage: test
+  image:
+    name: quay.io/fedora/fedora:44
+  needs: []
+  variables:
+    CC: "gcc"
+  before_script:
+    - dnf -y --setopt=install_weak_deps=False install meson ninja-build gcc diffutils glib2-devel zlib-devel pkgconf-pkg-config git xz
+  script:
+    - meson setup _build_dist -Ddocs=false -Dintrospection=false -Dvapi=false -Dnls=false -Dtest-env=true
+    - meson dist -C _build_dist --no-tests
+    - mkdir -p _distcheck
+    - tar -xf _build_dist/meson-dist/gcab-*.tar.xz -C _distcheck --strip-components=1
+    - meson setup _distcheck/_build _distcheck -Ddocs=false -Dintrospection=false -Dvapi=false -Dnls=false -Dtest-env=true
+    - meson compile -C _distcheck/_build
+    - meson test -C _distcheck/_build --print-errorlogs
+  artifacts:
+    when: on_failure
+    expire_in: "7 days"
+    paths:
+      - "_build_dist/meson-logs/"
+      - "_distcheck/_build/meson-logs/"

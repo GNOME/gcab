@@ -18,8 +18,7 @@
  * MA 02110-1301 USA
  */
 
-#ifndef _GCAB_FILE_H_
-#define _GCAB_FILE_H_
+#pragma once
 
 #include <gio/gio.h>
 #include <glib-object.h>
@@ -53,7 +52,7 @@ typedef enum
   GCAB_FILE_ATTRIBUTE_ARCH        = 0x20,
   GCAB_FILE_ATTRIBUTE_EXEC        = 0x40,
   GCAB_FILE_ATTRIBUTE_NAME_IS_UTF = 0x80
-} GCabFileAttribute;
+} G_GNUC_FLAG_ENUM GCabFileAttribute;
 
 /**
  * GCabFileCallback:
@@ -79,6 +78,9 @@ void            gcab_file_set_attributes            (GCabFile *file, guint32 att
 GDateTime *     gcab_file_get_date_time             (GCabFile *file);
 void            gcab_file_set_date_time             (GCabFile *file, GDateTime *dt);
 
+gboolean        gcab_file_is_continued_from_prev    (GCabFile *file);
+gboolean        gcab_file_is_continued_to_next      (GCabFile *file);
+
 G_GNUC_BEGIN_IGNORE_DEPRECATIONS
 G_DEPRECATED_FOR(gcab_file_get_date_time)
 gboolean        gcab_file_get_date                  (GCabFile *file, GTimeVal *result);
@@ -87,5 +89,3 @@ void            gcab_file_set_date                  (GCabFile *file, const GTime
 G_GNUC_END_IGNORE_DEPRECATIONS
 
 G_END_DECLS
-
-#endif /* _GCAB_FILE_H_ */

@@ -1,0 +1,2 @@
+[rules]
+property_switch_exhaustiveness = false

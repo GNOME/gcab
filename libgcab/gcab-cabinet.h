@@ -18,14 +18,13 @@
  * MA 02110-1301 USA
  */
 
-#ifndef _GCAB_CABINET_H_
-#define _GCAB_CABINET_H_
+#pragma once
 
 #include <gio/gio.h>
 #include <glib-object.h>
 
-#include "gcab-folder.h"
 #include "gcab-file.h"
+#include "gcab-folder.h"
 
 G_BEGIN_DECLS
 
@@ -70,6 +69,10 @@ gboolean           gcab_cabinet_load          (GCabCabinet *cabinet,
                                                GInputStream *stream,
                                                GCancellable *cancellable,
                                                GError **error);
+gboolean           gcab_cabinet_load_from_file (GCabCabinet *cabinet,
+                                               GFile *file,
+                                               GCancellable *cancellable,
+                                               GError **error);
 
 GPtrArray *        gcab_cabinet_get_folders   (GCabCabinet *cabinet);
 guint32            gcab_cabinet_get_size      (GCabCabinet *cabinet);
@@ -103,10 +106,23 @@ gboolean           gcab_cabinet_extract_simple(GCabCabinet *cabinet,
                                                gpointer user_data,
                                                GCancellable *cancellable,
                                                GError **error);
+void               gcab_cabinet_set_extract_size_limit(GCabCabinet *cabinet,
+                                                       guint64 limit);
+guint64            gcab_cabinet_get_extract_size_limit(GCabCabinet *cabinet);
+void               gcab_cabinet_set_extract_ratio_limit(GCabCabinet *cabinet,
+                                                        guint64 limit);
+guint64            gcab_cabinet_get_extract_ratio_limit(GCabCabinet *cabinet);
 const GByteArray * gcab_cabinet_get_signature (GCabCabinet *cabinet,
                                                GCancellable *cancellable,
                                                GError **error);
 
-G_END_DECLS
+const gchar *      gcab_cabinet_get_next_name (GCabCabinet *cabinet);
+const gchar *      gcab_cabinet_get_prev_name (GCabCabinet *cabinet);
+GCabCabinet *      gcab_cabinet_get_next      (GCabCabinet *cabinet);
+GCabCabinet *      gcab_cabinet_get_prev      (GCabCabinet *cabinet);
+void               gcab_cabinet_set_next      (GCabCabinet *cabinet,
+                                               GCabCabinet *next);
+void               gcab_cabinet_set_prev      (GCabCabinet *cabinet,
+                                               GCabCabinet *prev);
 
-#endif /* _GCAB_CABINET_H_ */
+G_END_DECLS

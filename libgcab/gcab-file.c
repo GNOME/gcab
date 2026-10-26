@@ -21,8 +21,9 @@
 
 #include "config.h"
 
-#include "gcab-priv.h"
 #include "gcab-file.h"
+
+#include "gcab-priv.h"
 
 /**
  * SECTION:gcab-file
@@ -49,15 +50,15 @@ struct _GCabFile
     cfile_t *cfile;
 };
 
-enum {
-    PROP_0,
-
-    PROP_NAME,
+typedef enum {
+    PROP_NAME = 1,
     PROP_FILE,
     PROP_BYTES,
-};
+} GCabFileProps;
 
-G_DEFINE_TYPE (GCabFile, gcab_file, G_TYPE_OBJECT);
+static GParamSpec *props[PROP_BYTES + 1] = { NULL, };
+
+G_DEFINE_FINAL_TYPE (GCabFile, gcab_file, G_TYPE_OBJECT);
 
 static void
 gcab_file_init (GCabFile *self)
@@ -82,14 +83,18 @@ gcab_file_finalize (GObject *object)
 static void
 gcab_file_set_name (GCabFile *self, const gchar *name)
 {
-    gchar *fname = g_strdup (name);
+    gchar *fname;
 
+    g_return_if_fail (GCAB_IS_FILE (self));
+    g_return_if_fail (name != NULL);
     g_return_if_fail (self->cfile != NULL);
+
+    fname = g_strdup (name);
 
     /* assuming that on win32 we don't get unix paths */
 #ifndef G_OS_WIN32
     if (fname) {
-        int i, len = strlen (fname);
+        gint i, len = strlen (fname);
         for (i = 0; i < len; i++)
             if (fname[i] == '/')
                 fname[i] = '\\';
@@ -103,7 +108,7 @@ gcab_file_set_name (GCabFile *self, const gchar *name)
 /**
  * gcab_file_set_bytes:
  * @file: a #GCabFile
- * @bytes: a #GBytes
+ * @bytes: (nullable): a #GBytes, or %NULL to clear the data
  *
  * Replace the #GBytes associated with @self.
  * This is most usefule when the #GCabFile has been created using
@@ -114,12 +119,16 @@ gcab_file_set_name (GCabFile *self, const gchar *name)
 void
 gcab_file_set_bytes (GCabFile *self, GBytes *bytes)
 {
-    if (self->bytes != NULL)
-        g_bytes_unref (self->bytes);
-    self->bytes = g_bytes_ref (bytes);
+    g_return_if_fail (GCAB_IS_FILE (self));
+    g_return_if_fail (self->cfile != NULL);
+
+    GBytes *new_bytes = bytes != NULL ? g_bytes_ref (bytes) : NULL;
+
+    g_clear_pointer (&self->bytes, g_bytes_unref);
+    self->bytes = new_bytes;
 
     /* this is embedded into the archive */
-    self->cfile->usize = g_bytes_get_size (bytes);
+    self->cfile->usize = bytes != NULL ? g_bytes_get_size (bytes) : 0;
 }
 
 static void
@@ -128,7 +137,7 @@ gcab_file_set_property (GObject *object, guint prop_id, const GValue *value, GPa
     g_return_if_fail (GCAB_IS_FILE (object));
     GCabFile *self = GCAB_FILE (object);
 
-    switch (prop_id) {
+    switch ((GCabFileProps) prop_id) {
     case PROP_NAME:
         gcab_file_set_name (self, g_value_get_string (value));
         break;
@@ -137,9 +146,6 @@ gcab_file_set_property (GObject *object, guint prop_id, const GValue *value, GPa
         break;
     case PROP_BYTES:
         gcab_file_set_bytes (self, g_value_get_boxed (value));
-        break;
-    default:
-        G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
         break;
     }
 }
@@ -150,7 +156,7 @@ gcab_file_get_property (GObject *object, guint prop_id, GValue *value, GParamSpe
     g_return_if_fail (GCAB_IS_FILE (object));
     GCabFile *self = GCAB_FILE(object);
 
-    switch (prop_id) {
+    switch ((GCabFileProps) prop_id) {
     case PROP_NAME:
         g_value_set_string (value, self->cfile->name);
         break;
@@ -159,9 +165,6 @@ gcab_file_get_property (GObject *object, guint prop_id, GValue *value, GParamSpe
         break;
     case PROP_BYTES:
         g_value_set_boxed (value, self->bytes);
-        break;
-    default:
-        G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
         break;
     }
 }
@@ -175,20 +178,16 @@ gcab_file_class_init (GCabFileClass *klass)
     object_class->set_property = gcab_file_set_property;
     object_class->get_property = gcab_file_get_property;
 
-    g_object_class_install_property (object_class, PROP_NAME,
-        g_param_spec_string ("name", "name", "name", NULL,
-                             G_PARAM_READWRITE |
-                             G_PARAM_STATIC_STRINGS));
+    props[PROP_NAME] = g_param_spec_string ("name", NULL, NULL, NULL,
+                                            G_PARAM_READWRITE | G_PARAM_STATIC_NAME);
 
-    g_object_class_install_property (object_class, PROP_FILE,
-        g_param_spec_object ("file", "file", "file", G_TYPE_FILE,
-                             G_PARAM_READWRITE |
-                             G_PARAM_STATIC_STRINGS));
+    props[PROP_FILE] = g_param_spec_object ("file", NULL, NULL, G_TYPE_FILE,
+                                            G_PARAM_READWRITE | G_PARAM_STATIC_NAME);
 
-    g_object_class_install_property (object_class, PROP_BYTES,
-        g_param_spec_boxed ("bytes", "bytes", "bytes", G_TYPE_BYTES,
-                            G_PARAM_READWRITE |
-                            G_PARAM_STATIC_STRINGS));
+    props[PROP_BYTES] = g_param_spec_boxed ("bytes", NULL, NULL, G_TYPE_BYTES,
+                                            G_PARAM_READWRITE | G_PARAM_STATIC_NAME);
+
+    g_object_class_install_properties (object_class, G_N_ELEMENTS (props), props);
 }
 
 /**
@@ -204,6 +203,7 @@ void
 gcab_file_set_date_time (GCabFile *self, GDateTime *dt)
 {
     g_return_if_fail (GCAB_IS_FILE (self));
+    g_return_if_fail (self->cfile != NULL);
     g_return_if_fail (dt != NULL);
 
     self->cfile->date = ((g_date_time_get_year (dt) - 1980 ) << 9 ) +
@@ -536,6 +536,78 @@ gcab_file_get_input_stream (GCabFile *self, GCancellable *cancellable, GError **
     return NULL;
 }
 
+static gboolean
+_gcab_file_check_symlinks (GFile *file, GFile *path_extract, GError **error)
+{
+    g_autoptr(GPtrArray) components = g_ptr_array_new_with_free_func (g_object_unref);
+    g_autoptr(GFile) current = g_object_ref (file);
+
+    /* collect the path from the leaf up to, but excluding, the extraction root */
+    while (!g_file_equal (current, path_extract)) {
+        g_autoptr(GFile) parent = g_file_get_parent (current);
+        if (parent == NULL ||
+            (!g_file_equal (parent, path_extract) &&
+             !g_file_has_prefix (parent, path_extract))) {
+            g_set_error (error, GCAB_ERROR, GCAB_ERROR_INVALID_DATA,
+                         "Invalid extraction path");
+            return FALSE;
+        }
+        g_ptr_array_add (components, g_object_ref (current));
+        g_set_object (&current, parent);
+    }
+
+    /* check from the root down, since a missing component hides its children */
+    for (guint i = components->len; i > 0; i--) {
+        GFile *component = g_ptr_array_index (components, i - 1);
+        g_autoptr(GError) error_local = NULL;
+        g_autoptr(GFileInfo) info = g_file_query_info (component,
+                                                       G_FILE_ATTRIBUTE_STANDARD_TYPE ","
+                                                       G_FILE_ATTRIBUTE_STANDARD_IS_SYMLINK,
+                                                       G_FILE_QUERY_INFO_NOFOLLOW_SYMLINKS,
+                                                       NULL, &error_local);
+        if (info == NULL) {
+            if (g_error_matches (error_local, G_IO_ERROR, G_IO_ERROR_NOT_FOUND))
+                break;
+            g_propagate_error (error, g_steal_pointer (&error_local));
+            return FALSE;
+        }
+
+        if (g_file_info_get_is_symlink (info) ||
+            g_file_info_get_file_type (info) == G_FILE_TYPE_SYMBOLIC_LINK) {
+            g_autofree gchar *path = g_file_get_parse_name (component);
+            g_set_error (error, GCAB_ERROR, GCAB_ERROR_INVALID_DATA,
+                         "Refusing to extract through symbolic link '%s'", path);
+            return FALSE;
+        }
+
+        if (i > 1 && g_file_info_get_file_type (info) != G_FILE_TYPE_DIRECTORY) {
+            g_autofree gchar *path = g_file_get_parse_name (component);
+            g_set_error (error, GCAB_ERROR, GCAB_ERROR_INVALID_DATA,
+                         "Extraction path component '%s' is not a directory", path);
+            return FALSE;
+        }
+    }
+
+    return TRUE;
+}
+
+G_GNUC_INTERNAL gboolean
+_gcab_file_name_is_unsafe (const gchar *name)
+{
+    const gchar *p = name;
+
+    /* an empty name cannot describe a file below the extraction root */
+    if (p[0] == '\0')
+        return TRUE;
+
+    /* absolute paths, including UNC paths */
+    if (p[0] == '/')
+        return TRUE;
+
+    /* drive-letter paths, including drive-relative ones */
+    return g_ascii_isalpha (p[0]) && p[1] == ':';
+}
+
 G_GNUC_INTERNAL GOutputStream *
 gcab_file_get_output_stream (GCabFile *self,
                              GFile *path_extract,
@@ -547,22 +619,46 @@ gcab_file_get_output_stream (GCabFile *self,
         return g_memory_output_stream_new_resizable ();
 
     /* make path have UNIX directory slashes */
-    g_autofree gchar *fname = g_strdup (gcab_file_get_extract_name (self));
+    const gchar *extract_name = gcab_file_get_extract_name (self);
+    if (extract_name == NULL) {
+        g_set_error (error, GCAB_ERROR, GCAB_ERROR_INVALID_DATA,
+                     "File has no extraction name");
+        return NULL;
+    }
+
+#if HAVE_OPENAT2
+    gboolean fallback = FALSE;
+    GOutputStream *secure_out =
+        gcab_file_get_output_stream_openat2 (self, path_extract, error, &fallback);
+    if (secure_out != NULL)
+        return secure_out;
+    if (!fallback)
+        return NULL;
+
+    g_debug ("openat2 is unavailable, falling back to best-effort extraction");
+#endif
+
+    g_autofree gchar *fname = g_strdup (extract_name);
     g_strdelimit (fname, "\\", '/');
 
-    /* "Rebase" the file in the given path, to ensure we never escape it */
+    /* reject absolute, drive-letter, and empty paths */
+    if (_gcab_file_name_is_unsafe (fname)) {
+        g_set_error (error, GCAB_ERROR, GCAB_ERROR_INVALID_DATA,
+                     "Invalid file path '%s'", fname);
+        return NULL;
+    }
+
+    /* verify that the relative path could not escape the extraction directory */
     g_autoptr(GFile) file = g_file_resolve_relative_path (path_extract, fname);
     if (!g_file_has_prefix (file, path_extract)) {
-        g_autofree gchar *rawpath = g_file_get_path (file);
-        if (rawpath != NULL) {
-            char *newpath = rawpath;
-            while (*newpath != 0 && *newpath == G_DIR_SEPARATOR) {
-                newpath++;
-            }
-            g_autoptr(GFile) newfile = g_file_resolve_relative_path (path_extract, newpath);
-            g_set_object (&file, newfile);
-        }
+        g_set_error (error, GCAB_ERROR, GCAB_ERROR_INVALID_DATA,
+                     "File path '%s' is outside the extraction directory", fname);
+        return NULL;
     }
+
+    /* best-effort protection against writing through existing symlinks */
+    if (!_gcab_file_check_symlinks (file, path_extract, error))
+        return NULL;
 
     /* create parent directories */
     g_autoptr(GFile) parent = g_file_get_parent (file);
@@ -578,6 +674,56 @@ gcab_file_get_output_stream (GCabFile *self,
     return G_OUTPUT_STREAM (g_file_replace (file, NULL, FALSE,
                                             G_FILE_CREATE_REPLACE_DESTINATION,
                                             cancellable, error));
+}
+
+G_GNUC_INTERNAL gboolean
+gcab_file_is_continued (GCabFile *self)
+{
+    g_return_val_if_fail (GCAB_IS_FILE (self), FALSE);
+
+    return self->cfile->index >= CFILE_INDEX_CONTINUED_FROM_PREV;
+}
+
+/**
+ * gcab_file_is_continued_from_prev:
+ * @file: a #GCabFile
+ *
+ * Check whether the file data begins in the previous cabinet of a
+ * multi-cabinet set.  If %TRUE, extracting the file from this cabinet
+ * alone will not yield complete data.
+ *
+ * Since: 1.7
+ *
+ * Returns: %TRUE if the file continues from a previous cabinet
+ **/
+gboolean
+gcab_file_is_continued_from_prev (GCabFile *self)
+{
+    g_return_val_if_fail (GCAB_IS_FILE (self), FALSE);
+
+    return self->cfile->index == CFILE_INDEX_CONTINUED_FROM_PREV ||
+           self->cfile->index == CFILE_INDEX_CONTINUED_PREV_AND_NEXT;
+}
+
+/**
+ * gcab_file_is_continued_to_next:
+ * @file: a #GCabFile
+ *
+ * Check whether the file data continues into the next cabinet of a
+ * multi-cabinet set.  If %TRUE, extracting the file from this cabinet
+ * alone will not yield complete data.
+ *
+ * Since: 1.7
+ *
+ * Returns: %TRUE if the file continues to a next cabinet
+ **/
+gboolean
+gcab_file_is_continued_to_next (GCabFile *self)
+{
+    g_return_val_if_fail (GCAB_IS_FILE (self), FALSE);
+
+    return self->cfile->index == CFILE_INDEX_CONTINUED_TO_NEXT ||
+           self->cfile->index == CFILE_INDEX_CONTINUED_PREV_AND_NEXT;
 }
 
 /**
@@ -609,6 +755,5 @@ gcab_file_set_extract_name (GCabFile *self, const gchar *name)
 {
     g_return_if_fail (GCAB_IS_FILE (self));
 
-    g_free (self->extract_name);
-    self->extract_name = g_strdup (name);
+    g_set_str (&self->extract_name, name);
 }

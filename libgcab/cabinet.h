@@ -18,24 +18,23 @@
  * MA 02110-1301 USA
  */
 
-#ifndef CABINET_H
-#define CABINET_H
+#pragma once
 
-#include <glib.h>
-#include <gio/gio.h>
-
+#include <dirent.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <sys/stat.h>
 #include <sys/types.h>
-#include <dirent.h>
-#include <unistd.h>
 #include <time.h>
+#include <unistd.h>
+
+#include <gio/gio.h>
+#include <glib.h>
 #include <zlib.h>
 
-#include "gcab-folder.h"
 #include "decomp.h"
+#include "gcab-folder.h"
 
 /* based on the spec
    http://msdn.microsoft.com/en-us/library/bb417343.aspx */
@@ -45,8 +44,17 @@
 #define CAB_MAX_LZX_BLOCK_SIZE            (32768 + 6144)
 #define CAB_MAX_COMPRESSED_BLOCK_SIZE     (CAB_MAX_LZX_BLOCK_SIZE)
 
+/* extraction safeguards against decompression amplification */
+#define CAB_DEFAULT_MAX_EXTRACT_SIZE      ((guint64) 4 << 30)
+#define CAB_DEFAULT_MAX_EXTRACT_RATIO     1024
+
 #define CFO_START               0x24    /* folder offset */
 #define CFI_START               0x2C    /* file offset */
+
+/* special cfile_t index values for multi-cabinet spanning */
+#define CFILE_INDEX_CONTINUED_FROM_PREV     0xFFFD
+#define CFILE_INDEX_CONTINUED_TO_NEXT       0xFFFE
+#define CFILE_INDEX_CONTINUED_PREV_AND_NEXT 0xFFFF
 
 typedef struct
 {
@@ -65,7 +73,7 @@ typedef struct
     guint16 res_header;
     guint8 res_folder;
     guint8 res_data;
-    guint8 *reserved;
+    GByteArray *reserved;
     gchar *cab_prev;
     gchar *disk_prev;
     gchar *cab_next;
@@ -76,7 +84,7 @@ typedef enum {
     CABINET_HEADER_PREV = 0x0001,
     CABINET_HEADER_NEXT = 0x0002,
     CABINET_HEADER_RESERVE = 0x0004,
-} CabinetHeaderFlags;
+} G_GNUC_FLAG_ENUM CabinetHeaderFlags;
 
 typedef struct
 {
@@ -145,17 +153,28 @@ void         cfile_free                         (cfile_t *cf);
 
 gboolean     cdata_write                        (cdata_t *cd,
                                                  GDataOutputStream *out,
-                                                 int type,
+                                                 gint type,
                                                  guint8 *data,
-                                                 size_t size,
+                                                 gsize size,
                                                  gsize *bytes_written,
                                                  GCancellable *cancellable,
                                                  GError **error);
-gboolean     cdata_read                         (cdata_t *cd,
+gboolean     cdata_read_part                    (cdata_t *cd,
                                                  guint8 res_data,
-                                                 gint comptype,
                                                  GDataInputStream *in,
+                                                 guint8 *buf,
+                                                 gsize buf_sz,
+                                                 guint16 *ncbytes,
+                                                 guint16 *nubytes,
                                                  GCancellable *cancellable,
+                                                 GError **error);
+gboolean     cdata_get_read_buf                  (cdata_t *cd,
+                                                 gint compression,
+                                                 guint8 **buf,
+                                                 gsize *buf_sz,
+                                                 GError **error);
+gboolean     cdata_decompress                    (cdata_t *cd,
+                                                 gint comptype,
                                                  GError **error);
 void         cdata_free                         (cdata_t *cd);
 void         cdata_clear_decomp                 (cdata_t *cd);
@@ -164,5 +183,3 @@ G_DEFINE_AUTOPTR_CLEANUP_FUNC(cfolder_t, cfolder_free)
 G_DEFINE_AUTOPTR_CLEANUP_FUNC(cfile_t, cfile_free)
 G_DEFINE_AUTOPTR_CLEANUP_FUNC(cheader_t, cheader_free)
 G_DEFINE_AUTOPTR_CLEANUP_FUNC(cdata_t, cdata_free)
-
-#endif /* CABINET_H */

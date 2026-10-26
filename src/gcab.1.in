@@ -13,7 +13,14 @@ Create the cabinet file CABFILE from the list of FILES.
 create a new cabinet archive
 .TP
 \fB\-x, --extract\fR
-extract files from a cabinet archive
+extract files from a cabinet archive. Extraction is refused if the archive
+would produce more than 4 GiB, or expand by more than 1024:1. Treat archives
+from untrusted sources with caution: extraction does not provide a sandbox,
+and symbolic-link checks in the target directory are best effort.
+.TP
+\fB\-\-max\-extract\-size=\fIN\fR
+refuse to extract more than \fIN\fR bytes (default 4 GiB; 0 disables the
+absolute limit)
 .TP
 \fB\-t, --list\fR
 list files of a cabinet archive

@@ -44,17 +44,23 @@ struct _GCabCabinet {
     cheader_t *cheader;
     GByteArray *signature;
     GInputStream *stream;
+    guint64 stream_size;
+    guint64 extract_size_limit;
+    guint64 extract_ratio_limit;
     guint8 allowed_compression;
+    gpointer next;
+    gpointer prev;
+    GPtrArray *chained;
 };
 
-enum {
-    PROP_0,
-
-    PROP_RESERVED,
+typedef enum {
+    PROP_RESERVED = 1,
     PROP_SIGNATURE,
-};
+} GCabCabinetProps;
 
-G_DEFINE_TYPE (GCabCabinet, gcab_cabinet, G_TYPE_OBJECT);
+static GParamSpec *props[PROP_SIGNATURE + 1] = { NULL, };
+
+G_DEFINE_FINAL_TYPE (GCabCabinet, gcab_cabinet, G_TYPE_OBJECT);
 
 GQuark
 gcab_error_quark (void)
@@ -66,6 +72,8 @@ static void
 gcab_cabinet_init (GCabCabinet *self)
 {
     self->allowed_compression = GCAB_COMPRESSION_MASK;
+    self->extract_size_limit = CAB_DEFAULT_MAX_EXTRACT_SIZE;
+    self->extract_ratio_limit = CAB_DEFAULT_MAX_EXTRACT_RATIO;
     self->folders = g_ptr_array_new_with_free_func (g_object_unref);
 }
 
@@ -74,6 +82,9 @@ gcab_cabinet_finalize (GObject *object)
 {
     GCabCabinet *self = GCAB_CABINET (object);
 
+    g_clear_weak_pointer (&self->next);
+    g_clear_weak_pointer (&self->prev);
+    g_clear_pointer (&self->chained, g_ptr_array_unref);
     cheader_free (self->cheader);
     g_ptr_array_unref (self->folders);
     if (self->reserved)
@@ -92,7 +103,7 @@ gcab_cabinet_set_property (GObject *object, guint prop_id, const GValue *value, 
     g_return_if_fail (GCAB_IS_CABINET (object));
     GCabCabinet *self = GCAB_CABINET (object);
 
-    switch (prop_id) {
+    switch ((GCabCabinetProps) prop_id) {
     case PROP_RESERVED:
         if (self->reserved)
             g_byte_array_unref (self->reserved);
@@ -103,9 +114,6 @@ gcab_cabinet_set_property (GObject *object, guint prop_id, const GValue *value, 
             g_byte_array_unref (self->signature);
         self->signature = g_value_dup_boxed (value);
         break;
-    default:
-        G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
-        break;
     }
 }
 
@@ -115,15 +123,12 @@ gcab_cabinet_get_property (GObject *object, guint prop_id, GValue *value, GParam
     g_return_if_fail (GCAB_IS_CABINET (object));
     GCabCabinet *self = GCAB_CABINET (object);
 
-    switch (prop_id) {
+    switch ((GCabCabinetProps) prop_id) {
     case PROP_RESERVED:
         g_value_set_boxed (value, self->reserved);
         break;
     case PROP_SIGNATURE:
         g_value_set_boxed (value, gcab_cabinet_get_signature (self, NULL, NULL));
-        break;
-    default:
-        G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
         break;
     }
 }
@@ -140,15 +145,15 @@ gcab_cabinet_class_init (GCabCabinetClass *klass)
     object_class->set_property = gcab_cabinet_set_property;
     object_class->get_property = gcab_cabinet_get_property;
 
-    g_object_class_install_property (object_class, PROP_RESERVED,
-         g_param_spec_boxed ("reserved", "Reserved", "Reserved",
-                            G_TYPE_BYTE_ARRAY,
-                            G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
+    props[PROP_RESERVED] = g_param_spec_boxed ("reserved", NULL, NULL,
+                                               G_TYPE_BYTE_ARRAY,
+                                               G_PARAM_READWRITE | G_PARAM_STATIC_NAME);
 
-    g_object_class_install_property (object_class, PROP_SIGNATURE,
-         g_param_spec_boxed ("signature", "Signature", "Signature",
-                            G_TYPE_BYTE_ARRAY,
-                            G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
+    props[PROP_SIGNATURE] = g_param_spec_boxed ("signature", NULL, NULL,
+                                                G_TYPE_BYTE_ARRAY,
+                                                G_PARAM_READWRITE | G_PARAM_STATIC_NAME);
+
+    g_object_class_install_properties (object_class, G_N_ELEMENTS (props), props);
 }
 
 /**
@@ -215,6 +220,8 @@ gcab_cabinet_get_folders (GCabCabinet *self)
 guint32
 gcab_cabinet_get_size (GCabCabinet *self)
 {
+    g_return_val_if_fail (GCAB_IS_CABINET (self), 0);
+
     if (self->cheader == NULL)
         return 0;
     return self->cheader->size;
@@ -278,7 +285,7 @@ gcab_cabinet_write (GCabCabinet *self,
     cdata_t block = { 0, };
     guint8 data[CAB_MAX_BLOCK_SIZE];
     gsize written;
-    size_t sumstr = 0;
+    gsize sumstr = 0;
     g_autoptr(GSList) files = NULL;
     GCabFile *prevf = NULL;
 
@@ -291,7 +298,7 @@ gcab_cabinet_write (GCabCabinet *self,
         cheader->res_header = self->reserved->len;
         cheader->res_folder = 0;
         cheader->res_data = 0;
-        cheader->reserved = self->reserved->data;
+        cheader->reserved = g_byte_array_ref (self->reserved);
     }
 
     files = gcab_folder_get_files (cabfolder);
@@ -421,6 +428,9 @@ gcab_cabinet_new (void)
 static gboolean
 gcab_cabinet_is_compression_allowed(GCabCabinet *self, GCabCompression compression)
 {
+    /* the cabinet folder stores compression-specific flags in the upper bits */
+    compression &= GCAB_COMPRESSION_MASK;
+
     /* for the fuzzing self tests */
     if (self->allowed_compression == 0)
         return TRUE;
@@ -442,15 +452,96 @@ void
 gcab_cabinet_add_allowed_compression (GCabCabinet *self, GCabCompression compression)
 {
     g_return_if_fail (GCAB_IS_CABINET (self));
-    g_return_if_fail (compression < GCAB_COMPRESSION_MASK);
+    g_return_if_fail (compression >= 0 && compression < GCAB_COMPRESSION_MASK);
 
     /* clear all */
     if (self->allowed_compression == GCAB_COMPRESSION_MASK)
         self->allowed_compression = 0x0;
 
     /* enable this */
-    if (g_getenv ("GCAB_SKIP_COMPRESSION_CHECK") == NULL)
-        self->allowed_compression |= 1ull << compression;
+#ifdef GCAB_ENABLE_TEST_ENV
+    if (g_getenv ("GCAB_SKIP_COMPRESSION_CHECK") != NULL)
+        return;
+#endif
+    self->allowed_compression |= 1ull << compression;
+}
+
+/**
+ * gcab_cabinet_set_extract_size_limit:
+ * @cabinet: a #GCabCabinet
+ * @limit: maximum number of bytes to write while extracting, or 0 for no limit
+ *
+ * Set an upper bound on the total number of uncompressed bytes written by
+ * gcab_cabinet_extract().  The default is 4 GiB.  This limits decompression
+ * bombs and runaway extraction into memory or disk.  Set @limit to 0 to
+ * disable the absolute limit and rely only on the ratio limit.
+ *
+ * Since: 1.7
+ **/
+void
+gcab_cabinet_set_extract_size_limit (GCabCabinet *self,
+                                     guint64 limit)
+{
+    g_return_if_fail (GCAB_IS_CABINET (self));
+
+    self->extract_size_limit = limit;
+}
+
+/**
+ * gcab_cabinet_get_extract_size_limit:
+ * @cabinet: a #GCabCabinet
+ *
+ * Get the maximum number of bytes written during extraction.
+ *
+ * Returns: the limit in bytes, or 0 if unlimited
+ *
+ * Since: 1.7
+ **/
+guint64
+gcab_cabinet_get_extract_size_limit (GCabCabinet *self)
+{
+    g_return_val_if_fail (GCAB_IS_CABINET (self), 0);
+
+    return self->extract_size_limit;
+}
+
+/**
+ * gcab_cabinet_set_extract_ratio_limit:
+ * @cabinet: a #GCabCabinet
+ * @limit: maximum uncompressed-to-compressed ratio, or 0 for no limit
+ *
+ * Set an upper bound on the ratio between bytes written during extraction
+ * and the size of the cabinet set.  The default is 1024.  A low ratio
+ * catches archives that expand far beyond their on-disk size.  Set @limit
+ * to 0 to disable the ratio limit.
+ *
+ * Since: 1.7
+ **/
+void
+gcab_cabinet_set_extract_ratio_limit (GCabCabinet *self,
+                                      guint64 limit)
+{
+    g_return_if_fail (GCAB_IS_CABINET (self));
+
+    self->extract_ratio_limit = limit;
+}
+
+/**
+ * gcab_cabinet_get_extract_ratio_limit:
+ * @cabinet: a #GCabCabinet
+ *
+ * Get the maximum uncompressed-to-compressed extraction ratio.
+ *
+ * Returns: the ratio limit, or 0 if unlimited
+ *
+ * Since: 1.7
+ **/
+guint64
+gcab_cabinet_get_extract_ratio_limit (GCabCabinet *self)
+{
+    g_return_val_if_fail (GCAB_IS_CABINET (self), 0);
+
+    return self->extract_ratio_limit;
 }
 
 /**
@@ -488,10 +579,8 @@ gcab_cabinet_load (GCabCabinet *self,
         return FALSE;
 
     if (cheader->reserved != NULL) {
-        g_autoptr(GByteArray) blob = NULL;
-        blob = g_byte_array_new_take (cheader->reserved, cheader->res_header);
-        g_object_set (self, "reserved", blob, NULL);
-        cheader->reserved = NULL;
+        g_object_set (self, "reserved", cheader->reserved, NULL);
+        g_clear_pointer (&cheader->reserved, g_byte_array_unref);
     }
 
     for (guint i = 0; i < cheader->nfolders; i++) {
@@ -528,13 +617,26 @@ gcab_cabinet_load (GCabCabinet *self,
         if (!cfile_read (cfile, in, cancellable, error))
             return FALSE;
 
-        if (cfile->index >= self->folders->len) {
+        guint16 folder_index = cfile->index;
+        switch (folder_index) {
+        case CFILE_INDEX_CONTINUED_FROM_PREV:
+            folder_index = 0;
+            break;
+        case CFILE_INDEX_CONTINUED_TO_NEXT:
+        case CFILE_INDEX_CONTINUED_PREV_AND_NEXT:
+            folder_index = self->folders->len - 1;
+            break;
+        default:
+            break;
+        }
+
+        if (folder_index >= self->folders->len) {
             g_set_error (error, GCAB_ERROR, GCAB_ERROR_FORMAT,
                          "Invalid folder index");
             return FALSE;
         }
 
-        GCabFolder *folder = g_ptr_array_index (self->folders, cfile->index);
+        GCabFolder *folder = g_ptr_array_index (self->folders, folder_index);
         if (folder == NULL) {
             g_set_error (error, GCAB_ERROR, GCAB_ERROR_FORMAT,
                          "Invalid folder pointer");
@@ -548,6 +650,369 @@ gcab_cabinet_load (GCabCabinet *self,
 
     self->stream = g_object_ref (stream);
     self->cheader = g_steal_pointer (&cheader);
+
+    if (G_IS_SEEKABLE (stream)) {
+        GSeekable *seekable = G_SEEKABLE (stream);
+        goffset position = g_seekable_tell (seekable);
+
+        if (position >= 0 &&
+            g_seekable_seek (seekable, 0, G_SEEK_END, NULL, NULL)) {
+            goffset end = g_seekable_tell (seekable);
+
+            if (end >= 0)
+                self->stream_size = end;
+            g_seekable_seek (seekable, position, G_SEEK_SET, NULL, NULL);
+        }
+    }
+
+    return TRUE;
+}
+
+static gboolean
+cabinet_name_is_valid (const gchar *name)
+{
+    if (name == NULL || name[0] == '\0')
+        return FALSE;
+    if (g_strcmp0 (name, ".") == 0 || g_strcmp0 (name, "..") == 0)
+        return FALSE;
+    if (strchr (name, '/') != NULL || strchr (name, '\\') != NULL)
+        return FALSE;
+    return TRUE;
+}
+
+static GCabCabinet *
+cabinet_load_from_file (GFile *file,
+                        GCancellable *cancellable,
+                        GError **error)
+{
+    g_autoptr(GInputStream) stream = G_INPUT_STREAM (g_file_read (file, cancellable, error));
+    if (stream == NULL)
+        return NULL;
+
+    GCabCabinet *cabinet = gcab_cabinet_new ();
+    if (!gcab_cabinet_load (cabinet, stream, cancellable, error)) {
+        g_object_unref (cabinet);
+        return NULL;
+    }
+
+    return cabinet;
+}
+
+/**
+ * gcab_cabinet_load_from_file:
+ * @cabinet: a #GCabCabinet
+ * @file: a #GFile to load
+ * @cancellable: (allow-none): optional #GCancellable object,
+ *     %NULL to ignore
+ * @error: (allow-none): #GError to set on error, or %NULL
+ *
+ * Load a cabinet archive from @file. If the cabinet references
+ * adjacent cabinets in a multi-cabinet set, they are automatically
+ * loaded and chained from the same directory.
+ *
+ * Returns: %TRUE on success
+ *
+ * Since: 1.7
+ **/
+gboolean
+gcab_cabinet_load_from_file (GCabCabinet *self,
+                             GFile *file,
+                             GCancellable *cancellable,
+                             GError **error)
+{
+    g_return_val_if_fail (GCAB_IS_CABINET (self), FALSE);
+    g_return_val_if_fail (G_IS_FILE (file), FALSE);
+    g_return_val_if_fail (!cancellable || G_IS_CANCELLABLE (cancellable), FALSE);
+    g_return_val_if_fail (!error || *error == NULL, FALSE);
+
+    g_autoptr(GInputStream) stream = G_INPUT_STREAM (g_file_read (file, cancellable, error));
+    if (stream == NULL)
+        return FALSE;
+
+    if (!gcab_cabinet_load (self, stream, cancellable, error))
+        return FALSE;
+
+    g_autoptr(GFile) parent = g_file_get_parent (file);
+    if (parent == NULL)
+        return TRUE;
+
+    g_autoptr(GHashTable) visited = g_hash_table_new_full (g_file_hash,
+                                                           (GEqualFunc) g_file_equal,
+                                                           g_object_unref, NULL);
+    g_hash_table_add (visited, g_object_ref (file));
+
+    GCabCabinet *cur = self;
+    while (TRUE) {
+        const gchar *next_name = gcab_cabinet_get_next_name (cur);
+        if (next_name == NULL)
+            break;
+
+        if (!cabinet_name_is_valid (next_name)) {
+            g_set_error (error, GCAB_ERROR, GCAB_ERROR_FORMAT,
+                         "Invalid next cabinet name '%s'", next_name);
+            return FALSE;
+        }
+
+        g_autoptr(GFile) next_file = g_file_get_child (parent, next_name);
+        if (!g_file_query_exists (next_file, cancellable))
+            break;
+
+        if (g_hash_table_contains (visited, next_file)) {
+            g_set_error (error, GCAB_ERROR, GCAB_ERROR_FORMAT,
+                         "Cyclic cabinet chain detected at '%s'", next_name);
+            return FALSE;
+        }
+
+        g_autoptr(GCabCabinet) next_cab = cabinet_load_from_file (next_file, cancellable, error);
+        if (next_cab == NULL)
+            return FALSE;
+
+        if (next_cab->cheader->setID != cur->cheader->setID ||
+            next_cab->cheader->cabID != (guint16) (cur->cheader->cabID + 1)) {
+            g_set_error (error, GCAB_ERROR, GCAB_ERROR_FORMAT,
+                         "Cabinet '%s' is not the next cabinet in the set", next_name);
+            return FALSE;
+        }
+
+        g_hash_table_add (visited, g_object_ref (next_file));
+
+        gcab_cabinet_set_next (cur, next_cab);
+        gcab_cabinet_set_prev (next_cab, cur);
+
+        if (self->chained == NULL)
+            self->chained = g_ptr_array_new_with_free_func (g_object_unref);
+        g_ptr_array_add (self->chained, g_object_ref (next_cab));
+
+        cur = next_cab;
+    }
+
+    cur = self;
+    while (TRUE) {
+        const gchar *prev_name = gcab_cabinet_get_prev_name (cur);
+        if (prev_name == NULL)
+            break;
+
+        if (!cabinet_name_is_valid (prev_name)) {
+            g_set_error (error, GCAB_ERROR, GCAB_ERROR_FORMAT,
+                         "Invalid previous cabinet name '%s'", prev_name);
+            return FALSE;
+        }
+
+        g_autoptr(GFile) prev_file = g_file_get_child (parent, prev_name);
+        if (!g_file_query_exists (prev_file, cancellable))
+            break;
+
+        if (g_hash_table_contains (visited, prev_file)) {
+            g_set_error (error, GCAB_ERROR, GCAB_ERROR_FORMAT,
+                         "Cyclic cabinet chain detected at '%s'", prev_name);
+            return FALSE;
+        }
+
+        g_autoptr(GCabCabinet) prev_cab = cabinet_load_from_file (prev_file, cancellable, error);
+        if (prev_cab == NULL)
+            return FALSE;
+
+        if (prev_cab->cheader->setID != cur->cheader->setID ||
+            prev_cab->cheader->cabID != (guint16) (cur->cheader->cabID - 1)) {
+            g_set_error (error, GCAB_ERROR, GCAB_ERROR_FORMAT,
+                         "Cabinet '%s' is not the previous cabinet in the set", prev_name);
+            return FALSE;
+        }
+
+        g_hash_table_add (visited, g_object_ref (prev_file));
+
+        gcab_cabinet_set_prev (cur, prev_cab);
+        gcab_cabinet_set_next (prev_cab, cur);
+
+        if (self->chained == NULL)
+            self->chained = g_ptr_array_new_with_free_func (g_object_unref);
+        g_ptr_array_add (self->chained, g_object_ref (prev_cab));
+
+        cur = prev_cab;
+    }
+
+    return TRUE;
+}
+
+static void
+folder_fragment_free (GCabFolderFragment *fragment)
+{
+    g_object_unref (fragment->data);
+    g_free (fragment);
+}
+
+static GPtrArray *
+gcab_cabinet_get_continuations (GCabCabinet *self)
+{
+    GPtrArray *fragments = g_ptr_array_new_with_free_func ((GDestroyNotify) folder_fragment_free);
+    GCabCabinet *cab = self->next;
+
+    while (cab != NULL && cab->stream != NULL && cab->cheader != NULL &&
+           (cab->cheader->flags & CABINET_HEADER_PREV)) {
+        GPtrArray *folders = cab->folders;
+        GCabFolder *folder;
+        cfolder_t *cfolder;
+        GDataInputStream *data;
+        GCabFolderFragment *fragment;
+
+        if (folders->len == 0)
+            break;
+
+        folder = g_ptr_array_index (folders, 0);
+        cfolder = gcab_folder_get_cfolder (folder);
+        if (cfolder == NULL)
+            break;
+
+        data = g_data_input_stream_new (cab->stream);
+        g_data_input_stream_set_byte_order (data, G_DATA_STREAM_BYTE_ORDER_LITTLE_ENDIAN);
+        g_filter_input_stream_set_close_base_stream (G_FILTER_INPUT_STREAM (data), FALSE);
+
+        fragment = g_new0 (GCabFolderFragment, 1);
+        fragment->data = data;
+        fragment->offsetdata = cfolder->offsetdata;
+        fragment->ndatab = cfolder->ndatab;
+        fragment->res_data = cab->cheader->res_data;
+        g_ptr_array_add (fragments, fragment);
+
+        /* Only the last folder of a cabinet can continue into the next one. */
+        if (folders->len != 1)
+            break;
+
+        cab = gcab_cabinet_get_next (cab);
+    }
+
+    return fragments;
+}
+
+G_GNUC_INTERNAL gboolean
+gcab_extract_check_limits (GCabExtractContext *ctx,
+                           guint64 count,
+                           GError **error)
+{
+    guint64 total;
+
+    if (count > G_MAXUINT64 - ctx->written) {
+        g_set_error (error, GCAB_ERROR, GCAB_ERROR_INVALID_DATA,
+                     "Extraction size overflow");
+        return FALSE;
+    }
+
+    total = ctx->written + count;
+
+    if (ctx->max_size != 0 && total > ctx->max_size) {
+        g_set_error (error, GCAB_ERROR, GCAB_ERROR_INVALID_DATA,
+                     "Extraction would exceed the configured size limit "
+                     "(%" G_GUINT64_FORMAT " bytes)", ctx->max_size);
+        return FALSE;
+    }
+
+    if (ctx->max_ratio != 0 && ctx->input_size != 0 &&
+        ctx->input_size <= G_MAXUINT64 / ctx->max_ratio &&
+        total > ctx->input_size * ctx->max_ratio) {
+        g_set_error (error, GCAB_ERROR, GCAB_ERROR_INVALID_DATA,
+                     "Extraction would exceed the configured compression "
+                     "ratio limit (%" G_GUINT64_FORMAT ":1)", ctx->max_ratio);
+        return FALSE;
+    }
+
+    return TRUE;
+}
+
+static gboolean
+gcab_cabinet_extract_prepare (GCabCabinet *first,
+                              GCabExtractContext *ctx,
+                              GError **error)
+{
+    guint64 declared = 0;
+    guint64 input_size = 0;
+    g_autoptr(GHashTable) visited = g_hash_table_new (g_direct_hash, g_direct_equal);
+
+    for (GCabCabinet *cab = first; cab != NULL; cab = cab->next) {
+        guint64 cab_size;
+
+        if (!g_hash_table_add (visited, cab)) {
+            g_set_error (error, GCAB_ERROR, GCAB_ERROR_FORMAT,
+                         "Cyclic cabinet chain detected");
+            return FALSE;
+        }
+
+        if (cab->cheader == NULL) {
+            g_set_error (error, GCAB_ERROR, GCAB_ERROR_FAILED,
+                         "Cabinet has not been loaded");
+            return FALSE;
+        }
+
+        cab_size = cab->stream_size != 0 ? cab->stream_size : cab->cheader->size;
+        if (cab_size > G_MAXUINT64 - input_size) {
+            g_set_error (error, GCAB_ERROR, GCAB_ERROR_INVALID_DATA,
+                         "Cabinet set size overflow");
+            return FALSE;
+        }
+        input_size += cab_size;
+
+        for (guint i = 0; i < cab->folders->len; i++) {
+            GCabFolder *folder = g_ptr_array_index (cab->folders, i);
+            g_autoptr(GSList) files = gcab_folder_get_files (folder);
+
+            for (GSList *l = files; l != NULL; l = l->next) {
+                GCabFile *file = GCAB_FILE (l->data);
+                guint64 usize;
+
+                if (gcab_file_is_continued_from_prev (file))
+                    continue;
+
+                usize = gcab_file_get_usize (file);
+                if (usize > G_MAXUINT64 - declared) {
+                    g_set_error (error, GCAB_ERROR, GCAB_ERROR_INVALID_DATA,
+                                 "Extraction size overflow");
+                    return FALSE;
+                }
+                declared += usize;
+            }
+        }
+    }
+
+    ctx->input_size = input_size;
+    ctx->written = 0;
+    return gcab_extract_check_limits (ctx, declared, error);
+}
+
+static gboolean
+gcab_cabinet_extract_one (GCabCabinet *self,
+                          GFile *path,
+                          GCabFileCallback file_callback,
+                          GFileProgressCallback progress_callback,
+                          GCabExtractContext *extract_ctx,
+                          gpointer user_data,
+                          GCancellable *cancellable,
+                          GError **error)
+{
+    /* never loaded from a stream */
+    if (self->cheader == NULL) {
+        g_set_error (error, GCAB_ERROR, GCAB_ERROR_FAILED,
+                     "Cabinet has not been loaded");
+        return FALSE;
+    }
+
+    g_autoptr(GDataInputStream) data = g_data_input_stream_new (self->stream);
+    g_data_input_stream_set_byte_order (data, G_DATA_STREAM_BYTE_ORDER_LITTLE_ENDIAN);
+    g_filter_input_stream_set_close_base_stream (G_FILTER_INPUT_STREAM (data), FALSE);
+
+    for (guint i = 0; i < self->folders->len; ++i) {
+        GCabFolder *folder = g_ptr_array_index (self->folders, i);
+        g_autoptr(GPtrArray) continuations = NULL;
+
+        if (i == self->folders->len - 1)
+            continuations = gcab_cabinet_get_continuations (self);
+
+        if (!gcab_folder_extract (folder, data, path, self->cheader->res_data,
+                                  continuations,
+                                  file_callback, progress_callback, extract_ctx,
+                                  user_data, cancellable, error)) {
+            return FALSE;
+        }
+    }
+
     return TRUE;
 }
 
@@ -565,8 +1030,22 @@ gcab_cabinet_load (GCabCabinet *self,
  *
  * Extract files to given path.
  *
+ * If @cabinet is part of a chained multi-cabinet set, all cabinets in the
+ * set are extracted, starting from the first cabinet.
+ *
  * If @path is NULL then the files are decompressed to memory blobs stored on
  * each #GCabFile.
+ *
+ * When extracting to a directory, @path must be controlled by the caller and
+ * must not be writable by untrusted users. Existing path components are
+ * checked for symbolic links on a best-effort basis, but this cannot prevent
+ * another process from replacing a component after it has been checked. For
+ * hostile archives, extract into a private directory or a sandbox.
+ *
+ * Extraction is limited to 4 GiB of output and an uncompressed-to-compressed
+ * ratio of 1024:1 by default, which prevents decompression bombs. Use
+ * gcab_cabinet_set_extract_size_limit() and
+ * gcab_cabinet_set_extract_ratio_limit() to change or disable the limits.
  *
  * Returns: %TRUE on success.
  **/
@@ -584,24 +1063,30 @@ gcab_cabinet_extract (GCabCabinet *self,
     g_return_val_if_fail (!cancellable || G_IS_CANCELLABLE (cancellable), FALSE);
     g_return_val_if_fail (!error || *error == NULL, FALSE);
 
-    /* never loaded from a stream */
-    if (self->cheader == NULL) {
-        g_set_error (error, GCAB_ERROR, GCAB_ERROR_FAILED,
-                     "Cabinet has not been loaded");
+    GCabCabinet *first = self;
+    while (first->prev != NULL)
+        first = first->prev;
+
+    GCabExtractContext extract_ctx = {
+        .max_size = self->extract_size_limit,
+        .max_ratio = self->extract_ratio_limit,
+    };
+
+    if (!gcab_cabinet_extract_prepare (first, &extract_ctx, error))
         return FALSE;
-    }
 
-    g_autoptr(GDataInputStream) data = g_data_input_stream_new (self->stream);
-    g_data_input_stream_set_byte_order (data, G_DATA_STREAM_BYTE_ORDER_LITTLE_ENDIAN);
-    g_filter_input_stream_set_close_base_stream (G_FILTER_INPUT_STREAM (data), FALSE);
-
-    for (guint i = 0; i < self->folders->len; ++i) {
-        GCabFolder *folder = g_ptr_array_index (self->folders, i);
-        if (!gcab_folder_extract (folder, data, path, self->cheader->res_data,
-                                  file_callback, progress_callback, user_data,
-                                  cancellable, error)) {
+    g_autoptr(GHashTable) visited = g_hash_table_new (g_direct_hash, g_direct_equal);
+    for (GCabCabinet *cab = first; cab != NULL; cab = cab->next) {
+        if (!g_hash_table_add (visited, cab)) {
+            g_set_error (error, GCAB_ERROR, GCAB_ERROR_FORMAT,
+                         "Cyclic cabinet chain detected");
             return FALSE;
         }
+
+        if (!gcab_cabinet_extract_one (cab, path, file_callback,
+                                       progress_callback, &extract_ctx,
+                                       user_data, cancellable, error))
+            return FALSE;
     }
 
     return TRUE;
@@ -620,6 +1105,9 @@ gcab_cabinet_extract (GCabCabinet *self,
  *
  * Extract files to given path.
  *
+ * See gcab_cabinet_extract() for the security considerations when extracting
+ * to a directory.
+ *
  * Returns: %TRUE on success.
  **/
 gboolean
@@ -631,6 +1119,130 @@ gcab_cabinet_extract_simple (GCabCabinet *cabinet,
                              GError **error)
 {
     return gcab_cabinet_extract (cabinet, path, file_callback, NULL, user_data, cancellable, error);
+}
+
+/**
+ * gcab_cabinet_get_next_name:
+ * @cabinet: a #GCabCabinet
+ *
+ * Get the filename of the next cabinet in a multi-cabinet set, as stored
+ * in the cabinet header, or %NULL if this is the last cabinet.
+ *
+ * Since: 1.7
+ *
+ * Returns: (nullable): the next cabinet filename, or %NULL
+ **/
+const gchar *
+gcab_cabinet_get_next_name (GCabCabinet *self)
+{
+    g_return_val_if_fail (GCAB_IS_CABINET (self), NULL);
+
+    if (self->cheader == NULL)
+        return NULL;
+    return self->cheader->cab_next;
+}
+
+/**
+ * gcab_cabinet_get_prev_name:
+ * @cabinet: a #GCabCabinet
+ *
+ * Get the filename of the previous cabinet in a multi-cabinet set, as stored
+ * in the cabinet header, or %NULL if this is the first cabinet.
+ *
+ * Since: 1.7
+ *
+ * Returns: (nullable): the previous cabinet filename, or %NULL
+ **/
+const gchar *
+gcab_cabinet_get_prev_name (GCabCabinet *self)
+{
+    g_return_val_if_fail (GCAB_IS_CABINET (self), NULL);
+
+    if (self->cheader == NULL)
+        return NULL;
+    return self->cheader->cab_prev;
+}
+
+/**
+ * gcab_cabinet_get_next:
+ * @cabinet: a #GCabCabinet
+ *
+ * Get the next cabinet in a multi-cabinet set, or %NULL if not set.
+ * Use gcab_cabinet_set_next() or gcab_cabinet_load_from_file() to set up
+ * the chain.
+ *
+ * Since: 1.7
+ *
+ * Returns: (transfer none) (nullable): the next #GCabCabinet, or %NULL
+ **/
+GCabCabinet *
+gcab_cabinet_get_next (GCabCabinet *self)
+{
+    g_return_val_if_fail (GCAB_IS_CABINET (self), NULL);
+    return self->next;
+}
+
+/**
+ * gcab_cabinet_get_prev:
+ * @cabinet: a #GCabCabinet
+ *
+ * Get the previous cabinet in a multi-cabinet set, or %NULL if not set.
+ * Use gcab_cabinet_set_prev() or gcab_cabinet_load_from_file() to set up
+ * the chain.
+ *
+ * Since: 1.7
+ *
+ * Returns: (transfer none) (nullable): the previous #GCabCabinet, or %NULL
+ **/
+GCabCabinet *
+gcab_cabinet_get_prev (GCabCabinet *self)
+{
+    g_return_val_if_fail (GCAB_IS_CABINET (self), NULL);
+    return self->prev;
+}
+
+/**
+ * gcab_cabinet_set_next:
+ * @cabinet: a #GCabCabinet
+ * @next: (nullable): the next #GCabCabinet in the set, or %NULL
+ *
+ * Set the next cabinet in a multi-cabinet set.  When set, extraction
+ * of files that span into the next cabinet (CONTINUED_TO_NEXT) will
+ * automatically continue reading data from @next.
+ *
+ * The reference is weak: @next is not kept alive by @cabinet.
+ *
+ * Since: 1.7
+ **/
+void
+gcab_cabinet_set_next (GCabCabinet *self, GCabCabinet *next)
+{
+    g_return_if_fail (GCAB_IS_CABINET (self));
+    g_return_if_fail (next == NULL || GCAB_IS_CABINET (next));
+
+    g_set_weak_pointer (&self->next, next);
+}
+
+/**
+ * gcab_cabinet_set_prev:
+ * @cabinet: a #GCabCabinet
+ * @prev: (nullable): the previous #GCabCabinet in the set, or %NULL
+ *
+ * Set the previous cabinet in a multi-cabinet set.  When set, extraction
+ * of files that span from the previous cabinet (CONTINUED_FROM_PREV)
+ * will automatically start reading data from @prev.
+ *
+ * The reference is weak: @prev is not kept alive by @cabinet.
+ *
+ * Since: 1.7
+ **/
+void
+gcab_cabinet_set_prev (GCabCabinet *self, GCabCabinet *prev)
+{
+    g_return_if_fail (GCAB_IS_CABINET (self));
+    g_return_if_fail (prev == NULL || GCAB_IS_CABINET (prev));
+
+    g_set_weak_pointer (&self->prev, prev);
 }
 
 /**
@@ -652,7 +1264,9 @@ gcab_cabinet_get_signature (GCabCabinet *self,
                             GError **error)
 {
     const guint8 magic[] = { 0x00, 0x00, 0x10, 0x00 };
+    g_autoptr(GByteArray) signature = NULL;
     gssize sz;
+    goffset end;
     guint8 *reserved;
     guint32 offset;
     guint32 size;
@@ -688,27 +1302,45 @@ gcab_cabinet_get_signature (GCabCabinet *self,
     if (g_getenv ("GCAB_DEBUG"))
         g_debug ("signature offset: %u size: %u", offset, size);
 
-    self->signature = g_byte_array_sized_new (size);
-    g_byte_array_set_size (self->signature, size);
+    if (!g_seekable_seek (G_SEEKABLE (self->stream), 0, G_SEEK_END,
+                          cancellable, error)) {
+        g_prefix_error (error, "Cannot seek to end of cabinet: ");
+        return NULL;
+    }
+    end = g_seekable_tell (G_SEEKABLE (self->stream));
+    if (end < 0) {
+        g_set_error (error, GCAB_ERROR, GCAB_ERROR_INVALID_DATA,
+                     "Cannot determine cabinet size");
+        return NULL;
+    }
+    if (offset > (guint64) end || size > (guint64) end - offset) {
+        g_set_error (error, GCAB_ERROR, GCAB_ERROR_INVALID_DATA,
+                     "Signature offset and size are outside the cabinet");
+        return NULL;
+    }
 
-    if (!g_seekable_seek (G_SEEKABLE (self->stream), offset, G_SEEK_SET, cancellable, error)) {
+    if (!g_seekable_seek (G_SEEKABLE (self->stream), offset, G_SEEK_SET,
+                          cancellable, error)) {
         g_set_error (error, GCAB_ERROR, GCAB_ERROR_INVALID_DATA,
                      "Cannot seek to reserved area");
         return NULL;
     }
 
-    sz = g_input_stream_read (self->stream,
-                              self->signature->data, self->signature->len,
+    signature = g_byte_array_sized_new (size);
+    g_byte_array_set_size (signature, size);
+
+    sz = g_input_stream_read (self->stream, signature->data, signature->len,
                               cancellable, error);
     if (sz < 0) {
         g_prefix_error (error, "Failed to read signature from stream: ");
         return NULL;
     }
-    if (sz != self->signature->len) {
+    if (sz != signature->len) {
         g_set_error (error, GCAB_ERROR, GCAB_ERROR_FAILED,
                      "Failed to read correct size signature from stream: ");
         return NULL;
     }
 
+    self->signature = g_steal_pointer (&signature);
     return self->signature;
 }

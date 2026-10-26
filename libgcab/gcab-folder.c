@@ -56,15 +56,15 @@ struct _GCabFolder
     cfolder_t *cfolder;
 };
 
-enum {
-    PROP_0,
-
-    PROP_COMPRESSION,
+typedef enum {
+    PROP_COMPRESSION = 1,
     PROP_COMPTYPE,
-    PROP_RESERVED
-};
+    PROP_RESERVED,
+} GCabFolderProps;
 
-G_DEFINE_TYPE (GCabFolder, gcab_folder, G_TYPE_OBJECT);
+static GParamSpec *props[PROP_RESERVED + 1] = { NULL, };
+
+G_DEFINE_FINAL_TYPE (GCabFolder, gcab_folder, G_TYPE_OBJECT);
 
 static void
 gcab_folder_init (GCabFolder *self)
@@ -93,7 +93,7 @@ gcab_folder_set_property (GObject *object, guint prop_id, const GValue *value, G
     g_return_if_fail (GCAB_IS_FOLDER (object));
     GCabFolder *self = GCAB_FOLDER (object);
 
-    switch (prop_id) {
+    switch ((GCabFolderProps) prop_id) {
     case PROP_COMPTYPE:
         self->comptype = g_value_get_int (value);
         break;
@@ -102,8 +102,8 @@ gcab_folder_set_property (GObject *object, guint prop_id, const GValue *value, G
             g_byte_array_unref (self->reserved);
         self->reserved = g_value_dup_boxed (value);
         break;
-    default:
-        G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
+    case PROP_COMPRESSION:
+        g_assert_not_reached ();
         break;
     }
 }
@@ -114,7 +114,7 @@ gcab_folder_get_property (GObject *object, guint prop_id, GValue *value, GParamS
     g_return_if_fail (GCAB_IS_FOLDER (object));
     GCabFolder *self = GCAB_FOLDER (object);
 
-    switch (prop_id) {
+    switch ((GCabFolderProps) prop_id) {
     case PROP_COMPRESSION:
         g_value_set_enum (value, self->comptype & GCAB_COMPRESSION_MASK);
         break;
@@ -123,9 +123,6 @@ gcab_folder_get_property (GObject *object, guint prop_id, GValue *value, GParamS
         break;
     case PROP_RESERVED:
         g_value_set_boxed (value, self->reserved);
-        break;
-    default:
-        G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
         break;
     }
 }
@@ -139,22 +136,19 @@ gcab_folder_class_init (GCabFolderClass *klass)
     object_class->set_property = gcab_folder_set_property;
     object_class->get_property = gcab_folder_get_property;
 
-    g_object_class_install_property (object_class, PROP_COMPRESSION,
-        g_param_spec_enum ("compression", "compression", "compression",
-                           GCAB_TYPE_COMPRESSION, 0,
-                           G_PARAM_READABLE |
-                           G_PARAM_STATIC_STRINGS));
+    props[PROP_COMPRESSION] = g_param_spec_enum ("compression", NULL, NULL,
+                                                 GCAB_TYPE_COMPRESSION, 0,
+                                                 G_PARAM_READABLE | G_PARAM_STATIC_NAME);
 
-    g_object_class_install_property (object_class, PROP_COMPTYPE,
-        g_param_spec_int ("comptype", "comptype", "comptype",
-                          0, G_MAXINT, 0,
-                          G_PARAM_CONSTRUCT_ONLY | G_PARAM_READWRITE |
-                          G_PARAM_STATIC_STRINGS));
+    props[PROP_COMPTYPE] = g_param_spec_int ("comptype", NULL, NULL,
+                                             0, G_MAXINT, 0,
+                                             G_PARAM_CONSTRUCT_ONLY | G_PARAM_READWRITE | G_PARAM_STATIC_NAME);
 
-    g_object_class_install_property (object_class, PROP_RESERVED,
-         g_param_spec_boxed ("reserved", "Reserved", "Reserved",
-                            G_TYPE_BYTE_ARRAY,
-                            G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
+    props[PROP_RESERVED] = g_param_spec_boxed ("reserved", NULL, NULL,
+                                               G_TYPE_BYTE_ARRAY,
+                                               G_PARAM_READWRITE | G_PARAM_STATIC_NAME);
+
+    g_object_class_install_properties (object_class, G_N_ELEMENTS (props), props);
 
 }
 
@@ -171,6 +165,8 @@ gcab_folder_class_init (GCabFolderClass *klass)
 gint
 gcab_folder_get_comptype (GCabFolder *self)
 {
+    g_return_val_if_fail (GCAB_IS_FOLDER (self), 0);
+
     return self->comptype;
 }
 
@@ -272,7 +268,7 @@ gcab_folder_add_file (GCabFolder *self, GCabFile *file,
     if (gfile) {
         g_return_val_if_fail (G_IS_FILE (gfile), FALSE);
 
-        g_autoptr(GFileInfo) info = g_file_query_info (gfile, FILE_ATTRS, 0, NULL, error);
+        g_autoptr(GFileInfo) info = g_file_query_info (gfile, FILE_ATTRS, G_FILE_QUERY_INFO_NONE, NULL, error);
         if (info == NULL)
             return FALSE;
 
@@ -384,6 +380,13 @@ gcab_folder_get_file_by_name (GCabFolder *self, const gchar *name)
     return NULL;
 }
 
+G_GNUC_INTERNAL cfolder_t *
+gcab_folder_get_cfolder (GCabFolder *self)
+{
+    g_return_val_if_fail (GCAB_IS_FOLDER (self), NULL);
+    return self->cfolder;
+}
+
 static gint
 sort_by_offset (GCabFile *a, GCabFile *b)
 {
@@ -393,13 +396,119 @@ sort_by_offset (GCabFile *a, GCabFile *b)
     return (gint64) gcab_file_get_uoffset (a) - (gint64) gcab_file_get_uoffset (b);
 }
 
+typedef struct {
+    GPtrArray *continuations;
+    guint next_continuation;
+    GDataInputStream *data;
+    guint8 res_data;
+    guint32 offsetdata;
+    guint16 blocks_left;
+} GCabFolderReader;
+
+static void
+folder_reader_init (GCabFolderReader *reader,
+                    GCabFolder *folder,
+                    GDataInputStream *data,
+                    guint8 res_data,
+                    GPtrArray *continuations)
+{
+    reader->continuations = continuations;
+    reader->next_continuation = 0;
+    reader->data = data;
+    reader->res_data = res_data;
+    reader->offsetdata = folder->cfolder->offsetdata;
+    reader->blocks_left = folder->cfolder->ndatab;
+}
+
+static gboolean
+folder_reader_ensure_fragment (GCabFolderReader *reader,
+                               GCancellable *cancellable,
+                               GError **error)
+{
+    while (reader->blocks_left == 0) {
+        GCabFolderFragment *fragment;
+
+        if (reader->continuations == NULL ||
+            reader->next_continuation >= reader->continuations->len) {
+            g_set_error (error, GCAB_ERROR, GCAB_ERROR_INVALID_DATA,
+                         "Cabinet set ended in the middle of a folder");
+            return FALSE;
+        }
+
+        fragment = g_ptr_array_index (reader->continuations,
+                                      reader->next_continuation++);
+        reader->data = fragment->data;
+        reader->res_data = fragment->res_data;
+        reader->offsetdata = fragment->offsetdata;
+        reader->blocks_left = fragment->ndatab;
+
+        if (!g_seekable_seek (G_SEEKABLE (reader->data), reader->offsetdata,
+                              G_SEEK_SET, cancellable, error))
+            return FALSE;
+    }
+
+    return TRUE;
+}
+
+static gboolean
+folder_reader_read_cdata (GCabFolderReader *reader,
+                          GCabFolder *folder,
+                          cdata_t *cdata,
+                          GCancellable *cancellable,
+                          GError **error)
+{
+    guint8 *buf = NULL;
+    gsize buf_sz = 0;
+    gsize total_ncbytes = 0;
+    guint16 total_nubytes = 0;
+
+    if (!cdata_get_read_buf (cdata, folder->comptype & GCAB_COMPRESSION_MASK,
+                             &buf, &buf_sz, error))
+        return FALSE;
+
+    while (TRUE) {
+        guint16 ncbytes = 0, nubytes = 0;
+
+        if (!folder_reader_ensure_fragment (reader, cancellable, error))
+            return FALSE;
+
+        if (!cdata_read_part (cdata, reader->res_data, reader->data,
+                              buf + total_ncbytes, buf_sz - total_ncbytes,
+                              &ncbytes, &nubytes, cancellable, error))
+            return FALSE;
+
+        total_ncbytes += ncbytes;
+        reader->blocks_left--;
+
+        if (nubytes != 0) {
+            total_nubytes = nubytes;
+            break;
+        }
+    }
+
+    if (total_nubytes > CAB_MAX_BLOCK_SIZE) {
+        g_set_error (error, GCAB_ERROR, GCAB_ERROR_INVALID_DATA,
+                     "CDATA block of %" G_GUINT16_FORMAT " bytes "
+                     "was bigger than maximum size %i",
+                     total_nubytes, CAB_MAX_BLOCK_SIZE);
+        return FALSE;
+    }
+
+    cdata->ncbytes = (guint16) total_ncbytes;
+    cdata->nubytes = total_nubytes;
+
+    return cdata_decompress (cdata, folder->comptype, error);
+}
+
 G_GNUC_INTERNAL gboolean
 gcab_folder_extract (GCabFolder *self,
                      GDataInputStream *data,
                      GFile *path_extract,
                      guint8 res_data,
+                     GPtrArray *continuations,
                      GCabFileCallback file_callback,
                      GFileProgressCallback progress_callback,
+                     GCabExtractContext *extract_ctx,
                      gpointer callback_data,
                      GCancellable *cancellable,
                      GError **error)
@@ -407,8 +516,10 @@ gcab_folder_extract (GCabFolder *self,
     GSList *f = NULL;
     g_autoptr(GSList) files = NULL;
     g_autoptr(cdata_t) cdata = g_new0 (cdata_t, 1);
-    guint32 nubytes = 0;
-    guint8 *reserved;
+    GCabFolderReader reader;
+    guint64 nubytes = 0;
+    guint64 previous_end = 0;
+    gboolean have_previous = FALSE;
 
     /* never loaded from a stream */
     g_assert (self->cfolder != NULL);
@@ -416,24 +527,43 @@ gcab_folder_extract (GCabFolder *self,
     if (!g_seekable_seek (G_SEEKABLE (data), self->cfolder->offsetdata, G_SEEK_SET, cancellable, error))
         return FALSE;
 
-    files = g_slist_sort (g_slist_copy (self->files), (GCompareFunc)sort_by_offset);
+    folder_reader_init (&reader, self, data, res_data, continuations);
 
-    /* this is allocated for every block, but currently unused */
-    cdata->reserved = reserved = g_malloc (res_data);
+    files = g_slist_sort (g_slist_copy (self->files), (GCompareFunc)sort_by_offset);
 
     for (f = files; f != NULL; f = f->next) {
         GCabFile *file = f->data;
+
+        if (gcab_file_is_continued_from_prev (file))
+            continue;
+
+        if (gcab_file_is_continued_to_next (file) &&
+            (continuations == NULL || continuations->len == 0))
+            continue;
 
         if (file_callback && !file_callback (file, callback_data))
             continue;
 
         g_autoptr(GOutputStream) out = NULL;
+        guint64 usize = gcab_file_get_usize (file);
+        guint64 uoffset = gcab_file_get_uoffset (file);
+
+        /* Sorted, non-overlapping ranges are expected.  Allowing a file to
+         * overlap a previous one lets a tiny archive decompress the same data
+         * over and over again. */
+        if (usize > 0) {
+            if (have_previous && uoffset < previous_end) {
+                g_set_error (error, GCAB_ERROR, GCAB_ERROR_INVALID_DATA,
+                             "Overlapping file data in cabinet folder");
+                return FALSE;
+            }
+            previous_end = uoffset + usize;
+            have_previous = TRUE;
+        }
+
         out = gcab_file_get_output_stream (file, path_extract, cancellable, error);
         if (out == NULL)
             return FALSE;
-
-        guint32 usize = gcab_file_get_usize (file);
-        guint32 uoffset = gcab_file_get_uoffset (file);
 
         /* let's rewind if need be */
         if (uoffset < nubytes) {
@@ -441,26 +571,37 @@ gcab_folder_extract (GCabFolder *self,
                                   G_SEEK_SET, cancellable, error))
                 return FALSE;
             cdata_clear_decomp (cdata);
-            memset(cdata, 0x0, sizeof(cdata_t));
-            cdata->reserved = reserved;
+            memset (cdata, 0x0, sizeof(cdata_t));
             nubytes = 0;
+            folder_reader_init (&reader, self, data, res_data, continuations);
         }
 
         while (usize > 0) {
-            if ((nubytes + cdata->nubytes) <= uoffset) {
+            if (uoffset >= nubytes &&
+                cdata->nubytes <= uoffset - nubytes) {
                 nubytes += cdata->nubytes;
-                if (!cdata_read (cdata, res_data, self->comptype,
-                                 data, cancellable, error))
+                if (!folder_reader_read_cdata (&reader, self, cdata,
+                                               cancellable, error))
                     return FALSE;
                 continue;
             } else {
-                gsize offset = gcab_file_get_uoffset (file) > nubytes ?
-                    gcab_file_get_uoffset (file) - nubytes : 0;
-                const void *p = &cdata->out[offset];
-                gsize count = MIN (usize, cdata->nubytes - offset);
+                gsize offset, count;
+                const void *p;
+
+                if (!_gcab_folder_get_cdata_range (nubytes, uoffset, usize,
+                                                   cdata->nubytes, &offset, &count)) {
+                    g_set_error (error, GCAB_ERROR, GCAB_ERROR_INVALID_DATA,
+                                 "Invalid file offset in cabinet folder");
+                    return FALSE;
+                }
+
+                p = &cdata->out[offset];
+                if (!gcab_extract_check_limits (extract_ctx, count, error))
+                    return FALSE;
                 if (!g_output_stream_write_all (G_OUTPUT_STREAM (out), p, count,
                                                 NULL, cancellable, error))
                     return FALSE;
+                extract_ctx->written += count;
                 usize -= count;
                 uoffset += count;
             }
