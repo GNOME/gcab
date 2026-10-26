@@ -27,9 +27,15 @@ Security
 See `SECURITY.md` for how to report vulnerabilities.
 
 When extracting a cabinet to a directory, the destination must be controlled by
-the caller and must not be writable by untrusted users. Existing path
-components are checked for symbolic links on a best-effort basis, but this
-cannot prevent another process from replacing a component after it has been
+the caller and must not be writable by untrusted users. On Linux, extraction
+uses `openat2()` with `RESOLVE_BENEATH`, `RESOLVE_NO_SYMLINKS`, and
+`RESOLVE_NO_MAGICLINKS`, creating parent directories relative to an already
+opened directory handle. This prevents concurrent path or symlink replacement
+from redirecting writes outside the extraction directory.
+
+On other platforms, or when the kernel does not support `openat2()`, GCab
+falls back to `GFile` path checks. Those checks are best effort and cannot
+prevent another process from replacing a path component after it has been
 checked. For hostile archives, extract into a private directory or a sandbox.
 
 The GCAB_SKIP_CHECKSUM and GCAB_SKIP_COMPRESSION_CHECK overrides used by tests

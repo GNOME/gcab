@@ -70,6 +70,14 @@ GCabFolder *     gcab_folder_new_steal_cfolder       (cfolder_t **cfolder);
 GCabFile *       gcab_file_new_steal_cfile           (cfile_t   **cfile);
 
 gboolean         gcab_file_update_info               (GCabFile *file, GFileInfo *info);
+G_GNUC_INTERNAL gboolean _gcab_file_name_is_unsafe (const gchar *name);
+
+#if HAVE_OPENAT2
+G_GNUC_INTERNAL GOutputStream *gcab_file_get_output_stream_openat2 (GCabFile *file,
+                                                                     GFile *path_extract,
+                                                                     GError **error,
+                                                                     gboolean *fallback);
+#endif
 guint32          gcab_file_get_uoffset               (GCabFile *file);
 gboolean         gcab_file_set_uoffset               (GCabFile *file, guint32 uoffset);
 guint32          gcab_file_get_usize                 (GCabFile *file);

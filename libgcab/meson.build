@@ -39,6 +39,9 @@ libgcab_sources = [
   'cabinet.c',
   'decomp.c',
 ]
+if have_openat2
+  libgcab_sources += 'gcab-openat2.c'
+endif
 
 libgcab = library(
   'gcab-1.0',
@@ -49,7 +52,7 @@ libgcab = library(
   dependencies : [
     gio,
     libz,
-  ],
+  ] + gio_unix,
   c_args : cargs,
   include_directories : [
     include_directories('.'),
@@ -68,7 +71,7 @@ if get_option('libfuzzer')
     dependencies : [
       gio,
       libz,
-    ],
+    ] + gio_unix,
     c_args : cargs + fuzzing_cargs,
     include_directories : [
       include_directories('.'),

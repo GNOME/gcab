@@ -26,6 +26,8 @@ Bugfixes:
   - Allow clearing a GCabFile's GBytes with gcab_file_set_bytes (file, NULL)
   - Validate arguments in otherwise unchecked public getters
   - Validate the gcab --space value against the 16-bit cabinet header field
+  - On Linux, resolve and create extraction paths with openat2(), removing
+    the check-then-use window for symlink and path replacement attacks
   - Fix an undefined left shift in the Intel E8 post-processing path
   - Fix a leak when dumping the reserved area of an unsigned cabinet
 

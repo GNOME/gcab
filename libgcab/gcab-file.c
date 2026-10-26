@@ -591,7 +591,7 @@ _gcab_file_check_symlinks (GFile *file, GFile *path_extract, GError **error)
     return TRUE;
 }
 
-static gboolean
+G_GNUC_INTERNAL gboolean
 _gcab_file_name_is_unsafe (const gchar *name)
 {
     const gchar *p = name;
@@ -600,15 +600,11 @@ _gcab_file_name_is_unsafe (const gchar *name)
     if (p[0] == '\0')
         return TRUE;
 
-    /* UNC paths */
-    if (p[0] == '/' && p[1] == '/')
+    /* absolute paths, including UNC paths */
+    if (p[0] == '/')
         return TRUE;
 
     /* drive-letter paths, including drive-relative ones */
-    while (*p == '/')
-        p++;
-    if (*p == '\0')
-        return TRUE;
     return g_ascii_isalpha (p[0]) && p[1] == ':';
 }
 
@@ -629,31 +625,31 @@ gcab_file_get_output_stream (GCabFile *self,
                      "File has no extraction name");
         return NULL;
     }
+
+#if HAVE_OPENAT2
+    gboolean fallback = FALSE;
+    GOutputStream *secure_out =
+        gcab_file_get_output_stream_openat2 (self, path_extract, error, &fallback);
+    if (secure_out != NULL)
+        return secure_out;
+    if (!fallback)
+        return NULL;
+
+    g_debug ("openat2 is unavailable, falling back to best-effort extraction");
+#endif
+
     g_autofree gchar *fname = g_strdup (extract_name);
     g_strdelimit (fname, "\\", '/');
 
-    /* these are interpreted as absolute paths on Windows */
+    /* reject absolute, drive-letter, and empty paths */
     if (_gcab_file_name_is_unsafe (fname)) {
         g_set_error (error, GCAB_ERROR, GCAB_ERROR_INVALID_DATA,
                      "Invalid file path '%s'", fname);
         return NULL;
     }
 
-    /* "Rebase" the file in the given path, to ensure we never escape it */
-    g_autoptr(GFile) file = g_file_resolve_relative_path (path_extract, fname);
-    if (!g_file_has_prefix (file, path_extract)) {
-        g_autofree gchar *rawpath = g_file_get_path (file);
-        if (rawpath != NULL) {
-            gchar *newpath = rawpath;
-            while (*newpath != 0 && *newpath == G_DIR_SEPARATOR) {
-                newpath++;
-            }
-            g_autoptr(GFile) newfile = g_file_resolve_relative_path (path_extract, newpath);
-            g_set_object (&file, newfile);
-        }
-    }
-
     /* verify that the relative path could not escape the extraction directory */
+    g_autoptr(GFile) file = g_file_resolve_relative_path (path_extract, fname);
     if (!g_file_has_prefix (file, path_extract)) {
         g_set_error (error, GCAB_ERROR, GCAB_ERROR_INVALID_DATA,
                      "File path '%s' is outside the extraction directory", fname);

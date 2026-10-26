@@ -62,6 +62,10 @@ cmp input/hello.txt out-none/hello.txt
 cmp input/sub/world.txt out-none/world.txt
 test ! -s out-none/empty.txt || fail "empty file is not empty"
 
+# extracting over existing files must replace them
+"$GCAB" --extract --directory out-none archive-none.cab
+cmp input/hello.txt out-none/hello.txt
+
 # extraction must not escape the destination directory
 mkdir out-safe
 (

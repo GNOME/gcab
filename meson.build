@@ -106,10 +106,32 @@ add_project_link_arguments(
 gio = dependency('gio-2.0', version : '>= 2.88.0')
 libz = dependency('zlib')
 
+have_openat2 = false
+if host_machine.system() == 'linux'
+  have_openat2 = cc.links('''
+    #define _GNU_SOURCE
+    #include <sys/syscall.h>
+    #include <unistd.h>
+    #include <linux/openat2.h>
+    int main (void)
+    {
+      struct open_how how = {
+        .resolve = RESOLVE_BENEATH | RESOLVE_NO_SYMLINKS | RESOLVE_NO_MAGICLINKS,
+      };
+      return syscall (SYS_openat2, -1, ".", &how, sizeof (how)) == 0;
+    }
+  ''', name : 'openat2 syscall')
+endif
+
+gio_unix = []
+if have_openat2
+  gio_unix = [dependency('gio-unix-2.0')]
+endif
+
 gcab_deps = [
   gio,
   libz,
-]
+] + gio_unix
 
 gnome = import('gnome')
 i18n = import('i18n')
@@ -129,6 +151,7 @@ conf.set_quoted('PACKAGE_NAME', meson.project_name())
 conf.set_quoted('PACKAGE_STRING', package_string)
 conf.set_quoted('LOCALEDIR', join_paths(get_option('prefix'), get_option('localedir')))
 conf.set_quoted('PACKAGE_BUGREPORT', 'https://gitlab.gnome.org/GNOME/gcab/issues/new')
+conf.set10('HAVE_OPENAT2', have_openat2)
 configure_file(
   output : 'config.h',
   configuration : conf

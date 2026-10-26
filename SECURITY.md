@@ -21,16 +21,22 @@ stable release when practical. Older releases are not supported.
 ## Extraction threat model
 
 Cabinet archives are untrusted input. The library validates member paths,
-rejects absolute and drive-letter paths, refuses to follow symbolic links in
-existing extraction path components, and enforces configurable output-size and
-compression-ratio limits. It also rejects overlapping file ranges and invalid
-compressed data.
+rejects absolute, drive-letter, and parent-directory paths, and enforces
+configurable output-size and compression-ratio limits. It also rejects
+overlapping file ranges and invalid compressed data.
 
-These checks are best effort. When extracting an archive, the destination
-directory must be controlled by the caller and must not be writable by
-untrusted users. A concurrent attacker can replace a checked path component
-between validation and use, so extract hostile archives into a private
-directory or a sandbox.
+On Linux, extraction resolves and creates each path component relative to an
+already-open directory descriptor using
+`openat2(RESOLVE_BENEATH | RESOLVE_NO_SYMLINKS | RESOLVE_NO_MAGICLINKS)`. This
+prevents symbolic links and concurrent path replacement from redirecting writes
+outside the extraction directory. On other platforms, or when `openat2()` is
+unavailable, GCab uses `GFile` path checks, which are best effort.
+
+Even with `openat2()`, the destination directory must be controlled by the
+caller and must not be writable by untrusted users. An attacker with write
+access to the destination can still replace or rename extraction directories
+after they are created. For hostile archives, extract into a private directory
+or a sandbox.
 
 The `GCAB_SKIP_CHECKSUM` and `GCAB_SKIP_COMPRESSION_CHECK` environment
 overrides exist only for tests and fuzzing. They are compiled out unless the
