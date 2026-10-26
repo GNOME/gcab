@@ -88,6 +88,27 @@ build-werror:
     paths:
       - "_build/meson-logs/"
 
+build-mingw-wine:
+  stage: test
+  image:
+    name: quay.io/fedora/fedora:44
+  needs: []
+  variables:
+    WINEDEBUG: "-all"
+    WINEDLLOVERRIDES: "mscoree,mshtml="
+    WINEARCH: "win64"
+  before_script:
+    - dnf -y --setopt=install_weak_deps=False install meson ninja-build gcc mingw64-gcc mingw64-glib2 mingw64-zlib wine-core
+  script:
+    - meson setup _build_mingw --cross-file ci/mingw64-cross.ini -Ddocs=false -Dintrospection=false -Dvapi=false -Dnls=false -Dtest-env=true
+    - meson compile -C _build_mingw
+    - meson test -C _build_mingw --print-errorlogs
+  artifacts:
+    when: on_failure
+    expire_in: "7 days"
+    paths:
+      - "_build_mingw/meson-logs/"
+
 test-sanitizers:
   stage: test
   image:

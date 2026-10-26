@@ -19,7 +19,8 @@ Pass `-Dwerror=false` at setup time if a newer compiler emits diagnostics
 outside the project's control. The CI pipeline additionally runs the tests
 under AddressSanitizer and UndefinedBehaviorSanitizer, under Valgrind, with
 coverage reporting, and with clang-tidy. It also builds the release tarball
-and re-tests it from a clean extraction.
+and re-tests it from a clean extraction, and cross-compiles for Windows with
+MinGW and runs the full test suite under Wine.
 
 Security
 --------
