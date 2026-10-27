@@ -4,149 +4,165 @@
 # Wylmer Wang <wantinghard@gmail.com>, 2014.
 # D <damnedlies@163.com>, 2020.
 # Dingzhong Chen <wsxy162@gmail.com>, 2021.
+# lumingzh <lumingzh@qq.com>, 2026.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: gcab master\n"
 "Report-Msgid-Bugs-To: https://gitlab.gnome.org/GNOME/gcab/issues\n"
-"POT-Creation-Date: 2021-04-12 11:14+0000\n"
-"PO-Revision-Date: 2021-09-07 17:28-0400\n"
-"Last-Translator: Boyuan Yang <073plan@gmail.com>\n"
-"Language-Team: Chinese - China <i18n-zh@googlegroups.com>\n"
+"POT-Creation-Date: 2026-10-26 10:42+0000\n"
+"PO-Revision-Date: 2026-10-28 07:47+0800\n"
+"Last-Translator: lumingzh <lumingzh@qq.com>\n"
+"Language-Team: Chinese (China) <i18n-zh@googlegroups.com>\n"
 "Language: zh_CN\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: Poedit 3.0\n"
+"X-Generator: Gtranslator 51.0\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 
-#: src/gcab.c:82
+#: src/gcab.c:83
 msgid "Dumping data to:"
 msgstr "将数据转储到："
 
-#: src/gcab.c:114
+#: src/gcab.c:120
 msgid "Print program version"
 msgstr "打印程序版本"
 
-#: src/gcab.c:115
+#: src/gcab.c:121
 msgid "Be verbose"
 msgstr "详尽模式"
 
-#: src/gcab.c:116
+#: src/gcab.c:122
 msgid "Create archive"
 msgstr "创建归档文件"
 
-#: src/gcab.c:117
+#: src/gcab.c:123
 msgid "Extract all files"
 msgstr "提取所有文件"
 
-#: src/gcab.c:118
+#: src/gcab.c:125
+msgid "Refuse to extract more than N bytes (0 for unlimited)"
+msgstr "拒绝提取超过 N 字节的数据（0 为无限制）"
+
+#: src/gcab.c:125
+msgid "N"
+msgstr "N"
+
+#: src/gcab.c:126
 msgid "Dump reserved and extra data"
 msgstr "转储保留区额外数据"
 
-#: src/gcab.c:119
+#: src/gcab.c:127
 msgid "List content"
 msgstr "列出内容"
 
-#: src/gcab.c:120
+#: src/gcab.c:128
 msgid "List content with file details"
 msgstr "列出文件内容与其详细信息"
 
-#: src/gcab.c:121
+#: src/gcab.c:129
 msgid "Change to directory DIR"
 msgstr "切换到指定目录"
 
-#: src/gcab.c:121
+#: src/gcab.c:129
 msgid "DIR"
 msgstr "目录"
 
-#: src/gcab.c:122
+#: src/gcab.c:130
 msgid "Use zip compression"
 msgstr "使用 zip 压缩"
 
-#: src/gcab.c:123
+#: src/gcab.c:131
 msgid "Do not include path"
 msgstr "不包括路径"
 
-#: src/gcab.c:124
+#: src/gcab.c:132
 msgid "Reserve space in cabinet for signing (e.g. -s 6144 reserves 6K bytes)"
 msgstr "在 cabinet 中预留签名空间（例如 -s 6144 会预留 6K 字节）"
 
-#: src/gcab.c:125
+#: src/gcab.c:133
 msgid "FILE INPUT_FILES..."
 msgstr "文件 输入文件..."
 
-#: src/gcab.c:139
+#: src/gcab.c:144
 msgid "- create a Cabinet file"
 msgstr "- 创建 Cabinet 文件"
 
-#: src/gcab.c:140
+#: src/gcab.c:145
 msgid "Report bugs to:"
 msgstr "将错误报告到："
 
-#: src/gcab.c:142
+#: src/gcab.c:147
 msgid ""
 "gcab saves many files together into a cabinet archive, and can restore\n"
 "individual files from the archive."
 msgstr ""
-"gcab 可以将多个文件保存到一个 cabinet 归档文件内，还可以从归档文件中恢复单"
-"独的文件。"
+"gcab 可以将多个文件保存到一个 cabinet 归档文件内，还可以从归档文件中恢复单独"
+"的文件。"
 
-#: src/gcab.c:149
+#: src/gcab.c:154
 msgid "Option parsing failed"
 msgstr "解析选项失败"
 
-#: src/gcab.c:159
+#: src/gcab.c:164
 msgid "Please specify a single operation"
 msgstr "请只指定一项操作"
 
-#: src/gcab.c:164
+#: src/gcab.c:169
+msgid "Extraction size limit must not be negative"
+msgstr "提取大小限制不能为负值"
+
+#: src/gcab.c:174
+msgid "Reserved space must be between 0 and 65535 bytes"
+msgstr "保留空间必须在 0 到 65535 字节之间"
+
+#: src/gcab.c:179
 msgid "Cabinet file must be specified"
 msgstr "必须指定 cabinet 文件"
 
-#: src/gcab.c:180
-msgid "Cannot open file for reading"
-msgstr "无法打开文件以读取"
-
-#: src/gcab.c:184
+#: src/gcab.c:194
 msgid "Error reading"
 msgstr "读取时出错"
 
-#: src/gcab.c:206
+#: src/gcab.c:224
 msgid "<unknown-date>"
 msgstr "<未知日期>"
 
-#: src/gcab.c:219
+#: src/gcab.c:239
 msgid "Error during extraction"
 msgstr "提取时出错"
 
-#: src/gcab.c:234
+#: src/gcab.c:255
 msgid "Error while reading signature"
 msgstr "读取签名时出错"
 
-#: src/gcab.c:246
+#: src/gcab.c:267
 msgid "No input files specified"
 msgstr "未指定输入文件"
 
-#: src/gcab.c:265
+#: src/gcab.c:286
 msgid "Cannot add file"
 msgstr "无法添加文件"
 
-#: src/gcab.c:271
+#: src/gcab.c:292
 msgid "No files to be archived"
 msgstr "没有要归档的文件"
 
-#: src/gcab.c:279
+#: src/gcab.c:300
 msgid "Cannot create cab file"
 msgstr "无法创建 cab 文件"
 
-#: src/gcab.c:285
+#: src/gcab.c:306
 msgid "Cannot add folder to cab file"
 msgstr "无法向 cab 文件添加文件夹"
 
-#: src/gcab.c:295
+#: src/gcab.c:316
 msgid "Cannot write cab file"
 msgstr "无法写入 cab 文件"
+
+#~ msgid "Cannot open file for reading"
+#~ msgstr "无法打开文件以读取"
 
 #~ msgid "Removing leading '%s' from member names"
 #~ msgstr "正在移除成员名称开头的“%s”"
